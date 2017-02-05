@@ -1,0 +1,4 @@
+# Blocks the direct access via URL to this directory. This is made as a
+# protection feature for the files and directories here contained.
+Satisfy All
+Deny from All
