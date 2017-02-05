@@ -28,24 +28,38 @@ Options +FollowSymLinks
     # prefered one, however, if you want to use the other option, please
     # comment the following lines out.
     RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
-    RewriteRule .* http://%1%{REQUEST_URI} [R=301,L]
+    RewriteRule . http://%1%{REQUEST_URI} [R=301,L,QSA]
 
     # Option #2: Rewrite "domain.com" to "www.domain.com". If you want to use
     # this option, uncomment the following lines and don't forget to comment
     # the lines of the first option.
     #RewriteCond %{HTTP_HOST} !^www\..*$ [NC]
-    #RewriteRule .* http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+    #RewriteRule .* http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L,QSA]
 
     # Drop final slash of request. We must force, or at least try to force, a
     # page is accessible from one, and only one URL for SEO reasons.
-    RedirectMatch 301 ^(.+)/$ $1
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)/$ /$1 [R=301,L,QSA]
 
     # Send all requests to a single entry-point located in index.php if
     # the file or directory requested are not real.
     RewriteCond %{REQUEST_URI} ^.*\.php$ [OR]
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^.*$ index.php [L]
+    RewriteRule . index.php [L]
+
+</IfModule>
+
+# Compression module definitions. This allows website's contents to be loaded
+# faster due to the use of compression algorithms.
+<IfModule mod_deflate.c>
+
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE application/html
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
 
 </IfModule>
 
