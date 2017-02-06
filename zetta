@@ -33,4 +33,4 @@ define('PUBLICPATH', DOCROOT.'/public');
  * is specified so one no longer needs explicitly include class files.
  */
 require FWORKPATH.'/bootstrap.php';
-Zettacast::boot();
+Zettacast::boot()->cli();

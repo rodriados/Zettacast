@@ -61,9 +61,9 @@ final class Initial implements Loader {
 		$elem = explode('\\', ltrim($class, '\\'));
 		
 		return
-			$this->loadfwork($elem) or
-			$this->loadclass($elem) or
-			$this->loadnamespace($elem)
+			$this->loadFwork($elem) or
+			$this->loadClass($elem) or
+			$this->loadNamespace($elem)
 		;
 			
 	}
@@ -83,7 +83,7 @@ final class Initial implements Loader {
 	 * be simply overwritten to the newest value.
 	 * @param array $map Map of classes to be added.
 	 */
-	public function addclass(array $map) {
+	public function addClass(array $map) {
 		
 		foreach($map as $cname => $cpath)
 			$this->classes[ltrim($cname, '\\')] = $cpath;
@@ -95,7 +95,7 @@ final class Initial implements Loader {
 	 * will simply be overwritten to the newest value.
 	 * @param array $map Map of namespaces to be added.
 	 */
-	public function addnamespace(array $map) {
+	public function addNamespace(array $map) {
 		
 		foreach($map as $nname => $npath)
 			$this->namespaces[ltrim($nname, '\\')] = rtrim($npath, '/');
@@ -108,7 +108,7 @@ final class Initial implements Loader {
 	 * load in case it still hasn't.
 	 * @param array|string $class Class to removed from map of classes.
 	 */
-	public function delclass(array $class) {
+	public function delClass(array $class) {
 		
 		foreach($class as $cname)
 			if(isset($this->classes[$cname]))
@@ -122,7 +122,7 @@ final class Initial implements Loader {
 	 * but they will not be able to load in case they still haven't.
 	 * @param array|string $nspace Namespace to be removed from map.
 	 */
-	public function delnamespace(array $nspace) {
+	public function delNamespace(array $nspace) {
 		
 		foreach($nspace as $nname)
 			if(isset($this->namespaces[$nname]))
@@ -136,7 +136,7 @@ final class Initial implements Loader {
 	 * @param array $elem Namespace-exploded class name.
 	 * @return bool Was the class successfully loaded?
 	 */
-	private function loadfwork($elem) {
+	private function loadFwork($elem) {
 		
 		if(count($elem) == 1) /* proxies */ {
 			
@@ -174,7 +174,7 @@ final class Initial implements Loader {
 	 * @param array $elem Namespace-exploded class name.
 	 * @return bool Was the class successfully loaded?
 	 */
-	private function loadclass($elem) {
+	private function loadClass($elem) {
 		
 		$cname = implode('\\', $elem);
 		$fname = str_replace(['_', '\\'], '/', strtolower($cname));
@@ -194,7 +194,7 @@ final class Initial implements Loader {
 	 * @param array $elem Namespace-exploded class name.
 	 * @return bool Was the class successfully loaded?
 	 */
-	private function loadnamespace($elem) {
+	private function loadNamespace($elem) {
 		
 		if(count($elem) < 2 or empty($this->namespaces))
 			return false;
