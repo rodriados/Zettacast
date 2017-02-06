@@ -1,7 +1,9 @@
 # Environment configuration variable, please let one and only one of the two
 # following lines uncommented, accordingly to the current stage of your project.
-SetEnv ENVIRONMENT development
-#SetEnv ENVIRONMENT production
+# Development = 0x001
+SetEnv env 0x001
+# Production = 0x002
+#SetEnv env 0x002
 
 # Server options definition. Make sure no directory listing is visible. We
 # don't want anybody spying us and looking our files.

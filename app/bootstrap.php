@@ -31,5 +31,5 @@ Autoload::addNamespace([
  */
 Autoload::addAlias([
 	// Add here the alias you want to add. Example:
-	// 'SendMail' => 'App/Package/Mail/Send'
+	// 'SendMail' => 'App\Package\Mail\Send'
 ]);

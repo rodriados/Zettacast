@@ -32,5 +32,5 @@ define('PUBLICPATH', DOCROOT.'/public');
  * needed for a correct Zettacast execution. Besides that, an autoload function
  * is specified so one no longer needs explicitly include class files.
  */
-require FWORKPATH.'/bootstrap.php';
+require FWORKPATH.'/zettacast.php';
 Zettacast::boot()->cli();
