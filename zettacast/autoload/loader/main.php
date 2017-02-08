@@ -21,7 +21,7 @@ use Zettacast\Autoload\Loader;
  * @package Zettacast\Autoload
  * @version 1.0
  */
-final class Initial implements Loader {
+final class Main implements Loader {
 	
 	/**
 	 * Maps classes to files. All entries in this array must be valid,
@@ -38,6 +38,16 @@ final class Initial implements Loader {
 	 * @var array Maps namespaces to their directories.
 	 */
 	private $namespaces;
+	
+	/**
+	 * Framework classes' aliases. The values in this array should not be
+	 * changed in any circunstances as they directly affect how the framework
+	 * loads it's classes.
+	 * @var array
+	 */
+	private const fclasses = [
+		
+	];
 	
 	/**
 	 * Initial loader constructor. Initializes the class and set values to
@@ -142,27 +152,26 @@ final class Initial implements Loader {
 			
 			$cname = $elem[0];
 			$lower = strtolower($cname);
-			$fname = FWORKPATH."/{$lower}/{$lower}.php";
-			$alias = true;
 			
-		} elseif($elem[0] !== ZETTACAST) {
+			$fname = in_array($cname, self::fclasses)
+				? FWORKPATH.'/'.self::fclasses[$cname]
+				: FWORKPATH."/{$lower}/{$lower}.php";
 			
-			return false;
+		} elseif($elem[0] == ZETTACAST) /* internal framework use */ {
 			
-		} else /* internal framework use */ {
-			
-			unset($elem[0]);
+			array_shift($elem);
 			$lower = strtolower(implode('/', $elem));
 			$fname = FWORKPATH."/{$lower}.php";
-			$alias = false;
 			
 		}
 		
-		if(!file_exists($fname))
+		if(!isset($fname) or !file_exists($fname))
 			return false;
 		
 		require $fname;
-		if($alias) class_alias('Zettacast\\'.$cname, $cname);
+		
+		if(isset($cname))
+			class_alias('Zettacast\\'.$cname, $cname);
 		
 		return true;
 		

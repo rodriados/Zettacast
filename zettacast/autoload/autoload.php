@@ -13,7 +13,7 @@ namespace Zettacast;
  * "hardcoding". All future classes will be loaded automatically.
  */
 require FWORKPATH.'/autoload/loader.php';
-require FWORKPATH.'/autoload/loader/initial.php';
+require FWORKPATH.'/autoload/loader/main.php';
 require FWORKPATH.'/autoload/loader/alias.php';
 
 /**
@@ -34,9 +34,9 @@ final class Autoload {
 	/**
 	 * Stores the default loader instance for Zettacast classes. This loader is
 	 * special and cannot be closed.
-	 * @var Autoload\Loader\Initial Zettacast main loader instance.
+	 * @var Autoload\Loader\Main Zettacast main loader instance.
 	 */
-	private $default;
+	private $main;
 	
 	/**
 	 * Stores the alias loader instance for Application use. This loader is
@@ -60,7 +60,7 @@ final class Autoload {
 	private function __construct() {
 		
 		$this->loaders = [];
-		$this->default = new Autoload\Loader\Initial;
+		$this->main = new Autoload\Loader\Main;
 		
 	}
 	
@@ -75,7 +75,7 @@ final class Autoload {
 		
 		if(!isset(self::$i)) {
 			self::$i = new self;
-			return self::register(self::$i->default);
+			return self::register(self::$i->main);
 		}
 		
 		if(!in_array($loader, self::$i->loaders)) {
@@ -111,7 +111,7 @@ final class Autoload {
 			$loader->reset();
 		}
 		
-		self::register(self::$i->default);
+		self::register(self::$i->main);
 		
 	}
 	
@@ -122,7 +122,7 @@ final class Autoload {
 	 */
 	public static function addClass(array $map) {
 		
-		self::$i->default->addClass($map);
+		self::$i->main->addClass($map);
 		
 	}
 	
@@ -134,7 +134,7 @@ final class Autoload {
 	 */
 	public static function delClass(array $class) {
 		
-		self::$i->default->delClass($class);
+		self::$i->main->delClass($class);
 		
 	}
 	
@@ -145,7 +145,7 @@ final class Autoload {
 	 */
 	public static function addNamespace(array $map) {
 		
-		self::$i->default->addNamespace($map);
+		self::$i->main->addNamespace($map);
 		
 	}
 	
@@ -157,7 +157,7 @@ final class Autoload {
 	 */
 	public static function delNamespace(array $nspace) {
 		
-		self::$i->default->delNamespace($nspace);
+		self::$i->main->delNamespace($nspace);
 		
 	}
 	
