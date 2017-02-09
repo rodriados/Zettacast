@@ -12,7 +12,7 @@ namespace Zettacast;
  * Imports class-loaders "manually". This is the last time we do this kind of
  * "hardcoding". All future classes will be loaded automatically.
  */
-require FWORKPATH.'/autoload/loader.php';
+require FWORKPATH.'/autoload/loader/loader.php';
 require FWORKPATH.'/autoload/loader/main.php';
 require FWORKPATH.'/autoload/loader/alias.php';
 
