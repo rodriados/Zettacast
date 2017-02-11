@@ -66,7 +66,6 @@ final class Zettacast {
 	 * This method is responsible for setting the minimal configuration and
 	 * gathering information about the environment so the framework can work
 	 * correctly and execute the application as expected.
-	 * @todo Uncomment lines after Request and Config are fully implemented.
 	 */
 	protected function __construct() {
 		
@@ -90,17 +89,12 @@ final class Zettacast {
 			error_reporting(0);
 		}
 		
+		#self::$mode = Request::ajax() ? self::ASYNCHRONOUS : self::APPLICATION;
 		self::$mode = self::APPLICATION;
 		require APPPATH.'/bootstrap.php';
-		
-		#Request::exec();
-		
-		if($_SERVER['REQUEST_URI'] == '/') {
-			include APPPATH."/http/index/index.php";
-		} elseif(file_exists(APPPATH."/http/".$_SERVER['REQUEST_URI']."/index.php")) {
-			$name = APPPATH."/http/".$_SERVER['REQUEST_URI']."/index.php";
-			include $name;
-		}
+
+		#\Zettacast\HTTP\Request::handle();
+		#print \Zettacast\HTTP\Request::url();
 		
 	}
 	
@@ -128,12 +122,11 @@ final class Zettacast {
 			throw new Exception('Zettacast cannot be booted more than once!');
 		
 		require FWORKPATH.'/autoload/autoload.php';
-		class_alias('Zettacast\\Autoload', 'Autoload');
-		Autoload::register();
+		\Zettacast\Autoload\Autoload::init();
 		
 		register_shutdown_function([self::class, 'shutdown']);
-		#set_exception_handler([Err::class, 'exception']);
-		#set_error_handler(Err::class, 'error');
+		#set_exception_handler([\Zettacast\Err\Err::class, 'exception']);
+		#set_error_handler(\Zettacast\Err\Err::class, 'error');
 
 		return self::$i = new self;
 		
@@ -142,26 +135,24 @@ final class Zettacast {
 	/**
 	 * Successfully finishes framework's execution and objects. Shutdown event
 	 * is triggered so that any final application function can run.
-	 * @todo Uncomment method calls after Event and Err classes are working.
 	 */
 	public static function shutdown() {
 		
-		Autoload::reset();
-		#Event::post('shutdown');
-		#Err::shutdown();
+		\Zettacast\Autoload\Autoload::reset();
+		#\Zettacast\Event\Event::post('shutdown');
+		#\Zettacast\Err\Err::shutdown();
 		
 	}
 	
 	/**
 	 * Aborts the framework execution. This method is always called explicitly,
 	 * never by any automatic PHP feature.
-	 * @todo Uncomment method calls after Event and Err classes are working.
 	 */
 	public static function abort() {
 		
-		Autoload::reset();
-		#Event::post('abort');
-		#Err::abort();
+		\Zettacast\Autoload\Autoload::reset();
+		#\Zettacast\Event\Event::post('abort');
+		#\Zettacast\Err\Err::abort();
 		
 		exit;
 		
@@ -176,10 +167,7 @@ final class Zettacast {
 	 */
 	public static function env(int $value = null) {
 		
-		return is_null($value)
-			? self::$env
-			: (bool)(self::$env & $value)
-		;
+		return is_null($value) ? self::$env : (bool)(self::$env & $value);
 		
 	}
 	
@@ -192,10 +180,7 @@ final class Zettacast {
 	 */
 	public static function mode(int $value = null) {
 		
-		return is_null($value)
-			? self::$mode
-			: (bool)(self::$mode & $value)
-		;
+		return is_null($value) ? self::$mode : (bool)(self::$mode & $value);
 		
 	}
 	

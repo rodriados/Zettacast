@@ -1,66 +1,72 @@
 <?php
 /**
- * Autoload proxy file.
+ * Zettacast\Autoload\Autoload class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast;
+namespace Zettacast\Autoload;
 
 /*
  * Imports class-loaders "manually". This is the last time we do this kind of
  * "hardcoding". All future classes will be loaded automatically.
  */
-require FWORKPATH.'/autoload/loader/loader.php';
-require FWORKPATH.'/autoload/loader/main.php';
-require FWORKPATH.'/autoload/loader/alias.php';
+require FWORKPATH.'/autoload/loader/base.php';
+require FWORKPATH.'/autoload/loader/framework.php';
+require FWORKPATH.'/helper/contract/singleton.php';
+
+use Zettacast\Autoload\Loader\Base;
+use Zettacast\Autoload\Loader\Framework;
+use Zettacast\Helper\Contract\Singleton;
 
 /**
  * The autoload class is responsible for loading all classes required by the
  * framework or the application itself. It also lets you set explicit paths for
  * classes to be loaded from.
- * @version 1.0
+ * @package Zettacast\Autoload
+ * @version 1.1
  */
 final class Autoload {
+	
+	/*
+	 * Singleton trait inclusion. This trait implements Singleton pattern
+	 * that allows the existance of one and only one object instance.
+	 */
+	use Singleton;
 	
 	/**
 	 * Stores the classloaders already registered in the autoloading system.
 	 * This allows us to keep track of all class loading functions.
-	 * @var array Class loader functions registered.
+	 * @var Base[] Class loader functions registered.
 	 */
 	private $loaders;
 	
 	/**
 	 * Stores the default loader instance for Zettacast classes. This loader is
 	 * special and cannot be closed.
-	 * @var Autoload\Loader\Main Zettacast main loader instance.
+	 * @var Framework Zettacast main loader instance.
 	 */
-	private $main;
+	private $framework;
 	
 	/**
-	 * Stores the alias loader instance for Application use. This loader is
-	 * only instanciated when needed.
-	 * @var Autoload\Loader\Alias Zettacast class alias loader instance.
+	 * Autoload constructor.
+	 * Initializes the class and set values to instance properties.
 	 */
-	private $alias = null;
-	
-	
-	/**
-	 * Stores this class' singleton instance and helps checking whether the
-	 * class has already been initialized or not.
-	 * @var Autoload Class' singleton instance.
-	 */
-	private static $i = null;
-	
-	/**
-	 * Autoload constructor. Initializes the class and set values to instance
-	 * properties.
-	 */
-	private function __construct() {
+	protected function __construct() {
 		
 		$this->loaders = [];
-		$this->main = new Autoload\Loader\Main;
+		$this->framework = new Framework;
+		
+	}
+	
+	/**
+	 * Starts framework autoloading.
+	 * Starts and registers default framework autoloader.
+	 */
+	public static function init() {
+		
+		self::register(self::i()->framework);
 		
 	}
 	
@@ -68,19 +74,16 @@ final class Autoload {
 	 * Registers a loader to the autoload stack. The autoload function will be
 	 * the responsible for automatically loading all classes invoked by the
 	 * framework or by the application.
-	 * @var Autoload\Loader $loader A loader to be registered.
+	 * @var Base $loader A loader to be registered.
 	 * @return bool Was the loader successfully registered?
 	 */
-	public static function register(Autoload\Loader $loader = null) {
-		
-		if(!isset(self::$i)) {
-			self::$i = new self;
-			return self::register(self::$i->main);
-		}
-		
-		if(!in_array($loader, self::$i->loaders)) {
-			self::$i->loaders[] = $loader;
+	public static function register(Base $loader) {
+
+		if(!in_array($loader, self::i()->loaders)) {
+			
+			self::i()->loaders[] = $loader;
 			return spl_autoload_register([$loader, 'load']);
+			
 		}
 		
 		return false;
@@ -89,13 +92,17 @@ final class Autoload {
 	
 	/**
 	 * Unregisters a class loader from the autoload stack.
-	 * @param Autoload\Loader $loader A loader to be unregistered.
+	 * @param Base $loader A loader to be unregistered.
 	 */
-	public static function unregister(Autoload\Loader $loader) {
+	public static function unregister(Base $loader) {
 		
-		if(in_array($loader, self::$i->loaders)) {
-			unset(self::$i->loaders[array_search($loader, self::$i->loaders)]);
+		if(in_array($loader, self::i()->loaders)) {
+			
+			unset(self::i()->loaders[
+				array_search($loader, self::i()->loaders)
+			]);
 			spl_autoload_unregister([$loader, 'load']);
+			
 		}
 		
 	}
@@ -106,106 +113,13 @@ final class Autoload {
 	 */
 	public static function reset() {
 		
-		foreach(self::$i->loaders as $loader) {
+		foreach(self::i()->loaders as $loader) {
 			spl_autoload_unregister([$loader, 'load']);
 			$loader->reset();
 		}
 		
-		self::register(self::$i->main);
+		self::init();
 		
-	}
-	
-	/**
-	 * Adds new map entries to the map of classes. Conflicting entries will
-	 * be simply overwritten to the newest value.
-	 * @param array $map Map of classes to be added.
-	 */
-	public static function addClass(array $map) {
-		
-		self::$i->main->addClass($map);
-		
-	}
-	
-	/**
-	 * Removes a class from the map of classes. The target class will not be
-	 * unloaded in case it has already been loaded, but it will not be able to
-	 * load in case it still hasn't.
-	 * @param array|string $class Class to removed from map of classes.
-	 */
-	public static function delClass(array $class) {
-		
-		self::$i->main->delClass($class);
-		
-	}
-	
-	/**
-	 * Adds new map entries to the map of namespaces. Conflicting entries
-	 * will simply be overwritten to the newest value.
-	 * @param array $map Map of namespaces to be added.
-	 */
-	public static function addNamespace(array $map) {
-		
-		self::$i->main->addNamespace($map);
-		
-	}
-	
-	/**
-	 * Removes a namespace from the map of namespaces. Classes in the target
-	 * namespace will not be unloaded in case they have already been loaded,
-	 * but they will not be able to load in case they still haven't.
-	 * @param array|string $nspace Namespace to be removed from map.
-	 */
-	public static function delNamespace(array $nspace) {
-		
-		self::$i->main->delNamespace($nspace);
-		
-	}
-	
-	/**
-	 * Adds new alias map entries. Conflicting entries will simply be
-	 * overwritten to the newest value.
-	 * @param array $map Map of aliases to be added.
-	 */
-	public static function addAlias(array $map) {
-		
-		if(!empty($map) and !isset(self::$i->alias)) {
-			
-			self::$i->alias = new Autoload\Loader\Alias;
-			self::register(self::$i->alias);
-			
-		}
-		
-		empty($map) or self::$i->alias->addAlias($map);
-		
-	}
-	
-	/**
-	 * Removes an alias from the map. Classes loaded using the target alias
-	 * will not be unloaded in they have already been loaded, but they will
-	 * not be able to be loaded using alias anymore.
-	 * @param array|string $alias Alias to be removed.
-	 */
-	public static function delAlias($alias) {
-		
-		if(isset(self::$i->alias))
-			self::$i->alias->delAlias($alias);
-		
-	}
-	
-	/**
-	 * Erases all previous aliases and put new ones in the list.
-	 * @param array $map New alias mappings.
-	 */
-	public static function setAlias(array $map) {
-		
-		if(!empty($map) and !isset(self::$i->alias)) {
-			
-			self::$i->alias = new Autoload\Loader\Alias;
-			self::register(self::$i->alias);
-			
-		}
-		
-		empty($map) or self::$i->alias->setAlias($map);
 	}
 	
 }

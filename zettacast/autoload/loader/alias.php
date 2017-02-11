@@ -8,19 +8,13 @@
  */
 namespace Zettacast\Autoload\Loader;
 
-/*
- * Declaration of exterior resources needed. We declare the resources we are
- * going to need so we can skip all namespace bureaucracy.
- */
-use Zettacast\Autoload\Loader;
-
 /**
  * The Alias loader class is responsible for implementing the use of class
  * alias, allowing classes and namespaces to be renamed in execution time.
  * @package Zettacast\Autoload
  * @version 1.0
  */
-final class Alias implements Loader {
+final class Alias extends Base {
 	
 	/**
 	 * Maps alias to classes' full names. The entries in this array should not
@@ -30,35 +24,29 @@ final class Alias implements Loader {
 	protected $alias;
 	
 	/**
-	 * Alias loader constructor. Initializes the class and set values to
-	 * instance properties.
-	 */
-	public function __construct() {
-		
-		$this->reset();
-		
-	}
-	
-	/**
 	 * Tries to load an invoked and not yet loaded class.
 	 * @param string $alias Aliased class to be loaded.
 	 * @return bool Was the class successfully loaded?
 	 */
 	public function load(string $alias): bool {
+
+		$aname = ltrim($alias, '\\');
 		
-		if(!isset($this->alias[$alias]))
+		if(!isset($this->alias[$aname]))
 			return false;
 		
-		return class_alias($this->alias[$alias], $alias);
+		return class_alias($this->alias[$aname], $aname);
 		
 	}
 	
 	/**
 	 * Resets the loader to its initial state.
+	 * @return self Loader instance.
 	 */
 	public function reset() {
 		
 		$this->alias = [];
+		return $this;
 		
 	}
 	
@@ -66,11 +54,14 @@ final class Alias implements Loader {
 	 * Adds new alias map entries. Conflicting entries will simply be
 	 * overwritten to the newest value.
 	 * @param array $map Map of aliases to be added.
+	 * @return self Loader instance.
 	 */
-	public function addAlias(array $map) {
+	public function add(array $map) {
 		
 		foreach($map as $target => $original)
 			$this->alias[ltrim($target, '\\')] = ltrim($original, '\\');
+	
+		return $this;
 		
 	}
 	
@@ -79,23 +70,29 @@ final class Alias implements Loader {
 	 * will not be unloaded in they have already been loaded, but they will
 	 * not be able to be loaded using alias anymore.
 	 * @param array|string $alias Alias to be removed.
+	 * @return self Loader instance.
 	 */
-	public function delAlias($alias) {
+	public function del($alias) {
 		
 		foreach((array)$alias as $target)
 			if(isset($this->alias[$target]))
 				unset($this->alias[$target]);
+
+		return $this;
 		
 	}
 	
 	/**
 	 * Resets and erases all previous aliases and put new ones in the list.
 	 * @param array $map New alias mappings.
+	 * @return self Loader instance.
 	 */
-	public function setAlias(array $map) {
+	public function set(array $map) {
 		
 		$this->reset();
-		$this->addAlias($map);
+		$this->add($map);
+		
+		return $this;
 		
 	}
 	
