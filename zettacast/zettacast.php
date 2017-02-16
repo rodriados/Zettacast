@@ -112,7 +112,6 @@ final class Zettacast {
 	/**
 	 * Boots framework's basic functions and modules up. It also sets all
 	 * needed handlers and callbacks for error and shutdown.
-	 * @todo Uncomment handlers after Err class is fully implemented.
 	 * @return Zettacast Booted framework instance.
 	 * @throws Exception
 	 */
@@ -121,6 +120,7 @@ final class Zettacast {
 		if(isset(self::$i))
 			throw new Exception('Zettacast cannot be booted more than once!');
 		
+		require FWORKPATH.'/helper/functions.php';
 		require FWORKPATH.'/autoload/autoload.php';
 		\Zettacast\Autoload\Autoload::init();
 		
