@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Collection\Simple class file.
+ * Zettacast\Collection\Basic class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -8,23 +8,25 @@
  */
 namespace Zettacast\Collection;
 
-use Zettacast\Collection\Permission\Erasable;
-use Zettacast\Collection\Permission\Readable;
-use Zettacast\Collection\Permission\Writable;
-
 /**
- * Simple collection class. This class has all basic methods implemented for
+ * Basic collection class. This class has all basic methods implemented for
  * collections. All write and read methods are available in basic collections.
  * @package Zettacast\Collection
  * @version 1.0
  */
-class Simple extends Base {
+class Basic extends Base {
 	
 	/**
-	 * Permission contract inclusions. These contracts allow simple containers
-	 * to have its contents read, updated or erased.
+	 * Adds an element to the collection if it doesn't exist.
+	 * @param mixed $key Key name to be added.
+	 * @param mixed $value Value to be stored.
 	 */
-	use Readable, Writable, Erasable;
+	public function add($key, $value) {
+		
+		if(!$this->has($key))
+			$this->set($key, $value);
+		
+	}
 	
 	/**
 	 * Chunks the collection into pieces of the given size.
@@ -36,10 +38,18 @@ class Simple extends Base {
 		if($size <= 0)
 			return new static;
 		
-		foreach(array_chunk($this->data, $size, true) as $chunk)
-			$chunks[] = new static($chunk);
+		return new static(array_chunk($this->data, $size, true) ?? []);
 		
-		return new static($chunks ?? []);
+	}
+	
+	/**
+	 * Removes an element from collection.
+	 * @param mixed $key Key to be removed.
+	 */
+	public function del($key) {
+		
+		if($this->has($key))
+			unset($this->data[$key]);
 		
 	}
 	
@@ -52,7 +62,7 @@ class Simple extends Base {
 	public function diff($items, $keys = false) {
 		
 		$fn = $keys ? 'array_diff_key' : 'array_diff';
-		return new static($fn($this->data, self::convert($items)));
+		return new static($fn($this->data, self::toarray($items)));
 		
 	}
 	
@@ -76,13 +86,10 @@ class Simple extends Base {
 	 * @return bool Does every element pass the test?
 	 */
 	public function every(callable $fn = null, $value = true) {
+		$fn = $fn ?? function($value) { return $value; };
 		
-		$fn = $fn ?: function($value) {
-			return $value;
-		};
-		
-		foreach($this->data as $key => $val)
-			if($fn($val, $key) != $value)
+		foreach($this->iterate() as $key => $v)
+			if($fn($v, $key) != $value)
 				return false;
 		
 		return true;
@@ -95,7 +102,7 @@ class Simple extends Base {
 	 * @return static New collection instance.
 	 */
 	public function except($keys) {
-		$keys = self::convert($keys);
+		$keys = self::toarray($keys);
 		
 		return $this->filter(function($value, $key) use($keys) {
 			return !in_array($key, $keys);
@@ -129,7 +136,7 @@ class Simple extends Base {
 	 */
 	public function first(callable $fn = null, $default = null) {
 		
-		foreach($this->data as $key => $value)
+		foreach($this->iterate() as $key => $value)
 			if($fn($value, $key))
 				return $value;
 		
@@ -148,13 +155,36 @@ class Simple extends Base {
 	}
 	
 	/**
+	 * Removes one or many elements from collection.
+	 * @param mixed|array $keys Keys to be forgotten.
+	 */
+	public function forget($keys) {
+		
+		foreach(self::toarray($keys) as $key)
+			$this->del($key);
+		
+	}
+	
+	/**
+	 * Get an element stored in collection.
+	 * @param mixed $key Key of requested element.
+	 * @param mixed $default Default value fallback.
+	 * @return mixed Requested element or default fallback.
+	 */
+	public function get($key, $default = null) {
+		
+		return $this->has($key) ? $this->data[$key] : $default;
+		
+	}
+	
+	/**
 	 * Intersects given items with collection's elements.
 	 * @param mixed $items Items to intersect with collection.
 	 * @return static Collection of intersected elements.
 	 */
 	public function intersect($items) {
 		
-		return new static(array_intersect($this->data, self::convert($items)));
+		return new static(array_intersect($this->data, self::toarray($items)));
 		
 	}
 	
@@ -176,7 +206,7 @@ class Simple extends Base {
 	 */
 	public function last(callable $fn = null, $default = null) {
 		
-		foreach(array_reverse($this->data) as $key => $value)
+		foreach($this->reverse()->iterate() as $key => $value)
 			if($fn($value, $key))
 				return $value;
 		
@@ -186,11 +216,11 @@ class Simple extends Base {
 	
 	/**
 	 * Locks collection to a readonly state.
-	 * @return ReadOnly Locked collection.
+	 * @return Imutable Locked collection.
 	 */
 	public function lock() {
 		
-		return new ReadOnly($this->data);
+		return Imutable::ref($this);
 		
 	}
 	
@@ -217,7 +247,7 @@ class Simple extends Base {
 	 */
 	public function merge($items) {
 		
-		return new static(array_merge($this->data, self::convert($items)));
+		return new static(array_merge($this->data, self::toarray($items)));
 		
 	}
 	
@@ -227,7 +257,7 @@ class Simple extends Base {
 	 * @return static New collection instance.
 	 */
 	public function only($keys) {
-		$keys = self::convert($keys);
+		$keys = self::toarray($keys);
 		
 		return $this->filter(function($value, $key) use($keys) {
 			return in_array($key, $keys);
@@ -322,11 +352,22 @@ class Simple extends Base {
 		if(is_string($needle) or !is_callable($needle))
 			return array_search($needle, $this->data, $strict);
 		
-		foreach($this->data as $key => $value)
+		foreach($this->iterate() as $key => $value)
 			if($needle($value, $key))
 				return $key;
 		
 		return false;
+		
+	}
+	
+	/**
+	 * Sets a value to the given key.
+	 * @param mixed $key Key to created or updated.
+	 * @param mixed $value Value to be stored in key.
+	 */
+	public function set($key, $value) {
+		
+		$this->data[$key] = $value;
 		
 	}
 	
@@ -429,7 +470,7 @@ class Simple extends Base {
 	 */
 	public function union($items) {
 		
-		return new static($this->data + self::convert($items));
+		return new static($this->data + self::toarray($items));
 		
 	}
 	
@@ -476,9 +517,9 @@ class Simple extends Base {
 	 * @param mixed $userdata Optional third parameter for function.
 	 * @return static Collection for method chaining.
 	 */
-	public function walk(callable $fn, &$userdata = null) {
+	public function walk(callable $fn, $userdata = null) {
 		
-		foreach($this->data as $key => &$value)
+		foreach($this->iterate() as $key => &$value)
 			$fn($value, $key, $userdata);
 		
 		return $this;
@@ -492,7 +533,7 @@ class Simple extends Base {
 	 */
 	public function zip(...$items) {
 		
-		$items = array_map([static::class, 'convert'], $items);
+		$items = array_map([static::class, 'toarray'], $items);
 		
 		return new static(array_map(function(...$params) {
 			return new static($params);

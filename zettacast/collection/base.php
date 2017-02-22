@@ -8,8 +8,6 @@
  */
 namespace Zettacast\Collection;
 
-use Zettacast\Collection\Permission\Iterable;
-
 /**
  * Base collection abstraction. This class has methods appliable for all kinds
  * of collections. Some methods are yet to implemented by inheritance.
@@ -18,12 +16,6 @@ use Zettacast\Collection\Permission\Iterable;
  * @version 1.0
  */
 abstract class Base implements \Countable, \Iterator, \ArrayAccess {
-
-	/*
-	 * Iterable contract inclusion. Allows all collections to be iterable by
-	 * the usage of foreach. Although it is possible to change how this works.
-	 */
-	use Iterable;
 	
 	/**
 	 * Data to be stored.
@@ -34,14 +26,25 @@ abstract class Base implements \Countable, \Iterator, \ArrayAccess {
 	/**
 	 * Base constructor. This constructor simply sets the data received as the
 	 * data stored in collection.
-	 * @param array|Simple|\Traversable $data Data to be stored.
+	 * @param array|Base|\Traversable $data Data to be stored.
 	 */
-	public function __construct($data = []) {
+	public function __construct($data = null) {
 		
-		$this->data = self::convert($data);
+		$this->data = !is_null($data) ? self::toarray($data) : [];
 		
 	}
 	
+	/**
+	 * Allows access to data using object notation.
+	 * @param mixed $name Data to be accessed in collection.
+	 * @return mixed Accessed data.
+	 */
+	final public function __get($name) {
+		
+		return $this->get($name);
+		
+	}
+		
 	/**
 	 * Checks whether data exists using object notation.
 	 * @param mixed $name Data name to be checked existence.
@@ -53,6 +56,27 @@ abstract class Base implements \Countable, \Iterator, \ArrayAccess {
 		
 	}
 	
+	/**
+	 * Sets or updates data stored using object notation.
+	 * @param mixed $name Data name to be stored.
+	 * @param mixed $value Value to be stored.
+	 */
+	final public function __set($name, $value) {
+		
+		$this->set($name, $value);
+		
+	}
+		
+	/**
+	 * Erases data stored using object notation.
+	 * @param mixed $name Data name to be erased.
+	 */
+	final public function __unset($name) {
+		
+		$this->del($name);
+		
+	}
+		
 	/**
 	 * Returns all data stored in collection.
 	 * @return array All data stored in collection.
@@ -84,12 +108,32 @@ abstract class Base implements \Countable, \Iterator, \ArrayAccess {
 	}
 	
 	/**
+	 * Return the element the internal pointer currently points to.
+	 * @return mixed Current element in the collection.
+	 */
+	public function current() {
+		
+		return current($this->data);
+		
+	}
+	
+	/**
 	 * Checks whether collection is currently empty.
 	 * @return bool Is collection empty?
 	 */
 	public function empty() {
 		
 		return empty($this->data);
+		
+	}
+	
+	/**
+	 * Sets the internal pointer of the collection to its last position.
+	 * @return mixed Element in the last position.
+	 */
+	public function end() {
+		
+		return end($this->data);
 		
 	}
 	
@@ -117,6 +161,56 @@ abstract class Base implements \Countable, \Iterator, \ArrayAccess {
 	}
 	
 	/**
+	 * Creates a generator that iterates over the collection.
+	 * @yield mixed Collection's stored values.
+	 */
+	public function iterate() {
+		
+		yield from $this->data;
+		
+	}
+	
+	/**
+	 * Fetches the key the internal pointer currently points to.
+	 * @return mixed Current element's key in the collection.
+	 */
+	public function key() {
+		
+		return key($this->data);
+		
+	}
+	
+	/**
+	 * Advances the internal pointer one position.
+	 * @return mixed Element in the next position.
+	 */
+	public function next() {
+		
+		return next($this->data);
+		
+	}
+	
+	/**
+	 * Rewinds the internal pointer one position.
+	 * @return mixed Element in the previous position.
+	 */
+	public function prev() {
+		
+		return prev($this->data);
+		
+	}
+	
+	/**
+	 * Set the internal pointer of the collection to its first element.
+	 * @return mixed First element in collection.
+	 */
+	public function rewind() {
+		
+		return reset($this->data);
+		
+	}
+	
+	/**
 	 * Passes the collection to the given function and returns it.
 	 * @param callable $fn Function to which collection is passed to.
 	 * @return static Collection's copy sent to function.
@@ -129,37 +223,35 @@ abstract class Base implements \Countable, \Iterator, \ArrayAccess {
 	}
 	
 	/**
-	 * Checks whether data can be converted into a collection.
-	 * @param mixed $target Data to be checked if collectible.
-	 * @return bool Is it possible data to be a collection?
+	 * Checks whether the pointer is a valid position.
+	 * @return bool Is the pointer in a valid position?
 	 */
-	final static protected function listable($target) {
+	public function valid() {
 		
-		return
-			is_array($target) or
-			$target instanceof Base or
-			$target instanceof \Traversable
-		;
+		return key($this->data) !== null;
 		
 	}
 	
 	/**
-	 * Transforms given data into an array.
-	 * @param mixed $target Data to be transformed into array.
-	 * @return array Given data as array.
+	 * Removes an element from collection.
+	 * @param mixed $key Key to be removed.
 	 */
-	final static protected function convert($target) {
-		
-		if(is_array($target))
-			return $target;
-		elseif($target instanceof Base)
-			return $target->all();
-		elseif($target instanceof \Traversable)
-			return iterator_to_array($target);
-		
-		return (array)$target;
-		
-	}
+	public abstract function del($key);
+	
+	/**
+	 * Get an element stored in collection.
+	 * @param mixed $key Key of requested element.
+	 * @param mixed $default Default value fallback.
+	 * @return mixed Requested element or default fallback.
+	 */
+	public abstract function get($key, $default = null);
+	
+	/**
+	 * Sets a value to the given key.
+	 * @param mixed $key Key to created or updated.
+	 * @param mixed $value Value to be stored in key.
+	 */
+	public abstract function set($key, $value);
 	
 	/**
 	 * Checks whether an offset exists in collection.
@@ -177,19 +269,77 @@ abstract class Base implements \Countable, \Iterator, \ArrayAccess {
 	 * @param mixed $offset Offset to be accessed.
 	 * @return mixed Offset value.
 	 */
-	public abstract function offsetGet($offset);
+	final public function offsetGet($offset) {
+		
+		return $this->get($offset);
+		
+	}
 	
 	/**
 	 * Sets data in collection using array notation.
 	 * @param mixed $offset Offset to be set.
 	 * @param mixed $value Data to be saved.
 	 */
-	public abstract function offsetSet($offset, $value);
+	final public function offsetSet($offset, $value) {
+		
+		$this->set($offset, $value);
+		
+	}
 	
 	/**
 	 * Erases data in collection using array notation.
 	 * @param mixed $offset Offset to be erased.
 	 */
-	public abstract function offsetUnset($offset);
+	final public function offsetUnset($offset) {
+		
+		$this->del($offset);
+		
+	}
+		
+	/**
+	 * Checks whether data can be converted into a collection.
+	 * @param mixed $data Data to be checked if collectible.
+	 * @return bool Is it possible data to be a collection?
+	 */
+	final static protected function listable($data) {
+		
+		return is_array($data)
+			or $data instanceof Base
+			or $data instanceof \Traversable;
+		
+	}
+	
+	/**
+	 * Transforms given data into an array.
+	 * @param mixed $data Data to be transformed into array.
+	 * @return array Given data as array.
+	 */
+	final static protected function toarray($data) {
+		
+		if(is_array($data)) return $data;
+		elseif($data instanceof Base) return $data->all();
+		elseif($data instanceof \Traversable) return iterator_to_array($data);
+		
+		return [$data];
+		
+	}
+	
+	/**
+	 * Creates a new collection mantaining the reference to the original
+	 * variable that is the data stored in it.
+	 * @param mixed $data Data to be stored in collection.
+	 * @return static New collection with referenced data.
+	 */
+	protected static function ref(&$data) {
+		
+		if(!is_array($data) and !$data instanceof Base)
+			return $data;
+		
+		$refobj = new static;
+		$refobj->data = &$data;
+		
+		return $refobj;
+		
+	}
 	
 }

@@ -8,10 +8,6 @@
  */
 namespace Zettacast\Collection;
 
-use Zettacast\Collection\Permission\Erasable;
-use Zettacast\Collection\Permission\Readable;
-use Zettacast\Collection\Permission\Writable;
-
 /**
  * Recursive collection class. This collection implements recursive access
  * methods, that is it transforms its data into recursive collections.
@@ -21,31 +17,17 @@ use Zettacast\Collection\Permission\Writable;
 class Recursive extends Base {
 	
 	/**
-	 * Permission contract inclusions. These contracts allow simple containers
-	 * to have its contents read, updated or erased.
+	 * Adds an element to the collection if it doesn't exist.
+	 * @param mixed $key Key name to be added.
+	 * @param mixed $value Value to be stored.
 	 */
-	use Readable, Writable, Erasable;
-	
-	/**
-	 * Recursive constructor. This constructor sets the data received as the
-	 * data stored in collection and then recursively create new collections.
-	 * @param array|Base|\Traversable $data Data to be stored.
-	 * @param bool $deep Should data be deep copied to collection?
-	 */
-	public function __construct($data = [], $deep = false) {
+	public function add($key, $value) {
 		
-		parent::__construct($data);
-		
-		foreach($this->data as &$value)
-			if($value instanceof self and !$deep)
-				continue;
-			elseif(self::listable($value))
-				$value = new static($value);
-			elseif($deep and is_object($value))
-				$value = clone $value;
+		if(!$this->has($key))
+			$this->set($key, $value);
 		
 	}
-	
+		
 	/**
 	 * Chunks the collection into pieces of the given size.
 	 * @param int $size Size of the chunks.
@@ -56,10 +38,7 @@ class Recursive extends Base {
 		if($size <= 0)
 			return new static;
 		
-		foreach(array_chunk($this->data, $size, true) as $chunk)
-			$chunks[] = new static($chunk);
-		
-		return new static($chunks ?? []);
+		return new static(array_chunk($this->data, $size, true) ?? []);
 		
 	}
 	
@@ -70,8 +49,19 @@ class Recursive extends Base {
 	public function collapse() {
 
 		return new static(array_reduce($this->data, function($carry, $value) {
-			return array_merge($carry, self::convert($value));
+			return array_merge($carry, self::toarray($value));
 		}, []));
+		
+	}
+	
+	/**
+	 * Removes an element from collection.
+	 * @param mixed $key Key to be removed.
+	 */
+	public function del($key) {
+		
+		if($this->has($key))
+			unset($this->data[$key]);
 		
 	}
 	
@@ -82,15 +72,10 @@ class Recursive extends Base {
 	 * @return bool Does every element pass the test?
 	 */
 	public function every(callable $fn = null, $value = true) {
+		$fn = $fn ?? function($value) { return $value; };
 		
-		$fn = $fn ?: function($value) {
-			return $value;
-		};
-		
-		foreach($this->data as $key => $val)
-			if($val instanceof self and !$val->every($fn, $value))
-				return false;
-			elseif($fn($val, $key) != $value)
+		foreach($this->iterate() as $key => $v)
+			if($fn($v, $key) != $value)
 				return false;
 		
 		return true;
@@ -103,9 +88,9 @@ class Recursive extends Base {
 	 * @return static New collection instance.
 	 */
 	public function except($keys) {
-		$keys = self::convert($keys);
+		$keys = self::toarray($keys);
 		
-		return $this->filter(function($value, $key) use($keys) {
+		return $this->filter(function($v, $key) use($keys) {
 			return !in_array($key, $keys);
 		});
 		
@@ -117,33 +102,57 @@ class Recursive extends Base {
 	 * @param callable $fn Test function. Parameters: value, key.
 	 * @return static Collection of all filtered values.
 	 */
-	protected function filter(callable $fn) {
+	public function filter(callable $fn) {
 		
-		return new static(
-			array_filter($this->data, $fn, ARRAY_FILTER_USE_BOTH)
-		);
+		foreach(parent::iterate() as $key => $value)
+			if($fn($value, $key))
+				$result[$key] = self::listable($value)
+					? self::ref($value)->filter($fn)->all()
+					: $value;
+		
+		return new static($result ?? []);
 		
 	}
 	
 	/**
 	 * Flattens the recursive collection into a single level collection.
-	 * @return Simple The flattened collection.
+	 * @return Basic The flattened collection.
 	 */
 	public function flatten() {
 		
-		$fn = function($array) use(&$fn) {
-			return array_reduce($array, function($carry, $value) use(&$fn) {
-				return array_merge($carry, self::listable($value)
-					? $fn(self::convert($value))
-					: self::convert($value)
-				);
-			}, []);
-		};
+		foreach($this->iterate() as $value)
+			$list[] = $value;
 		
-		return new Simple($fn($this->data));
+		return new Basic($list ?? []);
 		
 	}
 	
+	/**
+	 * Removes one or many elements from collection.
+	 * @param mixed|array $keys Keys to be forgotten.
+	 */
+	public function forget($keys) {
+		
+		foreach(self::toarray($keys) as $key)
+			$this->del($key);
+		
+	}
+		
+	/**
+	 * Get an element stored in collection.
+	 * @param mixed $key Key of requested element.
+	 * @param mixed $default Default value fallback.
+ 	 * @param bool $ref Should Collection be returned if element is array?
+	 * @return mixed Requested element or default fallback.
+	 */
+	public function get($key, $default = null, $ref = true) {
+		
+		return $this->has($key)
+			? ($ref ? self::ref($this->data[$key]) : $this->data[$key])
+			: $default;
+		
+	}
+		
 	/**
 	 * Checks whether an element exists in collection.
 	 * @param mixed $needle Element being searched for.
@@ -161,12 +170,41 @@ class Recursive extends Base {
 	}
 	
 	/**
+	 * Creates a generator that recursively iterates over the collection.
+	 * @yield mixed Collection's recursively stored values.
+	 */
+	public function iterate() {
+		
+		$gen = function($array) use(&$gen) {
+			
+			foreach($array as $key => $value)
+				self::listable($value)
+					? yield from $gen($value)
+					: yield $key => $value;
+			
+		};
+		
+		yield from $gen($this->data);
+		
+	}
+	
+	/**
 	 * Returns all element keys currently present in collection.
-	 * @return Simple Collection of this collection element's keys.
+	 * @return Basic Collection of this collection element's keys.
 	 */
 	public function keys() {
 		
-		return new Simple(array_keys($this->data));
+		return new Basic(array_keys($this->data));
+		
+	}
+	
+	/**
+	 * Locks collection to a readonly state.
+	 * @return Imutable Locked collection.
+	 */
+	public function lock() {
+		
+		return Imutable::ref($this);
 		
 	}
 		
@@ -178,15 +216,13 @@ class Recursive extends Base {
 	 * @return static New collection instance.
 	 */
 	public function map(callable $fn) {
-		
-		$keys = array_keys($this->data);
-		$values = array_map(function($value, $key) use(&$fn) {
-			return $value instanceof self
-				? $value->map($fn)
+
+		foreach(parent::iterate() as $key => $value)
+			$result[$key] = self::listable($value)
+				? self::ref($value)->map($fn)->all()
 				: $fn($value, $key);
-		}, $this->data, $keys);
 		
-		return new static(array_combine($keys, $values));
+		return new static($result ?? []);
 		
 	}
 	
@@ -197,7 +233,7 @@ class Recursive extends Base {
 	 */
 	public function merge($items) {
 		
-		return new static(array_merge($this->data, self::convert($items)));
+		return new static(array_merge($this->data, self::toarray($items)));
 		
 	}
 	
@@ -207,9 +243,9 @@ class Recursive extends Base {
 	 * @return static New collection instance.
 	 */
 	public function only($keys) {
-		$keys = self::convert($keys);
+		$keys = self::toarray($keys);
 		
-		return $this->filter(function($value, $key) use($keys) {
+		return $this->filter(function($v, $key) use($keys) {
 			return in_array($key, $keys);
 		});
 		
@@ -221,7 +257,8 @@ class Recursive extends Base {
 	 */
 	public function pop() {
 		
-		return array_pop($this->data);
+		$value = array_pop($this->data);
+		return self::listable($value) ? new static($value) : $value;
 		
 	}
 	
@@ -260,11 +297,10 @@ class Recursive extends Base {
 	 */
 	public function reduce(callable $fn, $initial = null) {
 		
-		return array_reduce($this->data, function($carry, $value) use($fn) {
-			return $value instanceof self
-				? $value->reduce($fn, $carry)
-				: $fn($carry, $value);
-		}, $initial);
+		foreach($this->iterate() as $value)
+			$initial = $fn($initial, $value);
+	
+		return $initial;
 		
 	}
 	
@@ -285,8 +321,7 @@ class Recursive extends Base {
 	 */
 	public function set($key, $value) {
 		
-		$this->data[$key] = (self::listable($value) and !$value instanceof self)
-			? new static($value) : $value;
+		$this->data[$key] = $value;
 		
 	}
 	
@@ -296,7 +331,8 @@ class Recursive extends Base {
 	 */
 	public function shift() {
 		
-		return array_shift($this->data);
+		$value = array_shift($this->data);
+		return self::listable($value) ? new static($value) : $value;
 		
 	}
 	
@@ -320,7 +356,7 @@ class Recursive extends Base {
 	public function split($count) {
 		
 		if($this->empty())
-			return new static;
+			return $this;
 		
 		return $this->chunk(ceil($this->count() / $count));
 		
@@ -361,7 +397,7 @@ class Recursive extends Base {
 	 */
 	public function union($items) {
 		
-		return new static($this->data + self::convert($items));
+		return new static($this->data + self::toarray($items));
 		
 	}
 	
@@ -383,11 +419,11 @@ class Recursive extends Base {
 	
 	/**
 	 * Returns all element values currently present in collection.
-	 * @return Simple Collection of this collection element's values.
+	 * @return Basic Collection of this collection element's values.
 	 */
 	public function values() {
 		
-		return new Simple(array_values($this->data));
+		return new Basic(array_values($this->data));
 		
 	}
 	
@@ -397,11 +433,11 @@ class Recursive extends Base {
 	 * @param mixed $userdata Optional third parameter for function.
 	 * @return static Collection for method chaining.
 	 */
-	public function walk(callable $fn, &$userdata = null) {
+	public function walk(callable $fn, $userdata = null) {
 		
-		foreach($this->data as $key => &$value)
-			$value instanceof self
-				? $value->walk($fn, $userdata)
+		foreach(parent::iterate() as $key => &$value)
+			is_array($value)
+				? self::ref($value)->walk($fn, $userdata)
 				: $fn($value, $key, $userdata);
 		
 		return $this;

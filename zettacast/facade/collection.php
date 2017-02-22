@@ -9,9 +9,9 @@
 namespace Zettacast;
 
 use Zettacast\Collection\Dot;
-use Zettacast\Collection\ReadOnly;
+use Zettacast\Collection\Imutable;
 use Zettacast\Collection\Recursive;
-use Zettacast\Collection\Simple as baseclass;
+use Zettacast\Collection\Basic as baseclass;
 use Zettacast\Helper\Contract\Extendable;
 
 /**
@@ -30,9 +30,9 @@ final class Collection {
 	
 	/**
 	 * Builds a new collection based on a function.
-	 * @param array $data Initial data to be fed to function.
+	 * @param array $data Initial data to be fed to generating function.
 	 * @param callable $fn Function to build collection. Params: key, value.
-	 * @return baseclass New collection.
+	 * @return baseclass New collection instance.
 	 */
 	public static function build($data, callable $fn) {
 		$collection = self::make();
@@ -47,6 +47,56 @@ final class Collection {
 	}
 	
 	/**
+	 * Creates a collection using an array for keys and another one for values.
+	 * @param array $keys Array to be used as keys.
+	 * @param array $values Array to be used as values.
+	 * @return baseclass New collection instance.
+	 */
+	public static function combine($keys, $values) {
+		
+		return self::make(array_combine($keys, $values));
+		
+	}
+	
+	/**
+	 * Recursive dot collection factory method.
+	 * @param array $data Data to be set in collection.
+	 * @param string $dot Depth-separator.
+	 * @return Dot New collection instance.
+	 */
+	public static function dot($data = [], string $dot = '.') {
+		
+		return new Dot($data, $dot);
+		
+	}
+	
+	/**
+	 * Creates a new collection and fills it with the given value.
+	 * @param mixed $value Value to fill collection with.
+	 * @param array|int $key Array of keys to be created or initial int key.
+	 * @param int $count Number of elements to be filled if keys are integers.
+	 * @return baseclass New collection instance.
+	 */
+	public static function fill($value, $key, int $count = 0) {
+		
+		return self::make(is_array($key)
+			? array_fill_keys($key, $value)
+			: array_fill($key, $count, $value));
+		
+	}
+	
+	/**
+	 * Imutable collection factory method.
+	 * @param array $data Data to be set in collection.
+	 * @return Imutable New collection instance.
+	 */
+	public static function lock($data = []) {
+		
+		return new Imutable($data);
+		
+	}
+	
+	/**
 	 * Simple collection factory method.
 	 * @param array $data Data to be set in collection.
 	 * @return baseclass New collection instance.
@@ -54,28 +104,6 @@ final class Collection {
 	public static function make($data = []) {
 		
 		return new baseclass($data);
-		
-	}
-	
-	/**
-	 * Recursive dot collection factory method.
-	 * @param array $data Data to be set in collection.
-	 * @return Dot New collection instance.
-	 */
-	public static function dot($data = []) {
-		
-		return new Dot($data);
-		
-	}
-	
-	/**
-	 * ReadOnly collection factory method.
-	 * @param array $data Data to be set in collection.
-	 * @return ReadOnly New collection instance.
-	 */
-	public static function readonly($data = []) {
-		
-		return new ReadOnly($data);
 		
 	}
 	

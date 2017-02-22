@@ -17,77 +17,102 @@ namespace Zettacast\Collection;
 class Dot extends Recursive {
 	
 	/**
-	 * Dot constructor. This constructor sets the data received as the data
-	 * stored in collection and then recursively create new collections.
-	 * @param array|Base|\Traversable $data Data to be stored.
+	 * Depth-separator. This variable holds the symbol that indicates depth
+	 * when iterating over the data. It defaults to a single dot.
+	 * @var string Depth separator.
 	 */
-	public function __construct($data = []) {
+	protected $dot;
+	
+	/**
+	 * Indicates scope the collection is inserted into. It defaults to nothing.
+	 * @var string Collection's scope.
+	 */
+	protected $scope = null;
+	
+	/**
+	 * Base constructor. This constructor simply sets the data received as the
+	 * data stored in collection.
+	 * @param array|Base|\Traversable $data Data to be stored.
+	 * @param string $dot Depth-separator.
+	 */
+	public function __construct($data = null, string $dot = '.') {
 		
-		parent::__construct($data, true);
+		$this->dot = $dot;
+		parent::__construct($data);
 		
 	}
-
+	
 	/**
 	 * Removes an element from collection.
 	 * @param mixed $key Key to be removed.
 	 */
 	public function del($key) {
-		$curr = $this;
-		$segments = static::dot($key);
-		$key = array_pop($segments);
+		$segment = $this->dot($key);
+		$lastkey = array_pop($segment);
+		$curnode = &$this->data;
 		
-		foreach($segments as $segment) {
-			
-			if(!$curr instanceof parent or !isset($curr->data[$segment]))
+		foreach($segment as $dot) {
+			if(!self::listable($curnode) or !isset($curnode[$dot]))
 				return;
 			
-			$curr = &$curr->data[$segment];
-			
+			$curnode = &$curnode[$dot];
 		}
 		
-		unset($curr->data[$key]);
+		unset($curnode[$lastkey]);
 		
 	}
 	
 	/**
-	 * Creates a new collection with all elements except the specified keys.
-	 * @param mixed|array $keys Keys to be forgotten in the new collection.
-	 * @return static New collection instance.
+	 * Explodes dot expression into array.
+	 * @param mixed $key Dot expression key to be split.
+	 * @return array Dot expression segments.
 	 */
-	public function except($keys) {
-		$keys = self::convert($keys);
-		$new = new static($this);
+	protected function dot($key) {
 		
-		foreach($keys as $key)
-			$new->del($key);
-		
-		return $new;
+		return explode($this->dot, $key);
 		
 	}
 	
+	/**
+	 * Filters elements according to the given test. If no test function is
+	 * given, it fallbacks to removing all false equivalent values.
+	 * @param callable $fn Test function. Parameters: value, key.
+	 * @return static Collection of all filtered values.
+	 */
+	public function filter(callable $fn) {
+		
+		$scope = !is_null($this->scope) ? $this->scope.$this->dot : null;
+		
+		foreach(Base::iterate() as $key => $value)
+			if($fn($value, $scope . $key))
+				$result[$key] = self::listable($value)
+					? $this->scrf($value, $scope.$key)->filter($fn)->all()
+					: $value;
+		
+		return new static($result ?? []);
+		
+	}
+		
 	/**
 	 * Gets an element stored in collection.
 	 * @param mixed $key Key of requested element.
 	 * @param mixed $default Default value fallback.
+	 * @param bool $ref Should Collection be returned if element is array?
 	 * @return mixed Requested element or default fallback.
 	 */
-	public function get($key, $default = null) {
+	public function get($key, $default = null, $ref = true) {
+		$segment = $this->dot($key);
+		$curnode = &$this->data;
 		
-		if(parent::has($key))
-			return $this->data[$key];
-		
-		$curr = $this;
-		
-		foreach(static::dot($key) as $segment) {
-
-			if(!$curr instanceof parent or !isset($curr->data[$segment]))
+		foreach($segment as $dot) {
+			if(!self::listable($curnode) or !isset($curnode[$dot]))
 				return $default;
 			
-			$curr = $curr->data[$segment];
+			$curnode = &$curnode[$dot];
 			
 		}
 		
-		return $curr;
+		return $ref ? self::ref($curnode) : $curnode;
 		
 	}
 	
@@ -97,18 +122,14 @@ class Dot extends Recursive {
 	 * @return bool Does key exist?
 	 */
 	public function has($key) {
+		$segment = $this->dot($key);
+		$curnode = &$this->data;
 		
-		if(parent::has($key))
-			return true;
-
-		$curr = $this;
-
-		foreach(static::dot($key) as $segment) {
-			
-			if(!$curr instanceof parent or !isset($curr->data[$segment]))
+		foreach($segment as $dot) {
+			if(!self::listable($curnode) or !isset($curnode[$dot]))
 				return false;
 			
-			$curr = $curr->data[$segment];
+			$curnode = &$curnode[$dot];
 			
 		}
 		
@@ -122,14 +143,14 @@ class Dot extends Recursive {
 	 * @return static New collection instance.
 	 */
 	public function only($keys) {
-		$keys = self::convert($keys);
-		$new = new static;
+		$keys = self::toarray($keys);
+		$result = new static;
 		
 		foreach($keys as $key)
 			if($this->has($key))
-				$new->set($key, $this->get($key));
+				$result->set($key, $this->get($key, null, false));
 		
-		return $new;
+		return $result;
 		
 	}
 	
@@ -137,18 +158,19 @@ class Dot extends Recursive {
 	 * Plucks an array of values from collection.
 	 * @param string|array $value Requested keys to pluck.
 	 * @param string|array $key Keys to index plucked array.
-	 * @return Simple The plucked values.
+	 * @return Basic The plucked values.
 	 */
 	public function pluck($value, $key = null) {
-		$result = new Simple;
 		
-		foreach($this->data as $item)
-			if(is_null($key))
-				$result[] = $item->get($value);
-			else
-				$result[$item->get($key)] = $item->get($value);
+		foreach(Base::iterate() as $item) {
+			$i = $this->scrf($item);
 			
-		return $result;
+			if(is_null($key)) $result[] = $i->get($value, null, false);
+			else $result[$i->get($key)] = $i->get($value, null, false);
+			
+		}
+		
+		return new Basic($result ?? []);
 		
 	}
 	
@@ -158,34 +180,39 @@ class Dot extends Recursive {
 	 * @param mixed $value Value to be stored in key.
 	 */
 	public function set($key, $value) {
-		$curr = $this;
-		$segments = static::dot($key);
-		$key = array_pop($segments);
-		
-		foreach($segments as $segment) {
+		$segment = $this->dot($key);
+		$lastkey = array_pop($segment);
+		$curnode = &$this->data;
+
+		foreach($segment as $dot) {
+			if(!isset($curnode[$dot]) or !self::listable($curnode[$dot]))
+				$curnode[$dot] = [];
 			
-			if(!$curr instanceof parent)
-				$curr = new static([$segment => new static]);
-			elseif(!isset($curr->data[$segment]))
-				$curr->data[$segment] = new static;
-			
-			$curr = &$curr->data[$segment];
+			$curnode = &$curnode[$dot];
 			
 		}
 		
-		$curr->data[$key] = (self::listable($value) and !$value instanceof self)
-			? new static($value) : $value;
+		$curnode[$lastkey] = $value;
 		
 	}
 	
 	/**
-	 * Explodes dot expression into array.
-	 * @param mixed $key Dot expression key to be split.
-	 * @return array Dot expression segments.
+	 * Creates a new collection mantaining the reference to the original
+	 * variable that is the data stored in it and sets a scope.
+	 * @param mixed $data Data to be stored in collection.
+	 * @param string $scope Scope to be attached to collection.
+	 * @return static New collection with referenced data.
 	 */
-	protected static function dot($key) {
+	protected function scrf(&$data, $scope = null) {
 		
-		return explode('.', $key);
+		if(!is_array($data) and !$data instanceof Base)
+			return $data;
+		
+		$refobj = new static(null, $this->dot);
+		$refobj->data = &$data;
+		$refobj->scope = $scope;
+		
+		return $refobj;
 		
 	}
 	
