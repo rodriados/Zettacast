@@ -191,6 +191,17 @@ abstract class Base implements \Countable, \Iterator, \ArrayAccess {
 	}
 	
 	/**
+	 * Passes the collection to the given function and returns the result.
+	 * @param callable $fn Function to which collection is passed to.
+	 * @return mixed Callback's return result.
+	 */
+	public function pipe(callable $fn) {
+		
+		return $fn($this);
+		
+	}
+	
+	/**
 	 * Rewinds the internal pointer one position.
 	 * @return mixed Element in the previous position.
 	 */
