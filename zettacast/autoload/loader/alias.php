@@ -8,13 +8,15 @@
  */
 namespace Zettacast\Autoload\Loader;
 
+use Zettacast\Autoload\Contract\Loader;
+
 /**
  * The Alias loader class is responsible for implementing the use of class
  * alias, allowing classes and namespaces to be renamed in execution time.
  * @package Zettacast\Autoload
  * @version 1.0
  */
-final class Alias extends Base {
+final class Alias implements Loader {
 	
 	/**
 	 * Maps alias to classes' full names. The entries in this array should not

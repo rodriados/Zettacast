@@ -8,13 +8,15 @@
  */
 namespace Zettacast\Autoload\Loader;
 
+use Zettacast\Autoload\Contract\Loader;
+
 /**
  * The Object loader class is responsible for implementing the loading of
  * objects explicitly listed along the execution.
  * @package Zettacast\Autoload
  * @version 1.0
  */
-class Object extends Base {
+class Object implements Loader {
 	
 	/**
 	 * Listed objects. The entries in this array should not override Zettacast

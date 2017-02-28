@@ -8,6 +8,8 @@
  */
 namespace Zettacast\Autoload\Loader;
 
+use Zettacast\Autoload\Contract\Loader;
+
 /**
  * The Framework loader class is responsible for loading all classes required
  * by the framework or the application itself. It also lets you set explicit
@@ -15,7 +17,7 @@ namespace Zettacast\Autoload\Loader;
  * @package Zettacast\Autoload
  * @version 1.0
  */
-final class Framework extends Base {
+final class Framework implements Loader {
 	
 	/**
 	 * Tries to load an invoked and not yet loaded class. The lookup for
@@ -68,6 +70,16 @@ final class Framework extends Base {
 		
 		require $fname;
 		return true;
+		
+	}
+	
+	/**
+	 * Resets the loader to its initial state.
+	 * @return self Loader instance.
+	 */
+	public function reset() {
+		
+		return $this;
 		
 	}
 	

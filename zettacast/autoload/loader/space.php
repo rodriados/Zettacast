@@ -8,13 +8,15 @@
  */
 namespace Zettacast\Autoload\Loader;
 
+use Zettacast\Autoload\Contract\Loader;
+
 /**
  * The Space loader class is responsible for implementing the loading of
  * classes in namespaces explicitly listed along the execution.
  * @package Zettacast\Autoload
  * @version 1.0
  */
-class Space extends Base {
+class Space implements Loader {
 	
 	/**
 	 * Listed namespaces. The entries in this array should not override
