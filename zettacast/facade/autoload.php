@@ -8,10 +8,10 @@
  */
 namespace Zettacast;
 
-use Zettacast\Autoload\Loader\Base;
 use Zettacast\Autoload\Loader\Alias;
 use Zettacast\Autoload\Loader\Object;
 use Zettacast\Autoload\Loader\Space;
+use Zettacast\Autoload\Contract\Loader;
 use Zettacast\Helper\Contract\Singleton;
 use Zettacast\Autoload\Autoload as baseclass;
 
@@ -50,10 +50,10 @@ final class Autoload {
 	 * Registers a loader to the autoload stack. The autoload function will be
 	 * the responsible for automatically loading all classes invoked by the
 	 * framework or by the application.
-	 * @var Base $loader A loader to be registered.
+	 * @var Loader $loader A loader to be registered.
 	 * @return bool Was the loader successfully registered?
 	 */
-	public static function register(Base $loader) {
+	public static function register(Loader $loader) {
 		
 		return baseclass::register($loader);
 		
@@ -61,9 +61,9 @@ final class Autoload {
 	
 	/**
 	 * Unregisters a class loader from the autoload stack.
-	 * @param Base $loader A loader to be unregistered.
+	 * @param Loader $loader A loader to be unregistered.
 	 */
-	public static function unregister(Base $loader) {
+	public static function unregister(Loader $loader) {
 		
 		baseclass::unregister($loader);
 		
