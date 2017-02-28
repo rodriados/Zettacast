@@ -8,6 +8,8 @@
  */
 namespace Zettacast\Collection;
 
+use Zettacast\Collection\Contract\Collection;
+
 /**
  * Dot collection class. This collection implements dot access methods, that is
  * it's possible to access its recursive data via a dot string.
@@ -30,9 +32,9 @@ class Dot extends Recursive {
 	protected $scope = null;
 	
 	/**
-	 * Base constructor. This constructor simply sets the data received as the
+	 * Dot constructor. This constructor simply sets the data received as the
 	 * data stored in collection.
-	 * @param array|Base|\Traversable $data Data to be stored.
+	 * @param array|Collection|\Traversable $data Data to be stored.
 	 * @param string $dot Depth-separator.
 	 */
 	public function __construct($data = null, string $dot = '.') {
@@ -205,7 +207,7 @@ class Dot extends Recursive {
 	 */
 	protected function scrf(&$data, $scope = null) {
 		
-		if(!is_array($data) and !$data instanceof Base)
+		if(!is_array($data) and !$data instanceof Collection)
 			return $data;
 		
 		$refobj = new static(null, $this->dot);

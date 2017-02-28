@@ -8,6 +8,9 @@
  */
 namespace Zettacast\Collection;
 
+use Traversable;
+use Zettacast\Collection\Contract\Collection;
+
 /**
  * Base collection abstraction. This class has methods appliable for all kinds
  * of collections. Some methods are yet to implemented by inheritance.
@@ -15,7 +18,7 @@ namespace Zettacast\Collection;
  * @see \Zettacast\Collection
  * @version 1.0
  */
-abstract class Base implements \Countable, \Iterator, \ArrayAccess {
+abstract class Base implements Collection {
 	
 	/**
 	 * Data to be stored.
@@ -26,7 +29,7 @@ abstract class Base implements \Countable, \Iterator, \ArrayAccess {
 	/**
 	 * Base constructor. This constructor simply sets the data received as the
 	 * data stored in collection.
-	 * @param array|Base|\Traversable $data Data to be stored.
+	 * @param array|Collection|\Traversable $data Data to be stored.
 	 */
 	public function __construct($data = null) {
 		
@@ -154,7 +157,7 @@ abstract class Base implements \Countable, \Iterator, \ArrayAccess {
 	 * @param bool $strict Should types be strictly the same?
 	 * @return bool Was the element found?
 	 */
-	public function in($needle, $strict = false) {
+	public function in($needle, bool $strict = false) {
 		
 		return in_array($needle, $this->data, $strict);
 		
@@ -315,8 +318,8 @@ abstract class Base implements \Countable, \Iterator, \ArrayAccess {
 	final static protected function listable($data) {
 		
 		return is_array($data)
-			or $data instanceof Base
-			or $data instanceof \Traversable;
+			or $data instanceof Collection
+			or $data instanceof Traversable;
 		
 	}
 	
@@ -328,8 +331,8 @@ abstract class Base implements \Countable, \Iterator, \ArrayAccess {
 	final static protected function toarray($data) {
 		
 		if(is_array($data)) return $data;
-		elseif($data instanceof Base) return $data->all();
-		elseif($data instanceof \Traversable) return iterator_to_array($data);
+		elseif($data instanceof Collection) return $data->all();
+		elseif($data instanceof Traversable) return iterator_to_array($data);
 		
 		return [$data];
 		
@@ -343,7 +346,7 @@ abstract class Base implements \Countable, \Iterator, \ArrayAccess {
 	 */
 	protected static function ref(&$data) {
 		
-		if(!is_array($data) and !$data instanceof Base)
+		if(!is_array($data) and !$data instanceof Collection)
 			return $data;
 		
 		$refobj = new static;

@@ -159,7 +159,7 @@ class Recursive extends Base {
 	 * @param bool $strict Should types be strictly the same?
 	 * @return bool Was the element found?
 	 */
-	public function in($needle, $strict = false) {
+	public function in($needle, bool $strict = false) {
 		
 		$fn = $strict
 			? function($value) use($needle) { return $value === $needle; }
