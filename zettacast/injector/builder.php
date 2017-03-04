@@ -61,21 +61,16 @@ class Builder {
 		$reflector = new ReflectionClass($concrete);
 		
 		if(!$reflector->isInstantiable())
-			throw new Exception($concrete.' is not instantiable');
+			$this->uninstantiable($concrete);
 		
 		if(is_null($constructor = $reflector->getConstructor()))
 			return new $concrete;
 		
 		$this->stack->push($concrete);
-		
-		foreach($constructor->getParameters() as $dependency)
-			$params[] = is_null($dependency->getClass())
-				? $this->rprimitive($dependency)
-				: $this->rclass($dependency);
-		
+		$params = $this->resolve($constructor->getParameters());
 		$this->stack->pop();
 		
-		return $reflector->newInstanceArgs($params ?? []);
+		return $reflector->newInstanceArgs($params);
 		
 	}
 	
@@ -91,22 +86,32 @@ class Builder {
 			? new ReflectionMethod(...explode('::', $fn))
 			: new ReflectionFunction($fn);
 		
-		foreach($reflector->getParameters() as $param)
-			if(array_key_exists($param->name, $params))
-				$callparam[] = $params[$param->name];
-			elseif($v = $param->getClass())
-				$callparam[] = $this->injector->make($v->name);
-			elseif($param->isDefaultValueAvailable())
-				$callparam[] = $param->getDefaultValue();
-			else
-				$callparam[] = null;
-		
-		$callparam = array_merge($callparam ?? [], $params);
-			
+		$callparam = $this->resolve($reflector->getParameters(), $params);
+
 		return function() use($reflector, $callparam) {
 			return $reflector->invokeArgs($callparam);
 		};
 			
+	}
+	
+	/**
+	 * Resolves all dependencies from a build or wrap request.
+	 * @param \ReflectionParameter[] $requested Requested dependencies.
+	 * @param array $params Parameters to be used instead of building.
+	 * @return array Resolved dependencies.
+	 */
+	protected function resolve(array $requested, array $params = []) {
+
+		foreach($requested as $dependency)
+			if(isset($params[$dependency->name]))
+				$solved[] = $params[$dependency->name];
+			elseif(!is_null($dependency->getClass()))
+				$solved[] = $this->varobject($dependency);
+			else
+				$solved[] = $this->varvalue($dependency);
+			
+		return array_merge($solved ?? [], $params);
+		
 	}
 	
 	/**
@@ -115,7 +120,7 @@ class Builder {
 	 * @return mixed Resolved primitive.
 	 * @throws Exception Primitive value could not be resolved.
 	 */
-	protected function rprimitive(\ReflectionParameter $param) {
+	protected function varvalue(\ReflectionParameter $param) {
 		
 		$context = $this->stack->end();
 		$link = $this->injector->resolve('$'.$param->name, $context)->concrete;
@@ -127,10 +132,7 @@ class Builder {
 		if($param->isDefaultValueAvailable())
 			return $param->getDefaultValue();
 		
-		throw new Exception(sprintf('Unresolvable %s in %s::%s',
-			$param,
-			!is_null($c = $param->getDeclaringClass()) ? $c->getName() : '',
-			$param->getDeclaringFunction()->getName() ?? ''));
+		$this->unresolvable($param);
 		
 	}
 	
@@ -140,15 +142,13 @@ class Builder {
 	 * @return mixed Resolved object.
 	 * @throws Exception Object dependency could not be resolved.
 	 */
-	protected function rclass(\ReflectionParameter $param) {
+	protected function varobject(\ReflectionParameter $param) {
 		
 		try {
 			
 			return $this->injector->make($param->getClass()->getName());
 			
-		}
-		
-		catch(Exception $e) {
+		} catch(Exception $e) {
 			
 			if($param->isOptional())
 				return $param->getDefaultValue();
@@ -156,6 +156,34 @@ class Builder {
 			throw $e;
 			
 		}
+		
+	}
+	
+	/**
+	 * Throws an exception for not instantiable object.
+	 * @param string $concrete Not instantiable object.
+	 * @throws Exception Thrown exception.
+	 */
+	private function uninstantiable(string $concrete) {
+		
+		throw new Exception(sprintf('%s is not instantiable!',
+			$concrete
+		));
+		
+	}
+	
+	/**
+	 * Throws an exception for unresolvable parameter.
+	 * @param \ReflectionParameter $param Unresolvable parameter.
+	 * @throws Exception Thrown exception.
+	 */
+	private function unresolvable(\ReflectionParameter $param) {
+		
+		throw new Exception(sprintf('Unresolvable %s in %s::%s',
+			$param->name,
+			$param->getDeclaringClass()->name,
+			$param->getDeclaringFunction()->name
+		));
 		
 	}
 	
