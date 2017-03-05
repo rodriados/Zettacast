@@ -12,7 +12,6 @@ use Zettacast\Autoload\Loader\Alias;
 use Zettacast\Autoload\Loader\Object;
 use Zettacast\Autoload\Loader\Space;
 use Zettacast\Autoload\Contract\Loader;
-use Zettacast\Helper\Contract\Singleton;
 use Zettacast\Autoload\Autoload as baseclass;
 
 /**
@@ -22,29 +21,23 @@ use Zettacast\Autoload\Autoload as baseclass;
  */
 final class Autoload {
 	
-	/*
-	 * Singleton trait inclusion. This trait implements Singleton pattern
-	 * that allows the existance of one and only one object instance.
-	 */
-	use Singleton;
-	
 	/**
 	 * Aliased objects loader instance.
 	 * @var Alias Loader instance.
 	 */
-	private $alias = null;
+	private static $alias = null;
 	
 	/**
 	 * External objects loader instance.
 	 * @var Object Loader instance.
 	 */
-	private $object = null;
+	private static $object = null;
 	
 	/**
 	 * Namespaced objects loader instance.
 	 * @var Space Loader instance.
 	 */
-	private $space = null;
+	private static $space = null;
 	
 	/**
 	 * Registers a loader to the autoload stack. The autoload function will be
@@ -55,7 +48,7 @@ final class Autoload {
 	 */
 	public static function register(Loader $loader) {
 		
-		return baseclass::register($loader);
+		return zetta(baseclass::class)->register($loader);
 		
 	}
 	
@@ -65,7 +58,7 @@ final class Autoload {
 	 */
 	public static function unregister(Loader $loader) {
 		
-		baseclass::unregister($loader);
+		zetta(baseclass::class)->unregister($loader);
 		
 	}
 	
@@ -75,7 +68,7 @@ final class Autoload {
 	 */
 	public static function reset() {
 		
-		baseclass::reset();
+		zetta(baseclass::class)->reset();
 		
 	}
 	
@@ -89,10 +82,10 @@ final class Autoload {
 		if($map)
 			return self::alias()->set($map);
 		
-		if(is_null(self::i()->alias))
-			baseclass::register(self::i()->alias = new Alias);
+		if(is_null(self::$alias))
+			zetta(baseclass::class)->register(self::$alias = new Alias);
 		
-		return self::i()->alias;
+		return self::$alias;
 		
 	}
 	
@@ -106,10 +99,10 @@ final class Autoload {
 		if($map)
 			return self::object()->set($map);
 		
-		if(is_null(self::i()->object))
-			baseclass::register(self::i()->object = new Object);
+		if(is_null(self::$object))
+			zetta(baseclass::class)->register(self::$object = new Object);
 		
-		return self::i()->object;
+		return self::$object;
 		
 	}
 	
@@ -123,10 +116,10 @@ final class Autoload {
 		if($map)
 			return self::space()->set($map);
 		
-		if(is_null(self::i()->space))
-			baseclass::register(self::i()->space = new Space);
+		if(is_null(self::$space))
+			zetta(baseclass::class)->register(self::$space = new Space);
 		
-		return self::i()->space;
+		return self::$space;
 		
 	}
 	

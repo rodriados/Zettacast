@@ -8,17 +8,11 @@
  */
 namespace Zettacast\Autoload;
 
-/*
- * Imports class-loaders "manually". This is the last time we do this kind of
- * "hardcoding". All future classes will be loaded automatically.
- */
-require FWORKPATH.'/autoload/contract/loader.php';
-require FWORKPATH.'/autoload/loader/framework.php';
-require FWORKPATH.'/helper/contract/singleton.php';
+require __DIR__.'/contract/loader.php';
+require __DIR__.'/loader/framework.php';
 
 use Zettacast\Autoload\Contract\Loader;
 use Zettacast\Autoload\Loader\Framework;
-use Zettacast\Helper\Contract\Singleton;
 
 /**
  * The autoload class is responsible for loading all classes required by the
@@ -28,12 +22,6 @@ use Zettacast\Helper\Contract\Singleton;
  * @version 1.1
  */
 final class Autoload {
-	
-	/*
-	 * Singleton trait inclusion. This trait implements Singleton pattern
-	 * that allows the existance of one and only one object instance.
-	 */
-	use Singleton;
 	
 	/**
 	 * Stores the classloaders already registered in the autoloading system.
@@ -52,21 +40,13 @@ final class Autoload {
 	/**
 	 * Autoload constructor.
 	 * Initializes the class and set values to instance properties.
+	 * @param string $path Framework's path.
 	 */
-	protected function __construct() {
+	public function __construct(string $path) {
 		
 		$this->loaders = [];
-		$this->framework = new Framework;
-		
-	}
-	
-	/**
-	 * Starts framework autoloading.
-	 * Starts and registers default framework autoloader.
-	 */
-	public static function init() {
-		
-		self::register(self::i()->framework);
+		$this->framework = new Framework($path);
+		$this->register($this->framework);
 		
 	}
 	
@@ -77,11 +57,11 @@ final class Autoload {
 	 * @var Loader $loader A loader to be registered.
 	 * @return bool Was the loader successfully registered?
 	 */
-	public static function register(Loader $loader) {
+	public function register(Loader $loader) {
 
-		if(!in_array($loader, self::i()->loaders)) {
+		if(!in_array($loader, $this->loaders)) {
 			
-			self::i()->loaders[] = $loader;
+			$this->loaders[] = $loader;
 			return spl_autoload_register([$loader, 'load']);
 			
 		}
@@ -94,12 +74,12 @@ final class Autoload {
 	 * Unregisters a class loader from the autoload stack.
 	 * @param Loader $loader A loader to be unregistered.
 	 */
-	public static function unregister(Loader $loader) {
+	public function unregister(Loader $loader) {
 		
-		if(in_array($loader, self::i()->loaders)) {
+		if(in_array($loader, $this->loaders)) {
 			
-			unset(self::i()->loaders[
-				array_search($loader, self::i()->loaders)
+			unset($this->loaders[
+				array_search($loader, $this->loaders)
 			]);
 			spl_autoload_unregister([$loader, 'load']);
 			
@@ -111,14 +91,14 @@ final class Autoload {
 	 * Resets all registered loaders and unregister all loaders but the default
 	 * one. This is used when only Zettacast's core classes are needed.
 	 */
-	public static function reset() {
+	public function reset() {
 		
-		foreach(self::i()->loaders as $loader) {
+		foreach($this->loaders as $loader) {
 			spl_autoload_unregister([$loader, 'load']);
 			$loader->reset();
 		}
 		
-		self::init();
+		$this->register($this->framework);
 		
 	}
 	

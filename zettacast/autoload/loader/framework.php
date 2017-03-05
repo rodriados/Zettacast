@@ -20,6 +20,23 @@ use Zettacast\Autoload\Contract\Loader;
 final class Framework implements Loader {
 	
 	/**
+	 * Framework's directory path.
+	 * @var string Path to framework's files.
+	 */
+	protected $path;
+	
+	/**
+	 * Autoload constructor.
+	 * Initializes the class and set values to instance properties.
+	 * @param string $path Framework's path.
+	 */
+	public function __construct(string $path) {
+		
+		$this->path = $path;
+		
+	}
+	
+	/**
 	 * Tries to load an invoked and not yet loaded class. The lookup for
 	 * classes happens in the framework core first and then it acts as PHP
 	 * default autoloader.
@@ -37,12 +54,12 @@ final class Framework implements Loader {
 		if(count($elem) == 1) /* façade */ {
 			
 			$lower = strtolower($elem[0]);
-			$fname = FWORKPATH."/facade/{$lower}.php";
+			$fname = $this->path."/facade/{$lower}.php";
 			
 		} else /* internal framework use */ {
 			
 			$lower = strtolower(implode('/', $elem));
-			$fname = FWORKPATH."/{$lower}.php";
+			$fname = $this->path."/{$lower}.php";
 			
 		}
 
@@ -63,7 +80,7 @@ final class Framework implements Loader {
 	private function default(string $class) {
 		
 		$lower = strtolower(str_replace('\\', '/', $class));
-		$fname = DOCROOT."/{$lower}.php";
+		$fname = $this->path."/../{$lower}.php";
 		
 		if(!file_exists($fname))
 			return false;

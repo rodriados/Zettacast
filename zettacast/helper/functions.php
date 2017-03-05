@@ -45,3 +45,19 @@ if(!function_exists('with')) {
 		
 	}
 }
+
+if(!function_exists('zetta')) {
+	/**
+	 * Gets the current framework instance.
+	 * @param string $abstract Abstraction to be made.
+	 * @return mixed Requested abstraction or framework instance.
+	 */
+	function zetta(string $abstract = null) {
+		
+		if(is_null($abstract))
+			return Zettacast::instance();
+		
+		return Zettacast::instance()->make($abstract);
+		
+	}
+}

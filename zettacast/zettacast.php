@@ -7,39 +7,21 @@
  * @copyright 2015-2017 Rodrigo Siqueira
  */
 
-/*
- * Gets the name, start time and memory of the framework. These information
- * can be used later anywhere in the framework.
- */
-defined('ZETTACAST') or define('ZETTACAST', 'Zettacast');
-defined('ZBOOTTIME') or define('ZBOOTTIME', microtime(true));
-defined('ZBOOTMEMO') or define('ZBOOTMEMO', memory_get_usage());
+use Zettacast\Injector\Injector;
 
 /**
  * Boots framework and starts its main classes and modules, allowing its
  * correct usage and execution.
  * @version 1.0
  */
-final class Zettacast {
+final class Zettacast extends Injector {
 	
-	/**
-	 * Input mode currently in use with the framework.
-	 * @var int Mode used in the framework.
-	 */
-	private static $mode;
-	
-	/**
-	 * Environment in which framework is being executed.
-	 * @var string Current environment mode.
-	 */
-	private static $env;
-
 	/**
 	 * Stores this class' singleton instance and helps checking whether the
 	 * framework has already been booted or not.
 	 * @var Zettacast Framework singleton instance.
 	 */
-	private static $i = null;
+	private static $instance = null;
 	
 	/**#@+
 	 * Environment mode constants. These constants determine in which mode
@@ -47,8 +29,10 @@ final class Zettacast {
 	 * depending on the environment framework is executing.
 	 * @var string Execution mode constants.
 	 */
-	const DEVELOPMENT   = 0x001;
-	const PRODUCTION    = 0x002;
+	const LOCAL         = 0x001;
+	const TESTING       = 0x002;
+	const DEVELOPMENT   = 0x004;
+	const PRODUCTION    = 0x008;
 	/**#@-*/
 	
 	/**#@+
@@ -57,130 +41,43 @@ final class Zettacast {
 	 * it's an asynchronous request, such as AJAX.
 	 * @var int Input mode constants.
 	 */
-	const APPLICATION   = 0x100;
-	const COMMANDLINE   = 0x200;
-	const ASYNCHRONOUS  = 0x400;
+	const APPLICATION   = 0x010;
+	const COMMANDLINE   = 0x020;
+	const ASYNCHRONOUS  = 0x040;
 	/**#@-*/
 	
 	/**
 	 * This method is responsible for setting the minimal configuration and
 	 * gathering information about the environment so the framework can work
 	 * correctly and execute the application as expected.
+	 * @param string $root Document root directory path.
 	 */
-	protected function __construct() {
+	public function __construct(string $root) {
+		parent::__construct();
+		$root = rtrim($root, '\/');
 		
-		self::$env = $_SERVER['env'] ?? self::PRODUCTION;
-		#self::$env = Config::get('environment', Request::server('env'))
-		#   ?: self::PRODUCTION;
+		$this->share('path', $root);
+		$this->share('path.app', $root.'/app');
+		$this->share('path.public', $root.'/public');
+		$this->share('path.fwork', $root.'/zettacast');
 		
-		date_default_timezone_set('America/Sao_Paulo');
-		#date_default_timezone_set(Config::get('timezone'));
+		$this->share(self::class, $this);
+		$this->share(Injector::class, $this);
 		
 	}
 	
 	/**
-	 * Application execution call. This method is responsible for executing and
-	 * rendering the application, and thus producing an answer for an user.
+	 * Singleton instance discovery. This method gives access to the singleton
+	 * or creates it if it's not yet created.
+	 * @param Zettacast $instance Instance to be used as singleton.
+	 * @return static Singleton instance.
 	 */
-	public function app() {
+	public static function instance(Zettacast $instance = null) {
 		
-		if(self::$env == self::PRODUCTION) {
-			ini_set('display_errors', 0);
-			error_reporting(0);
-		}
+		if(is_null(self::$instance) and !is_null($instance))
+			self::$instance = $instance;
 		
-		#self::$mode = Request::ajax() ? self::ASYNCHRONOUS : self::APPLICATION;
-		self::$mode = self::APPLICATION;
-		require APPPATH.'/bootstrap.php';
-
-		#\Zettacast\HTTP\Request::handle();
-		#print \Zettacast\HTTP\Request::url();
-		
-	}
-	
-	/**
-	 * Command line execution call. This method is responsible for executing a
-	 * command sent by a terminal or similar.
-	 */
-	public function cli() {
-		
-		self::$mode = self::COMMANDLINE;
-		print "Hello, Command Line!\n";
-		
-	}
-	
-	/**
-	 * Boots framework's basic functions and modules up. It also sets all
-	 * needed handlers and callbacks for error and shutdown.
-	 * @return Zettacast Booted framework instance.
-	 * @throws Exception
-	 */
-	public static function boot() {
-		
-		if(isset(self::$i))
-			throw new Exception('Zettacast cannot be booted more than once!');
-		
-		require FWORKPATH.'/helper/functions.php';
-		require FWORKPATH.'/autoload/autoload.php';
-		\Zettacast\Autoload\Autoload::init();
-		
-		register_shutdown_function([self::class, 'shutdown']);
-		#set_exception_handler([\Zettacast\Err\Err::class, 'exception']);
-		#set_error_handler(\Zettacast\Err\Err::class, 'error');
-
-		return self::$i = new self;
-		
-	}
-	
-	/**
-	 * Successfully finishes framework's execution and objects. Shutdown event
-	 * is triggered so that any final application function can run.
-	 */
-	public static function shutdown() {
-		
-		\Zettacast\Autoload\Autoload::reset();
-		#\Zettacast\Event\Event::post('shutdown');
-		#\Zettacast\Err\Err::shutdown();
-		
-	}
-	
-	/**
-	 * Aborts the framework execution. This method is always called explicitly,
-	 * never by any automatic PHP feature.
-	 */
-	public static function abort() {
-		
-		\Zettacast\Autoload\Autoload::reset();
-		#\Zettacast\Event\Event::post('abort');
-		#\Zettacast\Err\Err::abort();
-		
-		exit;
-		
-	}
-	
-	/**
-	 * Informs what is the environment currently used. This method's return
-	 * value is one of the most important values throughout the framework's
-	 * execution as many decisions are made based on it.
-	 * @param int $value Value to be checked if currently active.
-	 * @return int|bool Current environment.
-	 */
-	public static function env(int $value = null) {
-		
-		return is_null($value) ? self::$env : (bool)(self::$env & $value);
-		
-	}
-	
-	/**
-	 * Informs what is the input mode used. This information is important
-	 * because many resources can have their behavior changed depending on the
-	 * input mode used with the framework.
-	 * @param int $value Value to be checked if currently active.
-	 * @return int|bool Current input mode.
-	 */
-	public static function mode(int $value = null) {
-		
-		return is_null($value) ? self::$mode : (bool)(self::$mode & $value);
+		return self::$instance;
 		
 	}
 	

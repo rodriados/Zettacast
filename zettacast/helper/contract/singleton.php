@@ -32,8 +32,10 @@ trait Singleton {
 	 */
 	final public static function i() {
 		
-		if(!isset(self::$instance))
+		if(!isset(self::$instance)) {
 			self::$instance = new static;
+			zetta()->share(static::class, self::$instance);
+		}
 		
 		return self::$instance;
 		
@@ -53,7 +55,7 @@ trait Singleton {
 	 * Blocks clone magic method. This does not allow Singleton objects to be
 	 * cloned. Cloning is not possible when one wants keep one single instance.
 	 */
-	protected function __clone() {
+	final protected function __clone() {
 		
 		;
 		
@@ -63,7 +65,7 @@ trait Singleton {
 	 * Blocks wakeup magic method. This does not allow Singleton objects to be
 	 * instanciated via unserialization.
 	 */
-	protected function __wakeup() {
+	final protected function __wakeup() {
 		
 		;
 		
