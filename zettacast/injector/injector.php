@@ -6,9 +6,11 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Injector;
+namespace Zettacast;
 
 use Closure;
+use Zettacast\Injector\Binder;
+use Zettacast\Injector\Builder;
 use Zettacast\Collection\Basic as Collection;
 use Zettacast\Injector\Contract\Injector as InjectorContract;
 

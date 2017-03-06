@@ -30,7 +30,7 @@ trait Singleton {
 	 * or creates it if it's not yet created.
 	 * @return static Singleton instance.
 	 */
-	final public static function i() {
+	final public static function instance() {
 		
 		if(!isset(self::$instance)) {
 			self::$instance = new static;

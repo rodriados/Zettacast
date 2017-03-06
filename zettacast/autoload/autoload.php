@@ -6,10 +6,10 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Autoload;
+namespace Zettacast;
 
-require __DIR__.'/contract/loader.php';
-require __DIR__.'/loader/framework.php';
+require FWORKPATH.'/autoload/contract/loader.php';
+require FWORKPATH.'/autoload/loader/framework.php';
 
 use Zettacast\Autoload\Contract\Loader;
 use Zettacast\Autoload\Loader\Framework;
@@ -42,7 +42,7 @@ final class Autoload {
 	 * Initializes the class and set values to instance properties.
 	 * @param string $path Framework's path.
 	 */
-	public function __construct(string $path) {
+	public function __construct(string $path = FWORKPATH) {
 		
 		$this->loaders = [];
 		$this->framework = new Framework($path);

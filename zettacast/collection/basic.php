@@ -136,6 +136,8 @@ class Basic extends Base {
 	 */
 	public function first(callable $fn = null, $default = null) {
 		
+		$fn = $fn ?: function() { return true; };
+		
 		foreach($this->iterate() as $key => $value)
 			if($fn($value, $key))
 				return $value;
@@ -205,6 +207,8 @@ class Basic extends Base {
 	 * @return mixed Last element that passed the test.
 	 */
 	public function last(callable $fn = null, $default = null) {
+		
+		$fn = $fn ?: function() { return true; };
 		
 		foreach($this->reverse()->iterate() as $key => $value)
 			if($fn($value, $key))

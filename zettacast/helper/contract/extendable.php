@@ -8,6 +8,8 @@
  */
 namespace Zettacast\Helper\Contract;
 
+use Closure;
+
 /**
  * Implements methods that allow class extension. This trait allows the object
  * it is used within to be extended, that is to have methods included during
@@ -25,9 +27,9 @@ trait Extendable {
 	/**
 	 * Attaches a new method to the class by the creation of a new function.
 	 * @param string $name Name of the method being attached.
-	 * @param \Closure $fn Code block for function being attached.
+	 * @param Closure $fn Code block for function being attached.
 	 */
-	public static function attach($name, \Closure $fn) {
+	public static function attach($name, Closure $fn) {
 		
 		self::$fn[$name] = $fn;
 		
@@ -66,7 +68,7 @@ trait Extendable {
 		if(!isset(self::$fn[$name]))
 			throw new \BadMethodCallException("Method {$name} does not exist");
 		
-		$fn = \Closure::bind(self::$fn[$name], null, static::class);
+		$fn = Closure::bind(self::$fn[$name], null, static::class);
 		return $fn(...$params);
 		
 	}
@@ -82,7 +84,7 @@ trait Extendable {
 		if(!isset(self::$fn[$name]))
 			throw new \BadMethodCallException("Method {$name} does not exist");
 		
-		$fn = \Closure::bind(self::$fn[$name], $this, static::class);
+		$fn = Closure::bind(self::$fn[$name], $this, static::class);
 		return $fn(...$params);
 			
 	}

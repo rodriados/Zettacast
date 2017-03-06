@@ -30,7 +30,7 @@ final class Framework implements Loader {
 	 * Initializes the class and set values to instance properties.
 	 * @param string $path Framework's path.
 	 */
-	public function __construct(string $path) {
+	public function __construct(string $path = FWORKPATH) {
 		
 		$this->path = $path;
 		
@@ -51,10 +51,10 @@ final class Framework implements Loader {
 		if(array_shift($elem) != ZETTACAST)
 			return $this->default($class);
 		
-		if(count($elem) == 1) /* façade */ {
+		if(count($elem) == 1) /* package classes */ {
 			
 			$lower = strtolower($elem[0]);
-			$fname = $this->path."/facade/{$lower}.php";
+			$fname = $this->path."/{$lower}/{$lower}.php";
 			
 		} else /* internal framework use */ {
 			

@@ -13,6 +13,7 @@ use Exception;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionFunction;
+use Zettacast\Injector;
 use Zettacast\Collection\Basic as Collection;
 
 /**

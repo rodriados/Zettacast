@@ -6,7 +6,7 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-use Zettacast\Autoload;
+use Zettacast\Facade\Autoload;
 
 /*
  * This allows you to add your application's or any other classes to the

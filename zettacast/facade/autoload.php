@@ -6,13 +6,13 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast;
+namespace Zettacast\Facade;
 
 use Zettacast\Autoload\Loader\Alias;
 use Zettacast\Autoload\Loader\Object;
 use Zettacast\Autoload\Loader\Space;
-use Zettacast\Autoload\Contract\Loader;
-use Zettacast\Autoload\Autoload as baseclass;
+use Zettacast\Helper\Contract\Facadable;
+use Zettacast\Autoload as baseclass;
 
 /**
  * Zettacast's Autoload façade class.
@@ -20,6 +20,8 @@ use Zettacast\Autoload\Autoload as baseclass;
  * @version 1.0
  */
 final class Autoload {
+	
+	use Facadable;
 	
 	/**
 	 * Aliased objects loader instance.
@@ -40,35 +42,13 @@ final class Autoload {
 	private static $space = null;
 	
 	/**
-	 * Registers a loader to the autoload stack. The autoload function will be
-	 * the responsible for automatically loading all classes invoked by the
-	 * framework or by the application.
-	 * @var Loader $loader A loader to be registered.
-	 * @return bool Was the loader successfully registered?
+	 * Informs what the façaded object accessor is, allowing it to be further
+	 * used when calling façaded methods.
+	 * @return mixed Façaded object accessor.
 	 */
-	public static function register(Loader $loader) {
+	protected static function accessor() {
 		
-		return zetta(baseclass::class)->register($loader);
-		
-	}
-	
-	/**
-	 * Unregisters a class loader from the autoload stack.
-	 * @param Loader $loader A loader to be unregistered.
-	 */
-	public static function unregister(Loader $loader) {
-		
-		zetta(baseclass::class)->unregister($loader);
-		
-	}
-	
-	/**
-	 * Resets all registered loaders and unregister all loaders but the default
-	 * one. This is used when only Zettacast's core classes are needed.
-	 */
-	public static function reset() {
-		
-		zetta(baseclass::class)->reset();
+		return baseclass::class;
 		
 	}
 	

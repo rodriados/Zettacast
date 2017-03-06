@@ -20,14 +20,14 @@ error_reporting(~0);
  * needed for a correct Zettacast execution. Besides that, an autoload function
  * is specified so one no longer needs explicitly include class files.
  */
-$zcast = require __DIR__.'/../zettacast/bootstrap.php';
-require __DIR__.'/../app/bootstrap.php';
+$fwork = require __DIR__.'/../zettacast/bootstrap.php';
+		 require __DIR__.'/../app/bootstrap.php';
 
 /*
  * Now that we have our framework on, we must take care of the incoming HTTP
  * request and produce the expected response from it.
  */
-require $zcast->make('path.app').'/http/index/index.php';
+require APPPATH.'/http/index/index.php';
 /*
 $kernel = $zcast->make(Zettacast\HTTP\Kernel::class);
 

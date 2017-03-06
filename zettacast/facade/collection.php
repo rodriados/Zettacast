@@ -6,7 +6,7 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast;
+namespace Zettacast\Facade;
 
 use Zettacast\Collection\Dot;
 use Zettacast\Collection\Imutable;
@@ -22,11 +22,7 @@ use Zettacast\Helper\Contract\Extendable;
  */
 final class Collection {
 	
-	/*
-	 * Extendable contract inclusion. This allows different types of collection
-	 * to be created and registered during execution time.
-	 */
-	use Extendable;
+	use Extendable { Extendable::__callStatic as __callAttached; }
 	
 	/**
 	 * Builds a new collection based on a function.
@@ -118,4 +114,19 @@ final class Collection {
 		
 	}
 	
+	/**
+	 * Executes collection functions in built-in arrays.
+	 * @param string $method Method to be called.
+	 * @param array $args Arguments for the called method.
+	 * @return mixed Façaded method return value.
+	 */
+	public static function __callStatic(string $method, array $args) {
+		
+		if(count($args) >= 1 and is_callable([baseclass::class, $method]))
+			return self::make(array_shift($args))->$method(...$args);
+		
+		return self::__callAttached($method, $args);
+		
+	}
+		
 }

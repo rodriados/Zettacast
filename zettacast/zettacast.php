@@ -7,7 +7,7 @@
  * @copyright 2015-2017 Rodrigo Siqueira
  */
 
-use Zettacast\Injector\Injector;
+use Zettacast\Injector;
 
 /**
  * Boots framework and starts its main classes and modules, allowing its
@@ -52,14 +52,13 @@ final class Zettacast extends Injector {
 	 * correctly and execute the application as expected.
 	 * @param string $root Document root directory path.
 	 */
-	public function __construct(string $root) {
+	public function __construct(string $root = DOCROOT) {
 		parent::__construct();
-		$root = rtrim($root, '\/');
 		
-		$this->share('path', $root);
-		$this->share('path.app', $root.'/app');
+		$this->share('path', $root.'/app');
+		$this->share('path.base', $root);
 		$this->share('path.public', $root.'/public');
-		$this->share('path.fwork', $root.'/zettacast');
+		$this->share('path.zetta', $root.'/zettacast');
 		
 		$this->share(self::class, $this);
 		$this->share(Injector::class, $this);
@@ -69,13 +68,12 @@ final class Zettacast extends Injector {
 	/**
 	 * Singleton instance discovery. This method gives access to the singleton
 	 * or creates it if it's not yet created.
-	 * @param Zettacast $instance Instance to be used as singleton.
 	 * @return static Singleton instance.
 	 */
-	public static function instance(Zettacast $instance = null) {
+	public static function instance() {
 		
-		if(is_null(self::$instance) and !is_null($instance))
-			self::$instance = $instance;
+		if(is_null(self::$instance))
+			self::$instance = new self;
 		
 		return self::$instance;
 		
