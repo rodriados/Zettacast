@@ -17,11 +17,10 @@ use Zettacast\Injector;
 final class Zettacast extends Injector {
 	
 	/**
-	 * Stores this class' singleton instance and helps checking whether the
-	 * framework has already been booted or not.
-	 * @var Zettacast Framework singleton instance.
+	 * Informs Zettacast current version.
+	 * @var string Zettacast version.
 	 */
-	private static $instance = null;
+	const VERSION       = '1.0';
 	
 	/**#@+
 	 * Environment mode constants. These constants determine in which mode
@@ -45,6 +44,34 @@ final class Zettacast extends Injector {
 	const COMMANDLINE   = 0x020;
 	const ASYNCHRONOUS  = 0x040;
 	/**#@-*/
+	
+	/**
+	 * Internationalization locale. This property informs the language the
+	 * application is being presented to the used.
+	 * @var string Application's language.
+	 */
+	public static $locale = 'en_US';
+	
+	/**
+	 * User's timezone. This property informs the timezone to be shown whenever
+	 * a date or hour is presented to the user.
+	 * @var string Application's timezone.
+	 */
+	public static $timezone = 'UTC';
+	
+	/**
+	 * Application's encoding. This property informs the encoding used to show
+	 * texts for the user.
+	 * @var string Application's encoding.
+	 */
+	public static $encoding = 'UTF-8';
+	
+	/**
+	 * Stores this class' singleton instance and helps checking whether the
+	 * framework has already been booted or not.
+	 * @var Zettacast Framework singleton instance.
+	 */
+	private static $instance = null;
 	
 	/**
 	 * This method is responsible for setting the minimal configuration and

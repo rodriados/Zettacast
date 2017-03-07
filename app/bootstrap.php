@@ -34,3 +34,11 @@ Autoload::alias([
 	// Add here the alias you want to add. Example:
 	// 'SendMail' => 'App\Package\Mail\Send'
 ]);
+
+/*
+ * Sets application's locale, timezone and encoding. These values will be used
+ * only if no data can be found in a configuration file.
+ */
+Zettacast::$locale = 'en_US';
+Zettacast::$timezone = 'UTC';
+Zettacast::$encoding = 'UTF-8';
