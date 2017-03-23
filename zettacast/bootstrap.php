@@ -43,17 +43,4 @@ $loader = new Zettacast\Autoload;
  */
 require FWORKPATH.'/helper/functions.php';
 require FWORKPATH.'/zettacast.php';
-$fwork = Zettacast::instance();
-
-/*
- * Let us now share our autoload instance with the framework so it knows the
- * object instance responsible for loading all of its components.
- */
-$fwork->share(Zettacast\Autoload::class, $loader);
-
-/*
- * Return the framework instance. The instance is given back to the script so
- * the framework can be bootstrapped separately from where the application is
- * actually running.
- */
-return $fwork;
+zetta()->share(Zettacast\Autoload::class, $loader);

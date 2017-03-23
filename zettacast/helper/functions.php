@@ -41,7 +41,7 @@ if(!function_exists('with')) {
 	 */
 	function with($object) {
 		
-		return $object;
+		return $object instanceof Closure ? $object() : $object;
 		
 	}
 }
