@@ -336,6 +336,17 @@ class Basic extends Base {
 	}
 	
 	/**
+	 * Replaces collection according to the given data.
+	 * @param mixed $items Items to be replaced in the collection.
+	 * @return static Collection with replaced data.
+	 */
+	public function replace($items) {
+		
+		return new static(array_replace($this->data, self::toarray($items)));
+		
+	}
+	
+	/**
 	 * Reverses collection's elements order.
 	 * @return static Reversed collection.
 	 */
