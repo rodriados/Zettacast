@@ -8,6 +8,8 @@
  */
 namespace Zettacast\Collection;
 
+use Exception;
+
 /**
  * Imutable collection class. This collection has constant data, so the data
  * sent by the time of instance creation cannot be changed.
@@ -36,7 +38,7 @@ class Imutable extends Base {
 	 */
 	final public function set($name, $value) {
 		
-		throw new \Exception('Readonly data cannot be updated!');
+		throw new Exception('Readonly data cannot be updated!');
 		
 	}
 	
@@ -47,7 +49,7 @@ class Imutable extends Base {
 	 */
 	final public function del($name) {
 		
-		throw new \Exception('Readonly data cannot be erased!');
+		throw new Exception('Readonly data cannot be erased!');
 		
 	}
 	

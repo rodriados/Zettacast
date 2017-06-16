@@ -8,6 +8,8 @@
  */
 namespace Zettacast\Collection;
 
+use Iterator;
+use ArrayAccess;
 use Traversable;
 use Zettacast\Collection\Contract\Collection;
 
@@ -18,7 +20,7 @@ use Zettacast\Collection\Contract\Collection;
  * @see \Zettacast\Collection
  * @version 1.0
  */
-abstract class Base implements Collection {
+abstract class Base implements Collection, Iterator, ArrayAccess {
 	
 	/**
 	 * Data to be stored.

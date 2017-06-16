@@ -1,6 +1,6 @@
 <?php
 /**
- * Collection\Contract\Collection interface class file.
+ * Collection\Contract\Collection interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -8,11 +8,9 @@
  */
 namespace Zettacast\Collection\Contract;
 
-use Iterator;
 use Countable;
-use ArrayAccess;
 
-interface Collection extends Iterator, Countable, ArrayAccess {
+interface Collection extends Countable {
 	
 	/**
 	 * Collection constructor. This constructor simply sets the data received
@@ -22,45 +20,18 @@ interface Collection extends Iterator, Countable, ArrayAccess {
 	public function __construct($data = null);
 	
 	/**
-	 * Allows access to data using object notation.
-	 * @param mixed $name Data to be accessed in collection.
-	 * @return mixed Accessed data.
-	 */
-	public function __get($name);
-	
-	/**
-	 * Checks whether data exists using object notation.
-	 * @param mixed $name Data name to be checked existence.
-	 * @return bool Is offset set?
-	 */
-	public function __isset($name);
-	
-	/**
-	 * Sets or updates data stored using object notation.
-	 * @param mixed $name Data name to be stored.
-	 * @param mixed $value Value to be stored.
-	 */
-	public function __set($name, $value);
-	
-	/**
-	 * Erases data stored using object notation.
-	 * @param mixed $name Data name to be erased.
-	 */
-	public function __unset($name);
-	
-	/**
 	 * Returns all data stored in collection.
 	 * @return array All data stored in collection.
 	 */
 	public function all();
 	
 	/**
-	 * Creates a copy of collection.
-	 * @return static Copied collection.
+	 * Counts the number of elements currently in collection.
+	 * @return int Number of elements stored in the collection.
 	 */
-	public function copy();
-	
-	/**
+	public function count();
+		
+		/**
 	 * Removes an element from collection.
 	 * @param mixed $key Key to be removed.
 	 */
@@ -86,26 +57,6 @@ interface Collection extends Iterator, Countable, ArrayAccess {
 	 * @return bool Does key exist?
 	 */
 	public function has($key);
-	
-	/**
-	 * Checks whether an element exists in collection.
-	 * @param mixed $needle Element being searched for.
-	 * @param bool $strict Should types be strictly the same?
-	 * @return bool Was the element found?
-	 */
-	public function in($needle, bool $strict);
-	
-	/**
-	 * Creates a generator that iterates over the collection.
-	 * @yield mixed Collection's stored values.
-	 */
-	public function iterate();
-	
-	/**
-	 * Fetches the key the internal pointer currently points to.
-	 * @return mixed Current element's key in the collection.
-	 */
-	public function key();
 	
 	/**
 	 * Sets a value to the given key.

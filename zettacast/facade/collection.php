@@ -9,6 +9,7 @@
 namespace Zettacast\Facade;
 
 use Zettacast\Collection\Dot;
+use Zettacast\Collection\Secure;
 use Zettacast\Collection\Imutable;
 use Zettacast\Collection\Recursive;
 use Zettacast\Collection\Basic as baseclass;
@@ -111,6 +112,17 @@ final class Collection {
 	public static function recursive($data = []) {
 		
 		return new Recursive($data);
+		
+	}
+	
+	/**
+	 * Secure collection factory method.
+	 * @param array $data Data to be set in collection.
+	 * @return Secure New collection instance.
+	 */
+	public static function secure($data = []) {
+		
+		return new Secure($data);
 		
 	}
 	
