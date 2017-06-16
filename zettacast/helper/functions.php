@@ -9,7 +9,7 @@
 
 if(!function_exists('dd')) {
 	/**
-	 * Dumps the passed variables and end execution.
+	 * Dumps the passed variables and ends execution.
 	 * @param array ...$vars Variables to be dumped.
 	 */
 	function dd(...$vars) {
@@ -50,7 +50,7 @@ if(!function_exists('zetta')) {
 	/**
 	 * Gets the current framework instance.
 	 * @param string $abstract Abstraction to be made.
-	 * @return mixed Requested abstraction or framework instance.
+	 * @return Zettacast|mixed Requested abstraction or framework instance.
 	 */
 	function zetta(string $abstract = null) {
 		

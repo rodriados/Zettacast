@@ -13,7 +13,7 @@ use Zettacast\Collection\Secure;
 use Zettacast\Collection\Imutable;
 use Zettacast\Collection\Recursive;
 use Zettacast\Collection\Basic as baseclass;
-use Zettacast\Helper\Contract\Extendable;
+use Zettacast\Helper\Extendable;
 
 /**
  * The Collection façade is a factory for all other collection types. This

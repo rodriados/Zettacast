@@ -6,7 +6,7 @@
  * @license MIT License
  * @copyright 2016 Rodrigo Siqueira
  */
-namespace Zettacast\Helper\Contract;
+namespace Zettacast\Helper;
 
 use Closure;
 
@@ -14,7 +14,7 @@ use Closure;
  * Implements methods that allow class extension. This trait allows the object
  * it is used within to be extended, that is to have methods included during
  * runtime. Added methods can be both for instances or static scopes.
- * @package Zettacast\Helper\Contract
+ * @package Zettacast\Helper
  */
 trait Extendable {
 	

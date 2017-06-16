@@ -6,7 +6,7 @@
  * @license MIT License
  * @copyright 2016 Rodrigo Siqueira
  */
-namespace Zettacast\Helper\Contract;
+namespace Zettacast\Helper;
 
 /**
  * Implements singleton methods. This trait transforms every class in which it

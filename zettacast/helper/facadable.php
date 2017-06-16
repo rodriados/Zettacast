@@ -6,13 +6,13 @@
  * @license MIT License
  * @copyright 2016 Rodrigo Siqueira
  */
-namespace Zettacast\Helper\Contract;
+namespace Zettacast\Helper;
 
 /**
  * Implements methods that allow class to become a façade. This trait turns
  * the object it is used within into an another object instance, so this
  * instance can be accessed by the usage of static methods.
- * @package Zettacast\Helper\Contract
+ * @package Zettacast\Helper
  */
 trait Facadable {
 	
@@ -28,16 +28,14 @@ trait Facadable {
 	 * @return mixed Façaded object instance.
 	 */
 	protected static function facaded() {
-		
-		$access = static::accessor();
-		
-		if(is_object($access))
-			return $access;
-		
+
 		if(isset(self::$instance))
 			return self::$instance;
 		
-		return self::$instance = zetta($access);
+		$access = static::accessor();
+		
+		return self::$instance = is_object($access)
+			? $access : zetta($access);
 		
 	}
 	

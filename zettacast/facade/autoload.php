@@ -11,7 +11,7 @@ namespace Zettacast\Facade;
 use Zettacast\Autoload\Loader\Alias;
 use Zettacast\Autoload\Loader\Object;
 use Zettacast\Autoload\Loader\Space;
-use Zettacast\Helper\Contract\Facadable;
+use Zettacast\Helper\Facadable;
 use Zettacast\Autoload as baseclass;
 
 /**
@@ -63,7 +63,7 @@ final class Autoload {
 			return self::alias()->set($map);
 		
 		if(is_null(self::$alias))
-			zetta(baseclass::class)->register(self::$alias = new Alias);
+			self::facaded()->register(self::$alias = new Alias);
 		
 		return self::$alias;
 		
@@ -80,7 +80,7 @@ final class Autoload {
 			return self::object()->set($map);
 		
 		if(is_null(self::$object))
-			zetta(baseclass::class)->register(self::$object = new Object);
+			self::facaded()->register(self::$object = new Object);
 		
 		return self::$object;
 		
@@ -97,7 +97,7 @@ final class Autoload {
 			return self::space()->set($map);
 		
 		if(is_null(self::$space))
-			zetta(baseclass::class)->register(self::$space = new Space);
+			self::facaded()->register(self::$space = new Space);
 		
 		return self::$space;
 		
