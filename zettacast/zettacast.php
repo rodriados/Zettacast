@@ -90,6 +90,8 @@ final class Zettacast extends Injector {
 		$this->share(self::class, $this);
 		$this->share(Injector::class, $this);
 		
+		$this->fworkbind();
+		
 	}
 	
 	/**
@@ -103,6 +105,20 @@ final class Zettacast extends Injector {
 			self::$instance = new self;
 		
 		return self::$instance;
+		
+	}
+	
+	/**
+	 * This method binds all framework contract abstractions to their default
+	 * concrete implementations. Thus, dependency injection can work correctly.
+	 * @return void
+	 */
+	private function fworkbind() {
+		
+		$bindings = require FWORKPATH.'/bindings.php';
+		
+		foreach($bindings as $abstract => $concrete)
+			$this->bind($abstract, $concrete);
 		
 	}
 	

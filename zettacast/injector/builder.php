@@ -62,7 +62,7 @@ class Builder {
 		$reflector = new ReflectionClass($concrete);
 		
 		if(!$reflector->isInstantiable())
-			$this->uninstantiable($concrete);
+			self::uninstantiable($concrete);
 		
 		if(is_null($constructor = $reflector->getConstructor()))
 			return new $concrete;
@@ -133,7 +133,7 @@ class Builder {
 		if($param->isDefaultValueAvailable())
 			return $param->getDefaultValue();
 		
-		$this->unresolvable($param);
+		self::unresolvable($param);
 		
 	}
 	
@@ -165,7 +165,7 @@ class Builder {
 	 * @param string $concrete Not instantiable object.
 	 * @throws Exception Thrown exception.
 	 */
-	private function uninstantiable(string $concrete) {
+	private static function uninstantiable(string $concrete) {
 		
 		throw new Exception(sprintf('%s is not instantiable!',
 			$concrete
@@ -178,7 +178,7 @@ class Builder {
 	 * @param \ReflectionParameter $param Unresolvable parameter.
 	 * @throws Exception Thrown exception.
 	 */
-	private function unresolvable(\ReflectionParameter $param) {
+	private static function unresolvable(\ReflectionParameter $param) {
 		
 		throw new Exception(sprintf('Unresolvable %s in %s::%s',
 			$param->name,
