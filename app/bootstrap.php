@@ -6,6 +6,7 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
+use Zettacast\Zettacast;
 use Zettacast\Facade\Autoload;
 
 /*
