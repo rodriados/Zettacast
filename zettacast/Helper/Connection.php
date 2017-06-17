@@ -13,8 +13,8 @@ namespace Zettacast\Helper;
  * to a remote server or service.
  * @package Zettacast\Helper
  */
-interface Connection {
-	
+interface Connection
+{
 	/**
 	 * Checks whether the connection is active.
 	 * @return bool Is connection active?

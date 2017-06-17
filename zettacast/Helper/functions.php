@@ -13,11 +13,10 @@ if(!function_exists('dd')) {
 	 * Dumps the passed variables and ends execution.
 	 * @param array ...$vars Variables to be dumped.
 	 */
-	function dd(...$vars) {
-		
+	function dd(...$vars)
+	{
 		var_dump(...$vars);
 		exit;
-		
 	}
 }
 
@@ -27,10 +26,9 @@ if(!function_exists('e')) {
 	 * @param string $str String to be escaped.
 	 * @return string Escaped string.
 	 */
-	function e($str) {
-		
+	function e($str)
+	{
 		return htmlentities($str, ENT_QUOTES, 'UTF-8', false);
-		
 	}
 }
 
@@ -40,10 +38,9 @@ if(!function_exists('with')) {
 	 * @param mixed $object Object to be returned.
 	 * @return mixed Given object.
 	 */
-	function with($object) {
-		
+	function with($object)
+	{
 		return $object instanceof Closure ? $object() : $object;
-		
 	}
 }
 
@@ -53,12 +50,11 @@ if(!function_exists('zetta')) {
 	 * @param string $abstract Abstraction to be made.
 	 * @return Zettacast|mixed Requested abstraction or framework instance.
 	 */
-	function zetta(string $abstract = null) {
-		
+	function zetta(string $abstract = null)
+	{
 		if(is_null($abstract))
 			return Zettacast::instance();
 		
 		return Zettacast::instance()->make($abstract);
-		
 	}
 }

@@ -16,8 +16,8 @@ use Closure;
  * runtime. Added methods can be both for instances or static scopes.
  * @package Zettacast\Helper
  */
-trait Extendable {
-	
+trait Extendable
+{
 	/**
 	 * The registered string functions.
 	 * @var array Registered functions list.
@@ -29,21 +29,19 @@ trait Extendable {
 	 * @param string $name Name of the method being attached.
 	 * @param Closure $fn Code block for function being attached.
 	 */
-	public static function attach($name, Closure $fn) {
-		
+	public static function attach($name, Closure $fn)
+	{
 		self::$fn[$name] = $fn;
-		
 	}
 	
 	/**
 	 * Extends the class allowing many methods to be attached it.
 	 * @param array $functions Methods to be attached.
 	 */
-	public static function extend(array $functions) {
-		
+	public static function extend(array $functions)
+	{
 		foreach($functions as $name => $fn)
 			static::attach($name, $fn);
-		
 	}
 	
 	/**
@@ -51,10 +49,9 @@ trait Extendable {
 	 * @param string $name function to be checked.
 	 * @return bool Was function located?
 	 */
-	public static function attached($name) {
-		
+	public static function attached($name)
+	{
 		return isset(self::$fn[$name]);
-		
 	}
 	
 	/**
@@ -63,14 +60,13 @@ trait Extendable {
 	 * @param array $params Parameters passed to function.
 	 * @return mixed Called function returned value.
 	 */
-	public static function __callStatic($name, $params) {
-		
+	public static function __callStatic($name, $params)
+	{
 		if(!isset(self::$fn[$name]))
 			throw new \BadMethodCallException("Method {$name} does not exist");
 		
 		$fn = Closure::bind(self::$fn[$name], null, static::class);
 		return $fn(...$params);
-		
 	}
 	
 	/**
@@ -79,14 +75,13 @@ trait Extendable {
 	 * @param array $params Parameters passed to function.
 	 * @return mixed Called function return value.
 	 */
-	public function __call($name, $params) {
-		
+	public function __call($name, $params)
+	{
 		if(!isset(self::$fn[$name]))
 			throw new \BadMethodCallException("Method {$name} does not exist");
 		
 		$fn = Closure::bind(self::$fn[$name], $this, static::class);
 		return $fn(...$params);
-			
 	}
 	
 }

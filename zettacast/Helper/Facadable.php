@@ -14,8 +14,8 @@ namespace Zettacast\Helper;
  * instance can be accessed by the usage of static methods.
  * @package Zettacast\Helper
  */
-trait Facadable {
-	
+trait Facadable
+{
 	/**
 	 * Façaded object instance. This is the instance to be called when using a
 	 * façaded method.
@@ -27,8 +27,8 @@ trait Facadable {
 	 * Retrieves the instance of the object being façaded.
 	 * @return mixed Façaded object instance.
 	 */
-	protected static function facaded() {
-
+	protected static function facaded()
+	{
 		if(isset(self::$instance))
 			return self::$instance;
 		
@@ -36,7 +36,6 @@ trait Facadable {
 		
 		return self::$instance = is_object($access)
 			? $access : zetta($access);
-		
 	}
 	
 	/**
@@ -45,11 +44,10 @@ trait Facadable {
 	 * @param array $args Arguments for the called method.
 	 * @return mixed Façaded method return value.
 	 */
-	public static function __callStatic(string $method, array $args) {
-		
+	public static function __callStatic(string $method, array $args)
+	{
 		$instance = static::facaded();
 		return $instance->$method(...$args);
-		
 	}
 	
 	/**
