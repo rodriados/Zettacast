@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Helper\Contract\Connection interface file.
+ * Zettacast\Helper\Connection interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License

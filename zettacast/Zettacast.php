@@ -1,13 +1,14 @@
 <?php
 /**
- * Zettacast class file.
+ * Zettacast\Zettacast class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
+namespace Zettacast;
 
-use Zettacast\Injector;
+use Zettacast\Injector\Injector;
 
 /**
  * Boots framework and starts its main classes and modules, allowing its

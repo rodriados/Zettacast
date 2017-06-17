@@ -1,6 +1,6 @@
 <?php
 /**
- * Autoload\Loader\Alias class file.
+ * Zettacast\Autoload\Loader\Alias class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License

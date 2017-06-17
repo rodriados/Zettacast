@@ -1,6 +1,6 @@
 <?php
 /**
- * Helper\Contract\Extendable trait file.
+ * Zettcast\Helper\Extendable trait file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License

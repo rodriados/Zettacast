@@ -1,6 +1,6 @@
 <?php
 /**
- * Autoload\Contract\Loader interface class file.
+ * Zettacast\Autoload\Contract\Loader interface class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License

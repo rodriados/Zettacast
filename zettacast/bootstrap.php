@@ -33,14 +33,13 @@ define('PUBLICPATH', DOCROOT.'/public');
  * Creates a loader object. This object will be responsible for loading all
  * requested classes, interfaces or the like for the framework when needed.
  */
-require FWORKPATH.'/autoload/autoload.php';
-$loader = new Zettacast\Autoload;
+require FWORKPATH.'/Autoload/Autoload.php';
+$loader = new Zettacast\Autoload\Autoload(FWORKPATH);
 
 /*
  * Starts a new Zettacast framework instance. From now on, all objects can have
  * their instances built with dependency injection, that is, you will not need
  * to be worried with instantiating complex objects: we can do it for you.
  */
-require FWORKPATH.'/helper/functions.php';
-require FWORKPATH.'/zettacast.php';
-zetta()->share(Zettacast\Autoload::class, $loader);
+require FWORKPATH.'/Helper/functions.php';
+zetta()->share(Zettacast\Autoload\Autoload::class, $loader);

@@ -1,6 +1,6 @@
 <?php
 /**
- * Autoload\Loader\Framework class file.
+ * Zettacast\Autoload\Loader\Framework class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -48,21 +48,13 @@ final class Framework implements Loader {
 		$class = ltrim($class, '\\');
 		$elem = explode('\\', $class);
 		
-		if(array_shift($elem) != ZETTACAST)
-			return $this->default($class);
-		
-		if(count($elem) == 1) /* package classes */ {
-			
-			$lower = strtolower($elem[0]);
-			$fname = $this->path."/{$lower}/{$lower}.php";
-			
-		} else /* internal framework use */ {
-			
-			$lower = strtolower(implode('/', $elem));
-			$fname = $this->path."/{$lower}.php";
-			
-		}
+		if($elem[0] != ZETTACAST)
+			return $this->application($elem);
 
+		array_shift($elem);
+		$class = implode('/', $elem);
+		$fname = $this->path."/{$class}.php";
+		
 		if(!file_exists($fname))
 			return false;
 		
@@ -73,14 +65,19 @@ final class Framework implements Loader {
 	
 	/**
 	 * Tries to load an invoked and not yet loaded class. This method is a
-	 * fallback for classes not located in the framework.
-	 * @param string $class Class to be loaded.
+	 * fallback for classes not located in the framework, so it searches in
+	 * application directory.
+	 * @param array $class Class to be loaded exploded to namespaces.
 	 * @return bool Was the class successfully loaded?
 	 */
-	private function default(string $class) {
+	private function application(array $class) {
 		
-		$lower = strtolower(str_replace('\\', '/', $class));
-		$fname = $this->path."/../{$lower}.php";
+		if(array_shift($class) != 'App')
+			return false;
+		
+		$pkg = strtolower(array_shift($class));
+		$cpath = implode('/', $class);
+		$fname = APPPATH."/{$pkg}/{$cpath}.php";
 		
 		if(!file_exists($fname))
 			return false;

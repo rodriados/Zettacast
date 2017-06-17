@@ -6,10 +6,10 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast;
+namespace Zettacast\Autoload;
 
-require FWORKPATH.'/autoload/contract/loader.php';
-require FWORKPATH.'/autoload/loader/framework.php';
+require FWORKPATH.'/Autoload/Contract/Loader.php';
+require FWORKPATH.'/Autoload/Loader/Framework.php';
 
 use Zettacast\Autoload\Contract\Loader;
 use Zettacast\Autoload\Loader\Framework;

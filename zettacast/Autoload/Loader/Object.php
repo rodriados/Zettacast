@@ -1,6 +1,6 @@
 <?php
 /**
- * Autoload\Loader\Object class file.
+ * Zettacast\Autoload\Loader\Object class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License

@@ -1,6 +1,6 @@
 <?php
 /**
- * Helper\Contract\Singleton trait file.
+ * Zettacast\Helper\Singleton trait file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License

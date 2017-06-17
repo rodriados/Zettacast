@@ -1,6 +1,6 @@
 <?php
 /**
- * Autoload\Loader\Space class file.
+ * Zettacast\Autoload\Loader\Space class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -32,26 +32,22 @@ class Space implements Loader {
 	 */
 	public function load(string $obj): bool {
 		
-		$objname = strtolower(ltrim($obj, '\\'));
-		
-		$sname = explode('\\', $objname);
-		$objname = array_pop($sname);
-		
-		if(!$sname or empty($this->spaces))
+		if(empty($this->spaces))
 			return false;
-
-		while($sname) {
-			
-			$space = implode('\\', $sname);
+		
+		$obj = ltrim($obj, '\\');
+		$qnsname = explode('\\', $obj);
+		$objname = array_pop($qnsname);
+		
+		while($qnsname) {
+			$space = implode('\\', $qnsname);
 			
 			if(isset($this->spaces[$space])) {
-				
 				$fname = $this->spaces[$space].'/'.$objname.'.php';
 				break;
-				
 			}
 			
-			$objname = array_pop($sname).'/'.$objname;
+			$objname = array_pop($qnsname).'/'.$objname;
 			
 		}
 		

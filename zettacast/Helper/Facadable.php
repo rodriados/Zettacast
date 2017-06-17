@@ -1,6 +1,6 @@
 <?php
 /**
- * Helper\Contract\Facadable trait file.
+ * Zettacast\Helper\Facadable trait file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
