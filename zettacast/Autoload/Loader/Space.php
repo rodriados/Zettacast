@@ -16,8 +16,8 @@ use Zettacast\Autoload\Contract\Loader;
  * @package Zettacast\Autoload
  * @version 1.0
  */
-class Space implements Loader {
-	
+class Space implements Loader
+{
 	/**
 	 * Listed namespaces. The entries in this array should not override
 	 * Zettacast namespaces or unexpected errors may occur.
@@ -30,8 +30,8 @@ class Space implements Loader {
 	 * @param string $obj Object to be loaded.
 	 * @return bool Was the object successfully loaded?
 	 */
-	public function load(string $obj): bool {
-		
+	public function load(string $obj): bool
+	{
 		if(empty($this->spaces))
 			return false;
 		
@@ -48,7 +48,6 @@ class Space implements Loader {
 			}
 			
 			$objname = array_pop($qnsname).'/'.$objname;
-			
 		}
 		
 		if(!isset($fname) or !file_exists($fname))
@@ -56,18 +55,16 @@ class Space implements Loader {
 		
 		require $fname;
 		return true;
-		
 	}
 	
 	/**
 	 * Resets the loader to its initial state.
 	 * @return self Loader instance.
 	 */
-	public function reset() {
-		
+	public function reset()
+	{
 		$this->spaces = [];
 		return $this;
-		
 	}
 	
 	/**
@@ -76,17 +73,14 @@ class Space implements Loader {
 	 * @param array $map Map of namespaces to be added.
 	 * @return self Loader instance.
 	 */
-	public function add(array $map) {
-		
+	public function add(array $map)
+	{
 		foreach($map as $sname => $spath) {
-			
 			$sname = strtolower(ltrim($sname, '\\'));
 			$this->spaces[$sname] = rtrim($spath, '/');
-			
 		}
 		
 		return $this;
-		
 	}
 	
 	/**
@@ -95,19 +89,16 @@ class Space implements Loader {
 	 * @param array|string $slist Namespaces to be removed.
 	 * @return self Loader instance.
 	 */
-	public function del($slist) {
-		
+	public function del($slist)
+	{
 		foreach((array)$slist as $sname) {
-			
 			$sname = strtolower(ltrim($sname, '\\'));
 			
 			if(isset($this->spaces[$sname]))
 				unset($this->spaces[$sname]);
-			
 		}
 		
 		return $this;
-		
 	}
 	
 	/**
@@ -115,13 +106,12 @@ class Space implements Loader {
 	 * @param array $map New namespace mappings.
 	 * @return self Loader instance.
 	 */
-	public function set(array $map) {
-		
+	public function set(array $map)
+	{
 		$this->reset();
 		$this->add($map);
 		
 		return $this;
-		
 	}
 	
 }

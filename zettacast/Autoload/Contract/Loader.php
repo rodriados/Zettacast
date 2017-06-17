@@ -13,8 +13,8 @@ namespace Zettacast\Autoload\Contract;
  * loaders used in the autoload package.
  * @package Zettacast\Autoload
  */
-interface Loader {
-	
+interface Loader
+{
 	/**
 	 * Tries to load an invoked and not yet loaded class.
 	 * @param string $class Class to be loaded.

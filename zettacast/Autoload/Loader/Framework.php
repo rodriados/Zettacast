@@ -17,8 +17,8 @@ use Zettacast\Autoload\Contract\Loader;
  * @package Zettacast\Autoload
  * @version 1.0
  */
-final class Framework implements Loader {
-	
+final class Framework implements Loader
+{
 	/**
 	 * Framework's directory path.
 	 * @var string Path to framework's files.
@@ -30,10 +30,9 @@ final class Framework implements Loader {
 	 * Initializes the class and set values to instance properties.
 	 * @param string $path Framework's path.
 	 */
-	public function __construct(string $path = FWORKPATH) {
-		
+	public function __construct(string $path = FWORKPATH)
+	{
 		$this->path = $path;
-		
 	}
 	
 	/**
@@ -43,8 +42,8 @@ final class Framework implements Loader {
 	 * @param string $class Class to be loaded.
 	 * @return bool Was the class successfully loaded?
 	 */
-	public function load(string $class) : bool {
-		
+	public function load(string $class) : bool
+	{
 		$class = ltrim($class, '\\');
 		$elem = explode('\\', $class);
 		
@@ -60,7 +59,6 @@ final class Framework implements Loader {
 		
 		require $fname;
 		return true;
-			
 	}
 	
 	/**
@@ -70,8 +68,8 @@ final class Framework implements Loader {
 	 * @param array $class Class to be loaded exploded to namespaces.
 	 * @return bool Was the class successfully loaded?
 	 */
-	private function application(array $class) {
-		
+	private function application(array $class)
+	{
 		if(array_shift($class) != 'App')
 			return false;
 		
@@ -84,17 +82,15 @@ final class Framework implements Loader {
 		
 		require $fname;
 		return true;
-		
 	}
 	
 	/**
 	 * Resets the loader to its initial state.
 	 * @return self Loader instance.
 	 */
-	public function reset() {
-		
+	public function reset()
+	{
 		return $this;
-		
 	}
 	
 }

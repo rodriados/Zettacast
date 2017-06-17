@@ -21,8 +21,8 @@ use Zettacast\Autoload\Loader\Framework;
  * @package Zettacast\Autoload
  * @version 1.1
  */
-final class Autoload {
-	
+final class Autoload
+{
 	/**
 	 * Stores the classloaders already registered in the autoloading system.
 	 * This allows us to keep track of all class loading functions.
@@ -42,12 +42,11 @@ final class Autoload {
 	 * Initializes the class and set values to instance properties.
 	 * @param string $path Framework's path.
 	 */
-	public function __construct(string $path = FWORKPATH) {
-		
+	public function __construct(string $path = FWORKPATH)
+	{
 		$this->loaders = [];
 		$this->framework = new Framework($path);
 		$this->register($this->framework);
-		
 	}
 	
 	/**
@@ -57,49 +56,40 @@ final class Autoload {
 	 * @var Loader $loader A loader to be registered.
 	 * @return bool Was the loader successfully registered?
 	 */
-	public function register(Loader $loader) {
-
+	public function register(Loader $loader)
+	{
 		if(!in_array($loader, $this->loaders)) {
-			
 			$this->loaders[] = $loader;
 			return spl_autoload_register([$loader, 'load']);
-			
 		}
 		
 		return false;
-		
 	}
 	
 	/**
 	 * Unregisters a class loader from the autoload stack.
 	 * @param Loader $loader A loader to be unregistered.
 	 */
-	public function unregister(Loader $loader) {
-		
+	public function unregister(Loader $loader)
+	{
 		if(in_array($loader, $this->loaders)) {
-			
-			unset($this->loaders[
-				array_search($loader, $this->loaders)
-			]);
+			unset($this->loaders[array_search($loader, $this->loaders)]);
 			spl_autoload_unregister([$loader, 'load']);
-			
 		}
-		
 	}
 	
 	/**
 	 * Resets all registered loaders and unregister all loaders but the default
 	 * one. This is used when only Zettacast's core classes are needed.
 	 */
-	public function reset() {
-		
+	public function reset()
+	{
 		foreach($this->loaders as $loader) {
 			spl_autoload_unregister([$loader, 'load']);
 			$loader->reset();
 		}
 		
 		$this->register($this->framework);
-		
 	}
 	
 }

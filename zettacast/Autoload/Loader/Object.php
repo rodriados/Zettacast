@@ -16,8 +16,8 @@ use Zettacast\Autoload\Contract\Loader;
  * @package Zettacast\Autoload
  * @version 1.0
  */
-class Object implements Loader {
-	
+class Object implements Loader
+{
 	/**
 	 * Listed objects. The entries in this array should not override Zettacast
 	 * classes or unexpected errors may occur.
@@ -30,8 +30,8 @@ class Object implements Loader {
 	 * @param string $obj Object to be loaded.
 	 * @return bool Was the object successfully loaded?
 	 */
-	public function load(string $obj): bool {
-		
+	public function load(string $obj): bool
+	{
 		$objname = ltrim($obj, '\\');
 		
 		if(empty($this->objects) or !isset($this->objects[$objname]))
@@ -44,18 +44,16 @@ class Object implements Loader {
 		
 		require $fname;
 		return true;
-		
 	}
 	
 	/**
 	 * Resets the loader to its initial state.
 	 * @return self Loader instance.
 	 */
-	public function reset() {
-		
+	public function reset()
+	{
 		$this->objects = [];
 		return $this;
-		
 	}
 	
 	/**
@@ -64,13 +62,12 @@ class Object implements Loader {
 	 * @param array $map Map of objects to be added.
 	 * @return self Loader instance.
 	 */
-	public function add(array $map) {
-		
+	public function add(array $map)
+	{
 		foreach($map as $objname => $objpath)
 			$this->objects[ltrim($objname, '\\')] = $objpath;
 
 		return $this;
-		
 	}
 	
 	/**
@@ -79,14 +76,13 @@ class Object implements Loader {
 	 * @param array|string $objlist Objects to be removed.
 	 * @return self Loader instance.
 	 */
-	public function del($objlist) {
-		
+	public function del($objlist)
+	{
 		foreach((array)$objlist as $objname)
 			if(isset($this->objects[$objname]))
 				unset($this->objects[$objname]);
 		
 		return $this;
-		
 	}
 	
 	/**
@@ -94,13 +90,12 @@ class Object implements Loader {
 	 * @param array $map New object mappings.
 	 * @return self Loader instance.
 	 */
-	public function set(array $map) {
-		
+	public function set(array $map)
+	{
 		$this->reset();
 		$this->add($map);
 
 		return $this;
-		
 	}
 	
 }
