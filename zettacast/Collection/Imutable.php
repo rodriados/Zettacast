@@ -16,18 +16,17 @@ use Exception;
  * @package Zettacast\Collection
  * @version 1.0
  */
-class Imutable extends Base {
-	
+class Imutable extends Base
+{
 	/**
 	 * Get an element stored in collection.
 	 * @param mixed $key Key of requested element.
 	 * @param mixed $default Default value fallback.
 	 * @return mixed Requested element or default fallback.
 	 */
-	public function get($key, $default = null) {
-		
+	public function get($key, $default = null)
+	{
 		return $this->has($key) ? $this->data[$key] : $default;
-		
 	}
 		
 	/**
@@ -36,10 +35,9 @@ class Imutable extends Base {
 	 * @param mixed $value Value to be stored.
 	 * @throws \Exception
 	 */
-	final public function set($name, $value) {
-		
+	final public function set($name, $value)
+	{
 		throw new Exception('Readonly data cannot be updated!');
-		
 	}
 	
 	/**
@@ -47,10 +45,9 @@ class Imutable extends Base {
 	 * @param mixed $name Data name to be erased.
 	 * @throws \Exception
 	 */
-	final public function del($name) {
-		
+	final public function del($name)
+	{
 		throw new Exception('Readonly data cannot be erased!');
-		
 	}
 	
 }

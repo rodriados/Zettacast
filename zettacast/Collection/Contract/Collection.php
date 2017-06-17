@@ -1,6 +1,6 @@
 <?php
 /**
- * Collection\Contract\Collection interface file.
+ * Zettacast\Collection\Contract\Collection interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -10,8 +10,8 @@ namespace Zettacast\Collection\Contract;
 
 use Countable;
 
-interface Collection extends Countable {
-	
+interface Collection extends Countable
+{
 	/**
 	 * Collection constructor. This constructor simply sets the data received
 	 * as the data stored in collection.

@@ -13,7 +13,7 @@ use Exception;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionFunction;
-use Zettacast\Injector;
+use ReflectionParameter;
 use Zettacast\Collection\Basic as Collection;
 
 /**
@@ -23,8 +23,8 @@ use Zettacast\Collection\Basic as Collection;
  * @package Zettacast\Injector
  * @version 1.0
  */
-class Builder {
-	
+class Builder
+{
 	/**
 	 * Currently active injector instance. This object will be responsible for
 	 * handling any abstraction the builder may find.
@@ -44,11 +44,10 @@ class Builder {
 	 * the received parameters or empty objects.
 	 * @param Injector $injector Currently active injector instance.
 	 */
-	public function __construct(Injector $injector) {
-		
+	public function __construct(Injector $injector)
+	{
 		$this->injector = $injector;
 		$this->stack = new Collection;
-		
 	}
 	
 	/**
@@ -57,8 +56,8 @@ class Builder {
 	 * @return mixed Resolved type.
 	 * @throws \Exception Type is not instantiable.
 	 */
-	public function make(string $concrete) {
-		
+	public function make(string $concrete)
+	{
 		$reflector = new ReflectionClass($concrete);
 		
 		if(!$reflector->isInstantiable())
@@ -72,7 +71,6 @@ class Builder {
 		$this->stack->pop();
 		
 		return $reflector->newInstanceArgs($params);
-		
 	}
 	
 	/**
@@ -81,18 +79,17 @@ class Builder {
 	 * @param array $params Parameters to be used when invoked.
 	 * @return Closure Wrapped function.
 	 */
-	public function wrap(callable $fn, array $params = []) {
-		
+	public function wrap(callable $fn, array $params = [])
+	{
 		$reflector = is_string($fn) && strpos($fn, '::') !== false
 			? new ReflectionMethod(...explode('::', $fn))
 			: new ReflectionFunction($fn);
 		
 		$callparam = $this->resolve($reflector->getParameters(), $params);
 
-		return function() use($reflector, $callparam) {
+		return function () use ($reflector, $callparam) {
 			return $reflector->invokeArgs($callparam);
 		};
-			
 	}
 	
 	/**
@@ -101,8 +98,8 @@ class Builder {
 	 * @param array $params Parameters to be used instead of building.
 	 * @return array Resolved dependencies.
 	 */
-	protected function resolve(array $requested, array $params = []) {
-
+	protected function resolve(array $requested, array $params = [])
+	{
 		foreach($requested as $dependency)
 			if(isset($params[$dependency->name]))
 				$solved[] = $params[$dependency->name];
@@ -112,17 +109,16 @@ class Builder {
 				$solved[] = $this->varvalue($dependency);
 			
 		return array_merge($solved ?? [], $params);
-		
 	}
 	
 	/**
 	 * Tries to resolve a primitive dependency.
-	 * @param \ReflectionParameter $param Parameter to be resolved.
+	 * @param ReflectionParameter $param Parameter to be resolved.
 	 * @return mixed Resolved primitive.
 	 * @throws Exception Primitive value could not be resolved.
 	 */
-	protected function varvalue(\ReflectionParameter $param) {
-		
+	protected function varvalue(ReflectionParameter $param)
+	{
 		$context = $this->stack->end();
 		$link = $this->injector->resolve('$'.$param->name, $context)->concrete;
 		
@@ -134,30 +130,25 @@ class Builder {
 			return $param->getDefaultValue();
 		
 		self::unresolvable($param);
-		
+		return null;
 	}
 	
 	/**
 	 * Tries to resolve a object dependency.
-	 * @param \ReflectionParameter $param Parameter to be resolved.
+	 * @param ReflectionParameter $param Parameter to be resolved.
 	 * @return mixed Resolved object.
 	 * @throws Exception Object dependency could not be resolved.
 	 */
-	protected function varobject(\ReflectionParameter $param) {
-		
+	protected function varobject(ReflectionParameter $param)
+	{
 		try {
-			
 			return $this->injector->make($param->getClass()->getName());
-			
 		} catch(Exception $e) {
-			
 			if($param->isOptional())
 				return $param->getDefaultValue();
 			
 			throw $e;
-			
 		}
-		
 	}
 	
 	/**
@@ -165,27 +156,28 @@ class Builder {
 	 * @param string $concrete Not instantiable object.
 	 * @throws Exception Thrown exception.
 	 */
-	private static function uninstantiable(string $concrete) {
-		
-		throw new Exception(sprintf('%s is not instantiable!',
-			$concrete
-		));
-		
+	private static function uninstantiable(string $concrete)
+	{
+		throw new Exception(
+			sprintf('%s is not instantiable!', $concrete)
+		);
 	}
 	
 	/**
 	 * Throws an exception for unresolvable parameter.
-	 * @param \ReflectionParameter $param Unresolvable parameter.
+	 * @param ReflectionParameter $param Unresolvable parameter.
 	 * @throws Exception Thrown exception.
 	 */
-	private static function unresolvable(\ReflectionParameter $param) {
-		
-		throw new Exception(sprintf('Unresolvable %s in %s::%s',
-			$param->name,
-			$param->getDeclaringClass()->name,
-			$param->getDeclaringFunction()->name
-		));
-		
+	private static function unresolvable(ReflectionParameter $param)
+	{
+		throw new Exception(
+			sprintf(
+				'Unresolvable %s in %s::%s',
+				$param->name,
+				$param->getDeclaringClass()->name,
+				$param->getDeclaringFunction()->name
+			)
+		);
 	}
 	
 }

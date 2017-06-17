@@ -14,18 +14,17 @@ namespace Zettacast\Collection;
  * @package Zettacast\Collection
  * @version 1.0
  */
-class Basic extends Base {
-	
+class Basic extends Base
+{
 	/**
 	 * Adds an element to the collection if it doesn't exist.
 	 * @param mixed $key Key name to be added.
 	 * @param mixed $value Value to be stored.
 	 */
-	public function add($key, $value) {
-		
+	public function add($key, $value)
+	{
 		if(!$this->has($key))
 			$this->set($key, $value);
-		
 	}
 	
 	/**
@@ -33,24 +32,22 @@ class Basic extends Base {
 	 * @param int $size Size of the chunks.
 	 * @return static Collection of chunks.
 	 */
-	public function chunk($size) {
-		
+	public function chunk($size)
+	{
 		if($size <= 0)
 			return new static;
 		
 		return new static(array_chunk($this->data, $size, true) ?? []);
-		
 	}
 	
 	/**
 	 * Removes an element from collection.
 	 * @param mixed $key Key to be removed.
 	 */
-	public function del($key) {
-		
+	public function del($key)
+	{
 		if($this->has($key))
 			unset($this->data[$key]);
-		
 	}
 	
 	/**
@@ -59,24 +56,22 @@ class Basic extends Base {
 	 * @param bool $keys Should keys be compared instead of values?
 	 * @return static Diff'd array.
 	 */
-	public function diff($items, $keys = false) {
-		
+	public function diff($items, $keys = false)
+	{
 		$fn = $keys ? 'array_diff_key' : 'array_diff';
 		return new static($fn($this->data, self::toarray($items)));
-		
 	}
 	
 	/**
 	 * Divide collection's keys and values into two collections.
 	 * @return static Collection of keys and collection of values.
 	 */
-	public function divide() {
-		
+	public function divide()
+	{
 		return new static([
 			new static(array_keys($this->data)),
 			new static(array_values($this->data))
 		]);
-		
 	}
 	
 	/**
@@ -85,15 +80,15 @@ class Basic extends Base {
 	 * @param bool $value Value the test function result should be compared to.
 	 * @return bool Does every element pass the test?
 	 */
-	public function every(callable $fn = null, $value = true) {
-		$fn = $fn ?? function($value) { return $value; };
+	public function every(callable $fn = null, $value = true)
+	{
+		$fn = $fn ?? function ($value) { return $value; };
 		
 		foreach($this->iterate() as $key => $v)
 			if($fn($v, $key) != $value)
 				return false;
 		
 		return true;
-		
 	}
 	
 	/**
@@ -101,13 +96,13 @@ class Basic extends Base {
 	 * @param mixed|array $keys Keys to be forgotten in the new collection.
 	 * @return static New collection instance.
 	 */
-	public function except($keys) {
+	public function except($keys)
+	{
 		$keys = self::toarray($keys);
 		
-		return $this->filter(function($value, $key) use($keys) {
+		return $this->filter(function ($value, $key) use($keys) {
 			return !in_array($key, $keys);
 		});
-		
 	}
 	
 	/**
@@ -117,15 +112,18 @@ class Basic extends Base {
 	 * @param bool $invert Remove all values evaluated to true instead?
 	 * @return static Collection of all filtered values.
 	 */
-	public function filter(callable $fn = null, $invert = false) {
-		
+	public function filter(callable $fn = null, $invert = false)
+	{
 		return new static(is_null($fn)
 			? array_filter($this->data)
-			: array_filter($this->data, function($v, $k) use($fn, $invert) {
-				return $fn($v, $k) == !$invert;
-			}, ARRAY_FILTER_USE_BOTH)
+			: array_filter(
+				$this->data,
+				function ($v, $k) use($fn, $invert) {
+					return $fn($v, $k) == !$invert;
+				},
+				ARRAY_FILTER_USE_BOTH
+			)
 		);
-		
 	}
 	
 	/**
@@ -134,37 +132,34 @@ class Basic extends Base {
 	 * @param mixed $default Fallback if no element passes the test.
 	 * @return mixed First element that passed the test.
 	 */
-	public function first(callable $fn = null, $default = null) {
-		
-		$fn = $fn ?: function() { return true; };
+	public function first(callable $fn = null, $default = null)
+	{
+		$fn = $fn ?: function () { return true; };
 		
 		foreach($this->iterate() as $key => $value)
 			if($fn($value, $key))
 				return $value;
 		
 		return $default;
-		
 	}
 	
 	/**
 	 * Flips collection's keys and elements.
 	 * @return static Flipped collection.
 	 */
-	public function flip() {
-		
+	public function flip()
+	{
 		return new static(array_flip($this->data));
-		
 	}
 	
 	/**
 	 * Removes one or many elements from collection.
 	 * @param mixed|array $keys Keys to be forgotten.
 	 */
-	public function forget($keys) {
-		
+	public function forget($keys)
+	{
 		foreach(self::toarray($keys) as $key)
 			$this->del($key);
-		
 	}
 	
 	/**
@@ -173,10 +168,9 @@ class Basic extends Base {
 	 * @param mixed $default Default value fallback.
 	 * @return mixed Requested element or default fallback.
 	 */
-	public function get($key, $default = null) {
-		
+	public function get($key, $default = null)
+	{
 		return $this->has($key) ? $this->data[$key] : $default;
-		
 	}
 	
 	/**
@@ -184,20 +178,18 @@ class Basic extends Base {
 	 * @param mixed $items Items to intersect with collection.
 	 * @return static Collection of intersected elements.
 	 */
-	public function intersect($items) {
-		
+	public function intersect($items)
+	{
 		return new static(array_intersect($this->data, self::toarray($items)));
-		
 	}
 	
 	/**
 	 * Returns all element keys currently present in collection.
 	 * @return static Collection of this collection element's keys.
 	 */
-	public function keys() {
-		
+	public function keys()
+	{
 		return new static(array_keys($this->data));
-		
 	}
 	
 	/**
@@ -206,26 +198,24 @@ class Basic extends Base {
 	 * @param mixed $default Fallback if no element passes the test.
 	 * @return mixed Last element that passed the test.
 	 */
-	public function last(callable $fn = null, $default = null) {
-		
-		$fn = $fn ?: function() { return true; };
+	public function last(callable $fn = null, $default = null)
+	{
+		$fn = $fn ?: function () { return true; };
 		
 		foreach($this->reverse()->iterate() as $key => $value)
 			if($fn($value, $key))
 				return $value;
 		
 		return $default;
-		
 	}
 	
 	/**
 	 * Locks collection to a readonly state.
 	 * @return Imutable Locked collection.
 	 */
-	public function lock() {
-		
+	public function lock()
+	{
 		return Imutable::ref($this);
-		
 	}
 	
 	/**
@@ -235,13 +225,12 @@ class Basic extends Base {
 	 * @param callable $fn Function to be used for creating new elements.
 	 * @return static New collection instance.
 	 */
-	public function map(callable $fn) {
-		
+	public function map(callable $fn)
+	{
 		$keys = array_keys($this->data);
 		$values = array_map($fn, $this->data, $keys);
 		
 		return new static(array_combine($keys, $values));
-		
 	}
 	
 	/**
@@ -249,10 +238,9 @@ class Basic extends Base {
 	 * @param mixed $items Items to be merged into collection.
 	 * @return static Collection of merged elements.
 	 */
-	public function merge($items) {
-		
+	public function merge($items)
+	{
 		return new static(array_merge($this->data, self::toarray($items)));
-		
 	}
 	
 	/**
@@ -260,23 +248,22 @@ class Basic extends Base {
 	 * @param mixed|array $keys Keys to be included in new collection.
 	 * @return static New collection instance.
 	 */
-	public function only($keys) {
+	public function only($keys)
+	{
 		$keys = self::toarray($keys);
 		
-		return $this->filter(function($value, $key) use($keys) {
+		return $this->filter(function ($_, $key) use($keys) {
 			return in_array($key, $keys);
 		});
-		
 	}
 	
 	/**
 	 * Pops last element out of the collection and returns it.
 	 * @return mixed Popped element.
 	 */
-	public function pop() {
-		
+	public function pop()
+	{
 		return array_pop($this->data);
-		
 	}
 	
 	/**
@@ -285,13 +272,12 @@ class Basic extends Base {
 	 * @param mixed $default Default value if key not found.
 	 * @return mixed Pulled value.
 	 */
-	public function pull($key, $default = null) {
-		
+	public function pull($key, $default = null)
+	{
 		$value = $this->get($key, $default);
 		$this->del($key);
 		
 		return $value;
-		
 	}
 	
 	/**
@@ -299,11 +285,10 @@ class Basic extends Base {
 	 * @param mixed $value Value to be pushed onto the collection.
 	 * @return static Collection for method chaining.
 	 */
-	public function push($value) {
-		
+	public function push($value)
+	{
 		array_push($this->data, $value);
 		return $this;
-		
 	}
 	
 	/**
@@ -313,14 +298,13 @@ class Basic extends Base {
 	 * @param int $amount Amount of elements to be selected.
 	 * @return static Randomly selected elements from collection.
 	 */
-	public function random($amount = 1) {
-		
+	public function random($amount = 1)
+	{
 		if($amount >= $this->count())
 			return $this->shuffle();
 		
 		$keys = array_rand($this->data, $amount);
 		return new static(array_intersect_key($this->data, array_flip($keys)));
-		
 	}
 	
 	/**
@@ -329,10 +313,9 @@ class Basic extends Base {
 	 * @param mixed $initial Initial reduction value.
 	 * @return mixed Resulting value from reduction.
 	 */
-	public function reduce(callable $fn, $initial = null) {
-		
+	public function reduce(callable $fn, $initial = null)
+	{
 		return array_reduce($this->data, $fn, $initial);
-		
 	}
 	
 	/**
@@ -340,20 +323,18 @@ class Basic extends Base {
 	 * @param mixed $items Items to be replaced in the collection.
 	 * @return static Collection with replaced data.
 	 */
-	public function replace($items) {
-		
+	public function replace($items)
+	{
 		return new static(array_replace($this->data, self::toarray($items)));
-		
 	}
 	
 	/**
 	 * Reverses collection's elements order.
 	 * @return static Reversed collection.
 	 */
-	public function reverse() {
-		
+	public function reverse()
+	{
 		return new static(array_reverse($this->data));
-		
 	}
 	
 	/**
@@ -362,8 +343,8 @@ class Basic extends Base {
 	 * @param bool $strict Should search enforce element types?
 	 * @return mixed Successful key or false if none.
 	 */
-	public function search($needle, $strict = false) {
-		
+	public function search($needle, $strict = false)
+	{
 		if(is_string($needle) or !is_callable($needle))
 			return array_search($needle, $this->data, $strict);
 		
@@ -372,7 +353,6 @@ class Basic extends Base {
 				return $key;
 		
 		return false;
-		
 	}
 	
 	/**
@@ -380,33 +360,30 @@ class Basic extends Base {
 	 * @param mixed $key Key to created or updated.
 	 * @param mixed $value Value to be stored in key.
 	 */
-	public function set($key, $value) {
-		
+	public function set($key, $value)
+	{
 		$this->data[$key] = $value;
-		
 	}
 	
 	/**
 	 * Gets and removes an element from the beginning of the collection.
 	 * @return mixed Shifted value.
 	 */
-	public function shift() {
-		
+	public function shift()
+	{
 		return array_shift($this->data);
-		
 	}
 	
 	/**
 	 * Shuffles the elements in the collection.
 	 * @return static Shuffled collection.
 	 */
-	public function shuffle() {
-		
+	public function shuffle()
+	{
 		$data = $this->data;
 		shuffle($data);
 		
 		return new static($data);
-		
 	}
 	
 	/**
@@ -415,10 +392,9 @@ class Basic extends Base {
 	 * @param int $length Length of requested slice.
 	 * @return static Sliced collection.
 	 */
-	public function slice($offset, $length = null) {
-		
+	public function slice($offset, $length = null)
+	{
 		return new static(array_slice($this->data, $offset, $length, true));
-		
 	}
 	
 	/**
@@ -426,13 +402,12 @@ class Basic extends Base {
 	 * @param int $count Number of groups to split the collection.
 	 * @return static Splitted collection.
 	 */
-	public function split($count) {
-		
+	public function split($count)
+	{
 		if($this->empty())
 			return new static;
 		
 		return $this->chunk(ceil($this->count() / $count));
-		
 	}
 	
 	/**
@@ -440,13 +415,12 @@ class Basic extends Base {
 	 * @param callable $fn Ordering function.
 	 * @return static Sorted collection.
 	 */
-	public function sort(callable $fn = null) {
-		
+	public function sort(callable $fn = null)
+	{
 		$data = $this->data;
 		$fn ? uasort($data, $fn) : asort($data);
 		
 		return new static($data);
-		
 	}
 	
 	/**
@@ -456,12 +430,14 @@ class Basic extends Base {
 	 * @param array $replace Replacement for removed slice.
 	 * @return static Spliced collection.
 	 */
-	public function splice($offset, $length = null, $replace = []) {
-		
+	public function splice($offset, $length = null, $replace = [])
+	{
 		return new static(array_splice(
-			$this->data, $offset, $length ?: $this->count(), $replace
+			$this->data,
+			$offset,
+			$length ?: $this->count(),
+			$replace
 		));
-		
 	}
 	
 	/**
@@ -469,13 +445,11 @@ class Basic extends Base {
 	 * @param int $limit Number of items to be taken.
 	 * @return static Collection of the taken items.
 	 */
-	public function take($limit) {
-		
+	public function take($limit)
+	{
 		return $limit < 0
 			? $this->slice($limit, $this->count())
-			: $this->slice(0, $limit)
-		;
-		
+			: $this->slice(0, $limit);
 	}
 	
 	/**
@@ -483,20 +457,18 @@ class Basic extends Base {
 	 * @param mixed $items Items to be united with collection.
 	 * @return static United collection.
 	 */
-	public function union($items) {
-		
+	public function union($items)
+	{
 		return new static($this->data + self::toarray($items));
-		
 	}
 	
 	/**
 	 * Returns only unique items from collection.
 	 * @return static Collection of unique items.
 	 */
-	public function unique() {
-		
+	public function unique()
+	{
 		return new static(array_unique($this->data, SORT_REGULAR));
-		
 	}
 	
 	/**
@@ -505,25 +477,22 @@ class Basic extends Base {
 	 * @param mixed $key Key to be used for prepended element.
 	 * @return static Collection for method chaining.
 	 */
-	public function unshift($value, $key = null) {
-		
+	public function unshift($value, $key = null)
+	{
 		is_null($key)
 			? array_unshift($this->data, $value)
-			: $this->add($key, $value)
-		;
+			: $this->add($key, $value);
 		
 		return $this;
-		
 	}
 	
 	/**
 	 * Returns all element values currently present in collection.
 	 * @return static Collection of this collection element's values.
 	 */
-	public function values() {
-	
+	public function values()
+	{
 		return new static(array_values($this->data));
-		
 	}
 	
 	/**
@@ -532,13 +501,12 @@ class Basic extends Base {
 	 * @param mixed $userdata Optional third parameter for function.
 	 * @return static Collection for method chaining.
 	 */
-	public function walk(callable $fn, $userdata = null) {
-		
+	public function walk(callable $fn, $userdata = null)
+	{
 		foreach($this->iterate() as $key => &$value)
 			$fn($value, $key, $userdata);
 		
 		return $this;
-		
 	}
 	
 	/**
@@ -546,14 +514,13 @@ class Basic extends Base {
 	 * @param mixed ...$items Items to zip collection with.
 	 * @return static Collection of zipped collections.
 	 */
-	public function zip(...$items) {
-		
+	public function zip(...$items)
+	{
 		$items = array_map([static::class, 'toarray'], $items);
 		
-		return new static(array_map(function(...$params) {
+		return new static(array_map(function (...$params) {
 			return new static($params);
 		}, $this->data, ...$items));
-		
 	}
 	
 }

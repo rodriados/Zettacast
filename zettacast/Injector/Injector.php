@@ -6,11 +6,9 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast;
+namespace Zettacast\Injector;
 
 use Closure;
-use Zettacast\Injector\Binder;
-use Zettacast\Injector\Builder;
 use Zettacast\Collection\Basic as Collection;
 use Zettacast\Injector\Contract\Injector as InjectorContract;
 
@@ -21,8 +19,8 @@ use Zettacast\Injector\Contract\Injector as InjectorContract;
  * @package Zettacast\Injector
  * @version 1.0
  */
-class Injector implements InjectorContract {
-	
+class Injector implements InjectorContract
+{
 	/**
 	 * Collection of object aliases. Aliases allow full class names to be
 	 * shortened to a more readable and easier name.
@@ -56,14 +54,13 @@ class Injector implements InjectorContract {
 	 * Injector constructor. This constructor simply sets all properties to
 	 * empty collections. Each of these collections have a special use.
 	 */
-	public function __construct() {
-		
+	public function __construct()
+	{
 		$this->aliases  = new Collection;
 		$this->shared   = new Collection;
 		
 		$this->binder   = new Binder;
 		$this->builder  = new Builder($this);
-		
 	}
 	
 	/**
@@ -71,14 +68,13 @@ class Injector implements InjectorContract {
 	 * @param string $abstract Abstraction to be aliased.
 	 * @param string $alias Alias to be used for abstraction.
 	 */
-	public function alias(string $abstract, string $alias) {
-		
+	public function alias(string $abstract, string $alias)
+	{
 		if($abstract == $alias)
 			return;
 		
 		$this->drop($alias);
 		$this->aliases->set($alias, $abstract);
-		
 	}
 	
 	/**
@@ -87,13 +83,12 @@ class Injector implements InjectorContract {
 	 * @param string|Closure $concrete Concrete object to abstraction.
 	 * @param bool $shared Should abstraction become a singleton?
 	 */
-	public function bind(string $abstract, $concrete, bool $shared = false) {
-		
+	public function bind(string $abstract, $concrete, bool $shared = false)
+	{
 		$this->drop($abstract);
 		
 		$abstract = $this->identify($abstract);
 		$this->binder->bind($abstract, $concrete, $shared);
-		
 	}
 	
 	/**
@@ -101,11 +96,10 @@ class Injector implements InjectorContract {
 	 * @param string $abstract Abstraction to be checked.
 	 * @return bool Is abstract bound?
 	 */
-	public function bound(string $abstract) {
-		
+	public function bound(string $abstract)
+	{
 		$abstract = $this->identify($abstract);
 		return $this->binder->bound($abstract);
-		
 	}
 	
 	/**
@@ -114,23 +108,21 @@ class Injector implements InjectorContract {
 	 * @param string $abstract Abstraction to be bound.
 	 * @param string|Closure $concrete Concrete object to abstraction.
 	 */
-	public function context(string $context, string $abstract, $concrete) {
-		
+	public function context(string $context, string $abstract, $concrete)
+	{
 		$abstract = $this->identify($abstract);
 		$this->binder->bind($abstract, $concrete, false, $context);
-		
 	}
 	
 	/**
 	 * Drops all data related to an abstraction.
 	 * @param string $abstract Abstraction to be forgotten.
 	 */
-	public function drop(string $abstract) {
-		
+	public function drop(string $abstract)
+	{
 		$this->aliases->del($abstract);
 		$this->shared->del($abstract);
 		$this->binder->unbind($abstract);
-		
 	}
 	
 	/**
@@ -138,12 +130,11 @@ class Injector implements InjectorContract {
 	 * @param string $abstract Abstraction to be wrapped.
 	 * @return Closure Factory for abstraction.
 	 */
-	public function factory(string $abstract) : Closure {
-		
-		return function() use($abstract) {
+	public function factory(string $abstract) : Closure
+	{
+		return function () use($abstract) {
 			return $this->make($abstract);
 		};
-		
 	}
 	
 	/**
@@ -151,8 +142,8 @@ class Injector implements InjectorContract {
 	 * @param string $abstract Abstraction to be resolved.
 	 * @return mixed Resolved abstraction.
 	 */
-	public function make(string $abstract) {
-		
+	public function make(string $abstract)
+	{
 		$abstract = $this->identify($abstract);
 		
 		$link = $this->resolve($abstract);
@@ -170,7 +161,6 @@ class Injector implements InjectorContract {
 			$this->share($abstract, $object);
 		
 		return $object;
-		
 	}
 	
 	/**
@@ -179,10 +169,9 @@ class Injector implements InjectorContract {
 	 * @param string $context Context to be resolved from.
 	 * @return object Object containing concrete, context and shared data.
 	 */
-	public function resolve(string $abstract, string $context = null) {
-		
+	public function resolve(string $abstract, string $context = null)
+	{
 		return $this->binder->resolve($abstract, $context);
-		
 	}
 	
 	/**
@@ -190,11 +179,10 @@ class Injector implements InjectorContract {
 	 * @param string $abstract Abstraction to be shared.
 	 * @param mixed $instance Shared instance to registered.
 	 */
-	public function share(string $abstract, $instance) {
-		
+	public function share(string $abstract, $instance)
+	{
 		$this->aliases->del($abstract);
 		$this->shared->set($abstract, $instance);
-		
 	}
 	
 	/**
@@ -203,10 +191,9 @@ class Injector implements InjectorContract {
 	 * @param array $params Parameters to be used when invoked.
 	 * @return Closure Wrapped function.
 	 */
-	public function wrap(callable $fn, array $params = []) {
-		
+	public function wrap(callable $fn, array $params = [])
+	{
 		return $this->builder->wrap($fn, $params);
-		
 	}
 	
 	/**
@@ -214,12 +201,11 @@ class Injector implements InjectorContract {
 	 * @param string $alias Alias to be reversed.
 	 * @return mixed Real type name.
 	 */
-	protected function identify(string $alias) {
-		
+	protected function identify(string $alias)
+	{
 		return $this->aliases->has($alias)
 			? $this->identify($this->aliases->get($alias))
 			: $alias;
-		
 	}
 	
 }

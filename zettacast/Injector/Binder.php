@@ -17,8 +17,8 @@ use Zettacast\Collection\Basic as Collection;
  * @package Zettacast\Injector
  * @version 1.0
  */
-class Binder {
-	
+class Binder
+{
 	/**
 	 * Collection of abstraction bindings. Abstraction bindings allow the usage
 	 * of contracts as the requested object, so the concrete object can be
@@ -31,10 +31,9 @@ class Binder {
 	 * Binder constructor. This constructor simply sets all properties to
 	 * empty collections. Each of these collections have a special use.
 	 */
-	public function __construct() {
-		
+	public function __construct()
+	{
 		$this->links    = new Collection;
-		
 	}
 	
 	/**
@@ -45,16 +44,16 @@ class Binder {
 	 * @param string $context Context to which binding is applied.
 	 */
 	public function bind (
-		string $abstract, $concrete, bool $shared = false,
+		string $abstract,
+		$concrete,
+		bool $shared = false,
 		string $context = null
 	) {
-		
 		$this->links->set($context.$abstract, (object)[
 			'concrete'  => $concrete,
 			'context'   => (bool)$context,
 			'shared'    => $shared,
 		]);
-		
 	}
 	
 	/**
@@ -63,11 +62,10 @@ class Binder {
 	 * @param string $context Context to be checked from.
 	 * @return bool Is abstract bound?
 	 */
-	public function bound(string $abstract, string $context = null) {
-		
+	public function bound(string $abstract, string $context = null)
+	{
 		return !is_null($context) and $this->links->has($context.$abstract)
 			or $this->links->has($abstract);
-		
 	}
 	
 	/**
@@ -76,8 +74,8 @@ class Binder {
 	 * @param string $context Context to be resolved from.
 	 * @return object Object containing concrete, context and shared data.
 	 */
-	public function resolve(string $abstract, string $context = null) {
-		
+	public function resolve(string $abstract, string $context = null)
+	{
 		if($context && $result = $this->links->get($context.$abstract))
 			return $result;
 		
@@ -89,7 +87,6 @@ class Binder {
 			'context'   => false,
 			'shared'    => false,
 		];
-		
 	}
 	
 	/**
@@ -97,10 +94,9 @@ class Binder {
 	 * @param string $abstract Abstraction to be unbound.
 	 * @param string|null $context Applied context to binding.
 	 */
-	public function unbind(string $abstract, string $context = null) {
-		
+	public function unbind(string $abstract, string $context = null)
+	{
 		$this->links->del($context.$abstract);
-		
 	}
 	
 }

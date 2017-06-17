@@ -16,8 +16,8 @@ use Zettacast\Collection\Contract\Collection;
  * @package Zettacast\Collection
  * @version 1.0
  */
-class Dot extends Recursive {
-	
+class Dot extends Recursive
+{
 	/**
 	 * Depth-separator. This variable holds the symbol that indicates depth
 	 * when iterating over the data. It defaults to a single dot.
@@ -37,18 +37,18 @@ class Dot extends Recursive {
 	 * @param array|Collection|\Traversable $data Data to be stored.
 	 * @param string $dot Depth-separator.
 	 */
-	public function __construct($data = null, string $dot = '.') {
-		
+	public function __construct($data = null, string $dot = '.')
+	{
 		$this->dot = $dot;
 		parent::__construct($data);
-		
 	}
 	
 	/**
 	 * Removes an element from collection.
 	 * @param mixed $key Key to be removed.
 	 */
-	public function del($key) {
+	public function del($key)
+	{
 		$segment = $this->dot($key);
 		$lastkey = array_pop($segment);
 		$curnode = &$this->data;
@@ -61,7 +61,6 @@ class Dot extends Recursive {
 		}
 		
 		unset($curnode[$lastkey]);
-		
 	}
 	
 	/**
@@ -69,10 +68,9 @@ class Dot extends Recursive {
 	 * @param mixed $key Dot expression key to be split.
 	 * @return array Dot expression segments.
 	 */
-	protected function dot($key) {
-		
+	protected function dot($key)
+	{
 		return explode($this->dot, $key);
-		
 	}
 	
 	/**
@@ -81,8 +79,8 @@ class Dot extends Recursive {
 	 * @param callable $fn Test function. Parameters: value, key.
 	 * @return static Collection of all filtered values.
 	 */
-	public function filter(callable $fn) {
-		
+	public function filter(callable $fn)
+	{
 		$scope = !is_null($this->scope) ? $this->scope.$this->dot : null;
 		
 		foreach(Base::iterate() as $key => $value)
@@ -92,7 +90,6 @@ class Dot extends Recursive {
 					: $value;
 		
 		return new static($result ?? []);
-		
 	}
 		
 	/**
@@ -102,7 +99,8 @@ class Dot extends Recursive {
 	 * @param bool $ref Should Collection be returned if element is array?
 	 * @return mixed Requested element or default fallback.
 	 */
-	public function get($key, $default = null, $ref = true) {
+	public function get($key, $default = null, $ref = true)
+	{
 		$segment = $this->dot($key);
 		$curnode = &$this->data;
 		
@@ -111,11 +109,9 @@ class Dot extends Recursive {
 				return $default;
 			
 			$curnode = &$curnode[$dot];
-			
 		}
 		
 		return $ref ? self::ref($curnode) : $curnode;
-		
 	}
 	
 	/**
@@ -123,7 +119,8 @@ class Dot extends Recursive {
 	 * @param mixed $key Key to be check if exists.
 	 * @return bool Does key exist?
 	 */
-	public function has($key) {
+	public function has($key)
+	{
 		$segment = $this->dot($key);
 		$curnode = &$this->data;
 		
@@ -132,11 +129,9 @@ class Dot extends Recursive {
 				return false;
 			
 			$curnode = &$curnode[$dot];
-			
 		}
 		
 		return true;
-		
 	}
 	
 	/**
@@ -144,7 +139,8 @@ class Dot extends Recursive {
 	 * @param mixed|array $keys Keys to be included in new collection.
 	 * @return static New collection instance.
 	 */
-	public function only($keys) {
+	public function only($keys)
+	{
 		$keys = self::toarray($keys);
 		$result = new static;
 		
@@ -153,7 +149,6 @@ class Dot extends Recursive {
 				$result->set($key, $this->get($key, null, false));
 		
 		return $result;
-		
 	}
 	
 	/**
@@ -162,18 +157,16 @@ class Dot extends Recursive {
 	 * @param string|array $key Keys to index plucked array.
 	 * @return Basic The plucked values.
 	 */
-	public function pluck($value, $key = null) {
-		
+	public function pluck($value, $key = null)
+	{
 		foreach(Base::iterate() as $item) {
 			$i = $this->scrf($item);
 			
 			if(is_null($key)) $result[] = $i->get($value, null, false);
 			else $result[$i->get($key)] = $i->get($value, null, false);
-			
 		}
 		
 		return new Basic($result ?? []);
-		
 	}
 	
 	/**
@@ -181,7 +174,8 @@ class Dot extends Recursive {
 	 * @param mixed $key Key to created or updated.
 	 * @param mixed $value Value to be stored in key.
 	 */
-	public function set($key, $value) {
+	public function set($key, $value)
+	{
 		$segment = $this->dot($key);
 		$lastkey = array_pop($segment);
 		$curnode = &$this->data;
@@ -191,11 +185,9 @@ class Dot extends Recursive {
 				$curnode[$dot] = [];
 			
 			$curnode = &$curnode[$dot];
-			
 		}
 		
 		$curnode[$lastkey] = $value;
-		
 	}
 	
 	/**
@@ -205,8 +197,8 @@ class Dot extends Recursive {
 	 * @param string $scope Scope to be attached to collection.
 	 * @return static New collection with referenced data.
 	 */
-	protected function scrf(&$data, $scope = null) {
-		
+	protected function scrf(&$data, $scope = null)
+	{
 		if(!is_array($data) and !$data instanceof Collection)
 			return $data;
 		
@@ -215,7 +207,6 @@ class Dot extends Recursive {
 		$refobj->scope = $scope;
 		
 		return $refobj;
-		
 	}
 	
 }

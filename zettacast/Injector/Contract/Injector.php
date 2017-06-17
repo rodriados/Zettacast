@@ -1,6 +1,6 @@
 <?php
 /**
- * Injector\Contract\Injector interface class file.
+ * Zettacast\Injector\Contract\Injector interface class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -10,8 +10,12 @@ namespace Zettacast\Injector\Contract;
 
 use Closure;
 
-interface Injector {
-	
+/**
+ * This interface declares all needed methods for a properly working injector.
+ * @package Zettacast\Injector
+ */
+interface Injector
+{
 	/**
 	 * Creates a new object alias.
 	 * @param string $abstract Abstraction to be aliased.

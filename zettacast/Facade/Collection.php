@@ -21,9 +21,12 @@ use Zettacast\Helper\Extendable;
  * instanciate other collection types.
  * @version 1.0
  */
-final class Collection {
-	
-	use Extendable { Extendable::__callStatic as __callAttached; }
+final class Collection
+{
+	use Extendable
+	{
+		Extendable::__callStatic as __callAttached;
+	}
 	
 	/**
 	 * Builds a new collection based on a function.
@@ -31,7 +34,8 @@ final class Collection {
 	 * @param callable $fn Function to build collection. Params: key, value.
 	 * @return baseclass New collection instance.
 	 */
-	public static function build($data, callable $fn) {
+	public static function build($data, callable $fn)
+	{
 		$collection = self::make();
 
 		foreach($data as $key => $value) {
@@ -40,7 +44,6 @@ final class Collection {
 		}
 		
 		return $collection;
-		
 	}
 	
 	/**
@@ -49,10 +52,9 @@ final class Collection {
 	 * @param array $values Array to be used as values.
 	 * @return baseclass New collection instance.
 	 */
-	public static function combine($keys, $values) {
-		
+	public static function combine($keys, $values)
+	{
 		return self::make(array_combine($keys, $values));
-		
 	}
 	
 	/**
@@ -61,10 +63,9 @@ final class Collection {
 	 * @param string $dot Depth-separator.
 	 * @return Dot New collection instance.
 	 */
-	public static function dot($data = [], string $dot = '.') {
-		
+	public static function dot($data = [], string $dot = '.')
+	{
 		return new Dot($data, $dot);
-		
 	}
 	
 	/**
@@ -74,12 +75,11 @@ final class Collection {
 	 * @param int $count Number of elements to be filled if keys are integers.
 	 * @return baseclass New collection instance.
 	 */
-	public static function fill($value, $key, int $count = 0) {
-		
+	public static function fill($value, $key, int $count = 0)
+	{
 		return self::make(is_array($key)
 			? array_fill_keys($key, $value)
 			: array_fill($key, $count, $value));
-		
 	}
 	
 	/**
@@ -87,10 +87,9 @@ final class Collection {
 	 * @param array $data Data to be set in collection.
 	 * @return Imutable New collection instance.
 	 */
-	public static function lock($data = []) {
-		
+	public static function lock($data = [])
+	{
 		return new Imutable($data);
-		
 	}
 	
 	/**
@@ -98,10 +97,9 @@ final class Collection {
 	 * @param array $data Data to be set in collection.
 	 * @return baseclass New collection instance.
 	 */
-	public static function make($data = []) {
-		
+	public static function make($data = [])
+	{
 		return new baseclass($data);
-		
 	}
 	
 	/**
@@ -109,10 +107,9 @@ final class Collection {
 	 * @param array $data Data to be set in collection.
 	 * @return Recursive New collection instance.
 	 */
-	public static function recursive($data = []) {
-		
+	public static function recursive($data = [])
+	{
 		return new Recursive($data);
-		
 	}
 	
 	/**
@@ -120,10 +117,9 @@ final class Collection {
 	 * @param array $data Data to be set in collection.
 	 * @return Secure New collection instance.
 	 */
-	public static function secure($data = []) {
-		
+	public static function secure($data = [])
+	{
 		return new Secure($data);
-		
 	}
 	
 	/**
@@ -132,13 +128,12 @@ final class Collection {
 	 * @param array $args Arguments for the called method.
 	 * @return mixed Façaded method return value.
 	 */
-	public static function __callStatic(string $method, array $args) {
-		
+	public static function __callStatic(string $method, array $args)
+	{
 		if(count($args) >= 1 and is_callable([baseclass::class, $method]))
 			return self::make(array_shift($args))->$method(...$args);
 		
 		return self::__callAttached($method, $args);
-		
 	}
 		
 }
