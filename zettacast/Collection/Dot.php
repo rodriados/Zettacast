@@ -8,7 +8,7 @@
  */
 namespace Zettacast\Collection;
 
-use Zettacast\Collection\Contract\Collection;
+use Zettacast\Collection\Basic as Collection;
 
 /**
  * Dot collection class. This collection implements dot access methods, that is
@@ -27,7 +27,7 @@ class Dot extends Recursive
 	
 	/**
 	 * Indicates scope the collection is inserted into. It defaults to nothing.
-	 * @var string Collection's scope.
+	 * @var array Collection's scope.
 	 */
 	protected $scope = null;
 	
@@ -36,10 +36,16 @@ class Dot extends Recursive
 	 * data stored in collection.
 	 * @param array|Collection|\Traversable $data Data to be stored.
 	 * @param string $dot Depth-separator.
+	 * @param string $scope Scope to which this Collection is attached to.
 	 */
-	public function __construct($data = null, string $dot = '.')
-	{
+	public function __construct(
+		$data = null,
+		string $dot = '.',
+		string $scope = null
+	) {
 		$this->dot = $dot;
+		$this->scope = !is_null($scope) ? explode($dot, $scope) : [];
+		
 		parent::__construct($data);
 	}
 	
@@ -49,69 +55,64 @@ class Dot extends Recursive
 	 */
 	public function del($key)
 	{
-		$segment = $this->dot($key);
-		$lastkey = array_pop($segment);
-		$curnode = &$this->data;
+		$segments = $this->dot($key);
+		$last = array_pop($segments);
+		$node = &$this->data;
 		
-		foreach($segment as $dot) {
-			if(!self::listable($curnode) or !isset($curnode[$dot]))
+		foreach($segments as $segment) {
+			if(!self::traversable($node) or !isset($node[$segment]))
 				return;
 			
-			$curnode = &$curnode[$dot];
+			$node = &$this->inref($node, $segment);
 		}
 		
-		unset($curnode[$lastkey]);
-	}
-	
-	/**
-	 * Explodes dot expression into array.
-	 * @param mixed $key Dot expression key to be split.
-	 * @return array Dot expression segments.
-	 */
-	protected function dot($key)
-	{
-		return explode($this->dot, $key);
+		unset($node[$last]);
 	}
 	
 	/**
 	 * Filters elements according to the given test. If no test function is
 	 * given, it fallbacks to removing all false equivalent values.
 	 * @param callable $fn Test function. Parameters: value, key.
+	 * @param bool $invert Remove all values evaluated to true instead?
 	 * @return static Collection of all filtered values.
 	 */
-	public function filter(callable $fn)
+	public function filter(callable $fn = null, $invert = false)
 	{
-		$scope = !is_null($this->scope) ? $this->scope.$this->dot : null;
+		$fn = $fn ?? function ($value) {
+			return (bool)$value;
+		};
 		
-		foreach(Base::iterate() as $key => $value)
-			if($fn($value, $scope . $key))
-				$result[$key] = self::listable($value)
-					? $this->scrf($value, $scope.$key)->filter($fn)->all()
+		foreach($this->data as $key => $value)
+			if($fn($value, $s = array_merge($this->scope, [$key])) == !$invert)
+				$result[$key] = self::traversable($value)
+					? $this->outref($value, $s)->filter($fn)->all()
 					: $value;
 		
-		return new static($result ?? []);
+		$result = $result ?? [];
+		return $this->outref($result, $this->scope);
 	}
 		
 	/**
 	 * Gets an element stored in collection.
 	 * @param mixed $key Key of requested element.
 	 * @param mixed $default Default value fallback.
-	 * @param bool $ref Should Collection be returned if element is array?
 	 * @return mixed Requested element or default fallback.
 	 */
-	public function get($key, $default = null, $ref = true)
+	public function get($key, $default = null)
 	{
-		$segment = $this->dot($key);
-		$curnode = &$this->data;
+		$segments = $this->dot($key);
+		$scope = $this->scope;
+		$node = &$this->data;
 		
-		foreach($segment as $dot) {
-			if(!self::listable($curnode) or !isset($curnode[$dot]))
+		foreach($segments as $segment) {
+			if(!self::traversable($node) or !isset($node[$segment]))
 				return $default;
 			
-			$curnode = &$curnode[$dot];
+			$node = &$this->inref($node, $segment);
+			$scope[] = $segment;
 		}
 		
-		return $ref ? self::ref($curnode) : $curnode;
+		return $this->outref($node, $scope);
 	}
 	
 	/**
@@ -121,34 +122,17 @@ class Dot extends Recursive
 	 */
 	public function has($key)
 	{
-		$segment = $this->dot($key);
-		$curnode = &$this->data;
+		$segments = $this->dot($key);
+		$node = $this->data;
 		
-		foreach($segment as $dot) {
-			if(!self::listable($curnode) or !isset($curnode[$dot]))
+		foreach($segments as $segment) {
+			if(!self::traversable($node) or !isset($node[$segment]))
 				return false;
 			
-			$curnode = &$curnode[$dot];
+			$node = $node[$segment];
 		}
 		
 		return true;
-	}
-	
-	/**
-	 * Creates a new collection with a subset of elements.
-	 * @param mixed|array $keys Keys to be included in new collection.
-	 * @return static New collection instance.
-	 */
-	public function only($keys)
-	{
-		$keys = self::toarray($keys);
-		$result = new static;
-		
-		foreach($keys as $key)
-			if($this->has($key))
-				$result->set($key, $this->get($key, null, false));
-		
-		return $result;
 	}
 	
 	/**
@@ -159,11 +143,11 @@ class Dot extends Recursive
 	 */
 	public function pluck($value, $key = null)
 	{
-		foreach(Base::iterate() as $item) {
-			$i = $this->scrf($item);
+		foreach($this->data as $item) {
+			$i = $this->outref($item);
 			
-			if(is_null($key)) $result[] = $i->get($value, null, false);
-			else $result[$i->get($key)] = $i->get($value, null, false);
+			if(is_null($key)) $result[] = $i->get($value);
+			else $result[$i->get($key)] = $i->get($value);
 		}
 		
 		return new Basic($result ?? []);
@@ -176,37 +160,90 @@ class Dot extends Recursive
 	 */
 	public function set($key, $value)
 	{
-		$segment = $this->dot($key);
-		$lastkey = array_pop($segment);
-		$curnode = &$this->data;
-
-		foreach($segment as $dot) {
-			if(!isset($curnode[$dot]) or !self::listable($curnode[$dot]))
-				$curnode[$dot] = [];
+		$segments = $this->dot($key);
+		$last = array_pop($segments);
+		$node = &$this->data;
+		
+		foreach($segments as $segment) {
+			if(!isset($node[$segment]) or !self::traversable($node[$segment]))
+				$node[$segment] = [];
 			
-			$curnode = &$curnode[$dot];
+			$node = &$this->inref($node, $segment);
 		}
 		
-		$curnode[$lastkey] = $value;
+		$node[$last] = $value;
+	}
+	
+	/**
+	 * Creates a new instance of class based on an already existing instance,
+	 * and using by-reference assignment to data stored in new instance.
+	 * @param mixed &$target Data to be fed into the new instance.
+	 * @param array $scope Scope to be attached to collection.
+	 * @return static The new instance.
+	 */
+	protected function decorator(&$target, array $scope = null)
+	{
+		$obj = new static(null, $this->dot);
+		$obj->scope = $scope ?? $this->scope;
+		$obj->data = &$target;
+		return $obj;
+	}
+	
+	/**
+	 * Explodes dot expression into array.
+	 * @param string $key Dot expression key to be split.
+	 * @return array Dot expression segments.
+	 */
+	protected function dot(string $key)
+	{
+		$expanded = explode($this->dot, trim($key, $this->dot));
+		$intersect = array_intersect($this->scope, $expanded);
+		
+		return  $this->scope === $intersect
+			? array_slice($expanded, count($this->scope))
+			: $expanded;
+	}
+	
+	/**
+	 * Creates a new instance of class based on an already existing instance.
+	 * @param mixed $target Data to be fed into the new instance.
+	 * @param array $scope Scope to be attached to collection.
+	 * @return static The new instance.
+	 */
+	protected function factory($target = [], array $scope = null)
+	{
+		$obj = new static($target, $this->dot);
+		$obj->scope = $scope ?? $this->scope;
+		return $obj;
+	}
+	
+	/**
+	 * Gets an internal value by-reference if possible.
+	 * @param array|Collection $node Instance from which value is retrieved.
+	 * @param string $segment Segment to get reference from.
+	 * @return mixed Retrieve value's reference.
+	 */
+	protected function &inref(&$node, string $segment)
+	{
+		if($node instanceof Collection)
+			return $node->data[$segment];
+		
+		return $node[$segment];
 	}
 	
 	/**
 	 * Creates a new collection mantaining the reference to the original
 	 * variable that is the data stored in it and sets a scope.
 	 * @param mixed $data Data to be stored in collection.
-	 * @param string $scope Scope to be attached to collection.
+	 * @param array $scope Scope to be attached to collection.
 	 * @return static New collection with referenced data.
 	 */
-	protected function scrf(&$data, $scope = null)
+	protected function outref(&$data, array $scope = null)
 	{
 		if(!is_array($data) and !$data instanceof Collection)
 			return $data;
 		
-		$refobj = new static(null, $this->dot);
-		$refobj->data = &$data;
-		$refobj->scope = $scope;
-		
-		return $refobj;
+		return $this->decorator($data, $scope);
 	}
 	
 }

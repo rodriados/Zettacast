@@ -35,7 +35,9 @@ abstract class Base implements Collection, Iterator, ArrayAccess
 	 */
 	public function __construct($data = null)
 	{
-		$this->data = !is_null($data) ? self::toarray($data) : [];
+		$this->data = !is_null($data)
+			? self::toarray($data)
+			: [];
 	}
 	
 	/**
@@ -92,7 +94,7 @@ abstract class Base implements Collection, Iterator, ArrayAccess
 	 */
 	public function copy()
 	{
-		return new static($this->data);
+		return $this->factory($this->data);
 	}
 	
 	/**
@@ -228,6 +230,30 @@ abstract class Base implements Collection, Iterator, ArrayAccess
 	}
 	
 	/**
+	 * Creates a new instance of class based on an already existing instance,
+	 * and using by-reference assignment to data stored in new instance.
+	 * @param mixed &$target Data to be fed into the new instance.
+	 * @return static The new instance.
+	 */
+	protected function decorator(&$target)
+	{
+		$obj = new static();
+		$obj->data = &$target;
+		return $obj;
+	}
+	
+	/**
+	 * Creates a new instance of class based on an already existing instance.
+	 * @param mixed $target Data to be fed into the new instance.
+	 * @return static The new instance.
+	 */
+	protected function factory($target = [])
+	{
+		$obj = new static($target);
+		return $obj;
+	}
+	
+	/**
 	 * Removes an element from collection.
 	 * @param mixed $key Key to be removed.
 	 */
@@ -292,7 +318,7 @@ abstract class Base implements Collection, Iterator, ArrayAccess
 	 * @param mixed $data Data to be checked if collectible.
 	 * @return bool Is it possible data to be a collection?
 	 */
-	final static protected function listable($data)
+	final protected static function traversable($data)
 	{
 		return is_array($data)
 			or $data instanceof Collection
@@ -304,30 +330,13 @@ abstract class Base implements Collection, Iterator, ArrayAccess
 	 * @param mixed $data Data to be transformed into array.
 	 * @return array Given data as array.
 	 */
-	final static protected function toarray($data)
+	final protected static function toarray($data)
 	{
 		if(is_array($data)) return $data;
 		elseif($data instanceof Collection) return $data->all();
 		elseif($data instanceof Traversable) return iterator_to_array($data);
 		
 		return [$data];
-	}
-	
-	/**
-	 * Creates a new collection mantaining the reference to the original
-	 * variable that is the data stored in it.
-	 * @param mixed $data Data to be stored in collection.
-	 * @return static New collection with referenced data.
-	 */
-	protected static function ref(&$data)
-	{
-		if(!is_array($data) and !$data instanceof Collection)
-			return $data;
-		
-		$refobj = new static;
-		$refobj->data = &$data;
-		
-		return $refobj;
 	}
 	
 }

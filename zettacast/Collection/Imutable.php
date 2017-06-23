@@ -9,6 +9,7 @@
 namespace Zettacast\Collection;
 
 use Exception;
+use Zettacast\Collection\Contract\Collection;
 
 /**
  * Imutable collection class. This collection has constant data, so the data
@@ -26,7 +27,13 @@ class Imutable extends Base
 	 */
 	public function get($key, $default = null)
 	{
-		return $this->has($key) ? $this->data[$key] : $default;
+		$value = $this->data instanceof Collection
+			? $this->data->get($key, $default)
+			: $default;
+
+		return $value instanceof Collection
+			? new Imutable($value)
+			: $value;
 	}
 		
 	/**

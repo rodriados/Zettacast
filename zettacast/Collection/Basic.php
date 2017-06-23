@@ -35,9 +35,9 @@ class Basic extends Base
 	public function chunk($size)
 	{
 		if($size <= 0)
-			return new static;
+			return $this->factory();
 		
-		return new static(array_chunk($this->data, $size, true) ?? []);
+		return $this->factory(array_chunk($this->data, $size, true) ?? []);
 	}
 	
 	/**
@@ -59,7 +59,7 @@ class Basic extends Base
 	public function diff($items, $keys = false)
 	{
 		$fn = $keys ? 'array_diff_key' : 'array_diff';
-		return new static($fn($this->data, self::toarray($items)));
+		return $this->factory($fn($this->data, self::toarray($items)));
 	}
 	
 	/**
@@ -68,21 +68,20 @@ class Basic extends Base
 	 */
 	public function divide()
 	{
-		return new static([
-			new static(array_keys($this->data)),
-			new static(array_values($this->data))
-		]);
+		return $this->factory([$this->keys(), $this->values()]);
 	}
 	
 	/**
 	 * Checks whether all elements in collection pass given test.
 	 * @param callable $fn Test function. Parameters: value, key.
-	 * @param bool $value Value the test function result should be compared to.
+	 * @param mixed $value Value the test function result should be compared to.
 	 * @return bool Does every element pass the test?
 	 */
 	public function every(callable $fn = null, $value = true)
 	{
-		$fn = $fn ?? function ($value) { return $value; };
+		$fn = $fn ?: function ($value) {
+			return $value;
+		};
 		
 		foreach($this->iterate() as $key => $v)
 			if($fn($v, $key) != $value)
@@ -100,8 +99,8 @@ class Basic extends Base
 	{
 		$keys = self::toarray($keys);
 		
-		return $this->filter(function ($value, $key) use($keys) {
-			return !in_array($key, $keys);
+		return $this->filter(function ($_, $key) use ($keys) {
+			return !in_array($key, $keys, true);
 		});
 	}
 	
@@ -114,11 +113,11 @@ class Basic extends Base
 	 */
 	public function filter(callable $fn = null, $invert = false)
 	{
-		return new static(is_null($fn)
+		return $this->factory(is_null($fn)
 			? array_filter($this->data)
 			: array_filter(
 				$this->data,
-				function ($v, $k) use($fn, $invert) {
+				function ($v, $k) use ($fn, $invert) {
 					return $fn($v, $k) == !$invert;
 				},
 				ARRAY_FILTER_USE_BOTH
@@ -134,22 +133,15 @@ class Basic extends Base
 	 */
 	public function first(callable $fn = null, $default = null)
 	{
-		$fn = $fn ?: function () { return true; };
+		$fn = $fn ?: function () {
+			return true;
+		};
 		
 		foreach($this->iterate() as $key => $value)
 			if($fn($value, $key))
 				return $value;
 		
 		return $default;
-	}
-	
-	/**
-	 * Flips collection's keys and elements.
-	 * @return static Flipped collection.
-	 */
-	public function flip()
-	{
-		return new static(array_flip($this->data));
 	}
 	
 	/**
@@ -180,16 +172,18 @@ class Basic extends Base
 	 */
 	public function intersect($items)
 	{
-		return new static(array_intersect($this->data, self::toarray($items)));
+		return $this->factory(
+			array_intersect($this->data, self::toarray($items))
+		);
 	}
 	
 	/**
 	 * Returns all element keys currently present in collection.
-	 * @return static Collection of this collection element's keys.
+	 * @return self Collection of this collection element's keys.
 	 */
 	public function keys()
 	{
-		return new static(array_keys($this->data));
+		return new self(array_keys($this->data));
 	}
 	
 	/**
@@ -200,7 +194,9 @@ class Basic extends Base
 	 */
 	public function last(callable $fn = null, $default = null)
 	{
-		$fn = $fn ?: function () { return true; };
+		$fn = $fn ?: function () {
+			return true;
+		};
 		
 		foreach($this->reverse()->iterate() as $key => $value)
 			if($fn($value, $key))
@@ -215,7 +211,7 @@ class Basic extends Base
 	 */
 	public function lock()
 	{
-		return Imutable::ref($this);
+		return new Imutable($this);
 	}
 	
 	/**
@@ -230,7 +226,7 @@ class Basic extends Base
 		$keys = array_keys($this->data);
 		$values = array_map($fn, $this->data, $keys);
 		
-		return new static(array_combine($keys, $values));
+		return $this->factory(array_combine($keys, $values));
 	}
 	
 	/**
@@ -240,7 +236,7 @@ class Basic extends Base
 	 */
 	public function merge($items)
 	{
-		return new static(array_merge($this->data, self::toarray($items)));
+		return $this->factory(array_merge($this->data, self::toarray($items)));
 	}
 	
 	/**
@@ -304,7 +300,7 @@ class Basic extends Base
 			return $this->shuffle();
 		
 		$keys = array_rand($this->data, $amount);
-		return new static(array_intersect_key($this->data, array_flip($keys)));
+		return $this->factory(array_intersect_key($this->data, array_flip($keys)));
 	}
 	
 	/**
@@ -325,7 +321,7 @@ class Basic extends Base
 	 */
 	public function replace($items)
 	{
-		return new static(array_replace($this->data, self::toarray($items)));
+		return $this->factory(array_replace($this->data, self::toarray($items)));
 	}
 	
 	/**
@@ -334,7 +330,7 @@ class Basic extends Base
 	 */
 	public function reverse()
 	{
-		return new static(array_reverse($this->data));
+		return $this->factory(array_reverse($this->data));
 	}
 	
 	/**
@@ -383,7 +379,7 @@ class Basic extends Base
 		$data = $this->data;
 		shuffle($data);
 		
-		return new static($data);
+		return $this->factory($data);
 	}
 	
 	/**
@@ -394,7 +390,7 @@ class Basic extends Base
 	 */
 	public function slice($offset, $length = null)
 	{
-		return new static(array_slice($this->data, $offset, $length, true));
+		return $this->factory(array_slice($this->data, $offset, $length, true));
 	}
 	
 	/**
@@ -405,7 +401,7 @@ class Basic extends Base
 	public function split($count)
 	{
 		if($this->empty())
-			return new static;
+			return $this->factory();
 		
 		return $this->chunk(ceil($this->count() / $count));
 	}
@@ -420,7 +416,7 @@ class Basic extends Base
 		$data = $this->data;
 		$fn ? uasort($data, $fn) : asort($data);
 		
-		return new static($data);
+		return $this->factory($data);
 	}
 	
 	/**
@@ -432,7 +428,7 @@ class Basic extends Base
 	 */
 	public function splice($offset, $length = null, $replace = [])
 	{
-		return new static(array_splice(
+		return $this->factory(array_splice(
 			$this->data,
 			$offset,
 			$length ?: $this->count(),
@@ -459,7 +455,7 @@ class Basic extends Base
 	 */
 	public function union($items)
 	{
-		return new static($this->data + self::toarray($items));
+		return $this->factory($this->data + self::toarray($items));
 	}
 	
 	/**
@@ -468,7 +464,7 @@ class Basic extends Base
 	 */
 	public function unique()
 	{
-		return new static(array_unique($this->data, SORT_REGULAR));
+		return $this->factory(array_unique($this->data, SORT_REGULAR));
 	}
 	
 	/**
@@ -488,11 +484,11 @@ class Basic extends Base
 	
 	/**
 	 * Returns all element values currently present in collection.
-	 * @return static Collection of this collection element's values.
+	 * @return self Collection of this collection element's values.
 	 */
 	public function values()
 	{
-		return new static(array_values($this->data));
+		return new self(array_values($this->data));
 	}
 	
 	/**
@@ -518,8 +514,8 @@ class Basic extends Base
 	{
 		$items = array_map([static::class, 'toarray'], $items);
 		
-		return new static(array_map(function (...$params) {
-			return new static($params);
+		return $this->factory(array_map(function (...$params) {
+			return $this->factory($params);
 		}, $this->data, ...$items));
 	}
 	
