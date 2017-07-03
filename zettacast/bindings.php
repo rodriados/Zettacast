@@ -27,8 +27,10 @@ return [
 		=> Zettacast\HTTP\Request::class
 	
 	/* FileSystem Module */
-,	Zettacast\FileSystem\Contract\Adapter::class
-		=> Zettacast\FileSystem\Adapter\Local::class
+,	Zettacast\FileSystem\Contract\Driver::class
+		=> Zettacast\FileSystem\Driver\Local::class
+,   Zettacast\FileSystem\Contract\Handler::class
+		=> Zettacast\FileSystem\File::class
 	
 	/* Console */
 ,	//Zettacast\Console\Contract\Kernel::class => Zettacast\Console\Kernel::class,
