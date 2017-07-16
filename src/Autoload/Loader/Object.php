@@ -8,7 +8,7 @@
  */
 namespace Zettacast\Autoload\Loader;
 
-use Zettacast\Autoload\Contract\Loader;
+use Zettacast\Contract\Autoload\Loader;
 
 /**
  * The Object loader class is responsible for implementing the loading of
@@ -16,7 +16,8 @@ use Zettacast\Autoload\Contract\Loader;
  * @package Zettacast\Autoload
  * @version 1.0
  */
-class Object implements Loader
+class Object
+	implements Loader
 {
 	/**
 	 * Listed objects. The entries in this array should not override Zettacast
@@ -48,54 +49,44 @@ class Object implements Loader
 	
 	/**
 	 * Resets the loader to its initial state.
-	 * @return self Loader instance.
+	 * @return void No return expected.
 	 */
 	public function reset()
 	{
 		$this->objects = [];
-		return $this;
 	}
 	
 	/**
 	 * Adds new object map entries. Conflicting entries will simply be
 	 * overwritten to the newest value.
 	 * @param array $map Map of objects to be added.
-	 * @return self Loader instance.
 	 */
 	public function add(array $map)
 	{
 		foreach($map as $objname => $objpath)
 			$this->objects[ltrim($objname, '\\')] = $objpath;
-
-		return $this;
 	}
 	
 	/**
 	 * Removes an entry from the map. Classes to be loaded using this loader
 	 * will not be unloaded if they have already been loaded.
 	 * @param array|string $objlist Objects to be removed.
-	 * @return self Loader instance.
 	 */
 	public function del($objlist)
 	{
 		foreach((array)$objlist as $objname)
 			if(isset($this->objects[$objname]))
 				unset($this->objects[$objname]);
-		
-		return $this;
 	}
 	
 	/**
 	 * Resets and erases all previous entries and put new ones in the list.
 	 * @param array $map New object mappings.
-	 * @return self Loader instance.
 	 */
 	public function set(array $map)
 	{
 		$this->reset();
 		$this->add($map);
-
-		return $this;
 	}
 	
 }

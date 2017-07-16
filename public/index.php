@@ -20,7 +20,7 @@ error_reporting(~0);
  * needed for a correct Zettacast execution. Besides that, an autoload function
  * is specified so one no longer needs explicitly include class files.
  */
-require __DIR__.'/../zettacast/bootstrap.php';
+require __DIR__.'/../src/bootstrap.php';
 require __DIR__.'/../app/bootstrap.php';
 
 /*

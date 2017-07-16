@@ -8,10 +8,10 @@
  */
 namespace Zettacast\Autoload;
 
-require FWORKPATH.'/Autoload/Contract/Loader.php';
-require FWORKPATH.'/Autoload/Loader/Framework.php';
+require FWORKPATH."/Contract/Autoload/Loader.php";
+require FWORKPATH."/Autoload/Loader/Framework.php";
 
-use Zettacast\Autoload\Contract\Loader;
+use Zettacast\Contract\Autoload\Loader;
 use Zettacast\Autoload\Loader\Framework;
 
 /**
@@ -24,8 +24,8 @@ use Zettacast\Autoload\Loader\Framework;
 final class Autoload
 {
 	/**
-	 * Stores the classloaders already registered in the autoloading system.
-	 * This allows us to keep track of all class loading functions.
+	 * Stores the loaders already registered in the autoloading system. This
+	 * allows us to keep track of all class loading functions.
 	 * @var Loader[] Class loader functions registered.
 	 */
 	private $loaders;
@@ -40,13 +40,27 @@ final class Autoload
 	/**
 	 * Autoload constructor.
 	 * Initializes the class and set values to instance properties.
-	 * @param string $path Framework's path.
+	 * @param string $fwork Framework files' path.
+	 * @param string $app Application files' path.
 	 */
-	public function __construct(string $path = FWORKPATH)
-	{
+	public function __construct(
+		string $fwork = FWORKPATH,
+		string $app = APPPATH
+	) {
 		$this->loaders = [];
-		$this->framework = new Framework($path);
+		$this->framework = new Framework($fwork, $app);
 		$this->register($this->framework);
+	}
+	
+	/**
+	 * Checks whether a loader has already been registered to the stack.
+	 * @param Loader $loader Target to check whether registered.
+	 * @return bool Is loader already registered?
+	 */
+	public function inStack(Loader $loader)
+	{
+		return isset($this->loaders[$hash = spl_object_hash($loader)])
+			and $this->loaders[$hash];
 	}
 	
 	/**
@@ -58,12 +72,12 @@ final class Autoload
 	 */
 	public function register(Loader $loader)
 	{
-		if(!in_array($loader, $this->loaders)) {
-			$this->loaders[] = $loader;
-			return spl_autoload_register([$loader, 'load']);
+		if($this->inStack($loader)) {
+			return false;
 		}
 		
-		return false;
+		$this->loaders[spl_object_hash($loader)] = true;
+		return spl_autoload_register([$loader, 'load']);
 	}
 	
 	/**
@@ -72,24 +86,10 @@ final class Autoload
 	 */
 	public function unregister(Loader $loader)
 	{
-		if(in_array($loader, $this->loaders)) {
-			unset($this->loaders[array_search($loader, $this->loaders)]);
+		if($this->inStack($loader)) {
+			unset($this->loaders[spl_object_hash($loader)]);
 			spl_autoload_unregister([$loader, 'load']);
 		}
-	}
-	
-	/**
-	 * Resets all registered loaders and unregister all loaders but the default
-	 * one. This is used when only Zettacast's core classes are needed.
-	 */
-	public function reset()
-	{
-		foreach($this->loaders as $loader) {
-			spl_autoload_unregister([$loader, 'load']);
-			$loader->reset();
-		}
-		
-		$this->register($this->framework);
 	}
 	
 }

@@ -8,7 +8,7 @@
  */
 namespace Zettacast\Autoload\Loader;
 
-use Zettacast\Autoload\Contract\Loader;
+use Zettacast\Contract\Autoload\Loader;
 
 /**
  * The Space loader class is responsible for implementing the loading of
@@ -16,7 +16,8 @@ use Zettacast\Autoload\Contract\Loader;
  * @package Zettacast\Autoload
  * @version 1.0
  */
-class Space implements Loader
+class Space
+	implements Loader
 {
 	/**
 	 * Listed namespaces. The entries in this array should not override
@@ -59,19 +60,17 @@ class Space implements Loader
 	
 	/**
 	 * Resets the loader to its initial state.
-	 * @return self Loader instance.
+	 * @return void No return expected.
 	 */
 	public function reset()
 	{
 		$this->spaces = [];
-		return $this;
 	}
 	
 	/**
 	 * Adds new namespace map entries. Conflicting entries will simply be
 	 * overwritten to the newest value.
 	 * @param array $map Map of namespaces to be added.
-	 * @return self Loader instance.
 	 */
 	public function add(array $map)
 	{
@@ -79,15 +78,12 @@ class Space implements Loader
 			$sname = strtolower(ltrim($sname, '\\'));
 			$this->spaces[$sname] = rtrim($spath, '/');
 		}
-		
-		return $this;
 	}
 	
 	/**
 	 * Removes an entry from the map. Classes to be loaded using this loader
 	 * will not be unloaded if they have already been loaded.
 	 * @param array|string $slist Namespaces to be removed.
-	 * @return self Loader instance.
 	 */
 	public function del($slist)
 	{
@@ -97,21 +93,16 @@ class Space implements Loader
 			if(isset($this->spaces[$sname]))
 				unset($this->spaces[$sname]);
 		}
-		
-		return $this;
 	}
 	
 	/**
 	 * Resets and erases all previous entries and put new ones in the list.
 	 * @param array $map New namespace mappings.
-	 * @return self Loader instance.
 	 */
 	public function set(array $map)
 	{
 		$this->reset();
 		$this->add($map);
-		
-		return $this;
 	}
 	
 }

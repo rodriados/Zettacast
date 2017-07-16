@@ -13,7 +13,7 @@ use Zettacast\Facade\Autoload;
  * This allows you to add your application's or any other classes to the
  * autoloader object and easily access these classes from anywhere.
  */
-Autoload::object([
+Autoload::class([
 	// Add here the classes you want to add. Example:
 	//'Math' => APP.'/class/math.php',
 ]);
@@ -22,7 +22,7 @@ Autoload::object([
  * This allows you to add your application's or any other namespaces to the
  * autoloader object and easily access these namespaces from anywhere.
  */
-Autoload::space([
+Autoload::namespace([
 	// Add here the namespaces you want to add. Example:
 	//'Mail' => APP.'/class/mail',
 ]);

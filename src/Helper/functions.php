@@ -6,29 +6,36 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-use Zettacast\Zettacast;
 
-if(!function_exists('dd')) {
+if(!function_exists('dump')) {
 	/**
 	 * Dumps the passed variables and ends execution.
 	 * @param array ...$vars Variables to be dumped.
 	 */
-	function dd(...$vars)
+	function dump(...$vars)
 	{
 		var_dump(...$vars);
 		exit;
 	}
 }
 
-if(!function_exists('e')) {
+if(!function_exists('toarray')) {
 	/**
-	 * Escapes all HTML entities in the given string.
-	 * @param string $str String to be escaped.
-	 * @return string Escaped string.
+	 * Transforms given data into an array.
+	 * @param mixed $data Data to be transformed into array.
+	 * @return array Given data as array.
 	 */
-	function e($str)
+	function toarray($data)
 	{
-		return htmlentities($str, ENT_QUOTES, 'UTF-8', false);
+		if($data instanceof \Zettacast\Contract\Collection\Listable)
+			return $data->all();
+		
+		if($data instanceof Traversable)
+			return iterator_to_array($data);
+		
+		return is_array($data)
+			? $data
+			: [$data];
 	}
 }
 
@@ -40,7 +47,9 @@ if(!function_exists('with')) {
 	 */
 	function with($object)
 	{
-		return $object instanceof Closure ? $object() : $object;
+		return $object instanceof Closure
+			? $object()
+			: $object;
 	}
 }
 
@@ -48,13 +57,13 @@ if(!function_exists('zetta')) {
 	/**
 	 * Gets the current framework instance.
 	 * @param string $abstract Abstraction to be made.
-	 * @return Zettacast|mixed Requested abstraction or framework instance.
+	 * @return Zettacast\Zettacast|mixed Requested abstraction instance.
 	 */
 	function zetta(string $abstract = null)
 	{
 		if(is_null($abstract))
-			return Zettacast::instance();
+			return Zettacast\Zettacast::instance();
 		
-		return Zettacast::instance()->make($abstract);
+		return Zettacast\Zettacast::instance()->make($abstract);
 	}
 }

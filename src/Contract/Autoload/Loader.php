@@ -1,17 +1,17 @@
 <?php
 /**
- * Zettacast\Autoload\Contract\Loader interface class file.
+ * Zettacast\Contract\Autoload\Loader interface class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Autoload\Contract;
+namespace Zettacast\Contract\Autoload;
 
 /**
  * The Loader interface is responsible for exposing the common methods of
  * loaders used in the autoload package.
- * @package Zettacast\Autoload
+ * @package Zettacast\Contract\Autoload
  */
 interface Loader
 {

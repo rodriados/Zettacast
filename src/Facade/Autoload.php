@@ -8,10 +8,11 @@
  */
 namespace Zettacast\Facade;
 
-use Zettacast\Helper\Facadable;
-use Zettacast\Autoload\Loader\Alias;
-use Zettacast\Autoload\Loader\Object;
 use Zettacast\Autoload\Loader\Space;
+use Zettacast\Helper\Facadable;
+use Zettacast\Autoload\Loader\Alias as AliasLoader;
+use Zettacast\Autoload\Loader\Space as SpaceLoader;
+use Zettacast\Autoload\Loader\Object as ObjectLoader;
 use Zettacast\Autoload\Autoload as baseclass;
 
 /**
@@ -25,19 +26,19 @@ final class Autoload
 	
 	/**
 	 * Aliased objects loader instance.
-	 * @var Alias Loader instance.
+	 * @var AliasLoader Loader instance.
 	 */
 	private static $alias = null;
 	
 	/**
 	 * External objects loader instance.
-	 * @var Object Loader instance.
+	 * @var ObjectLoader Loader instance.
 	 */
 	private static $object = null;
 	
 	/**
 	 * Namespaced objects loader instance.
-	 * @var Space Loader instance.
+	 * @var SpaceLoader Loader instance.
 	 */
 	private static $space = null;
 	
@@ -54,48 +55,57 @@ final class Autoload
 	/**
 	 * Allows the registration of the aliased objects loader.
 	 * @param array|null $map Objects mapping to be set in the loader.
-	 * @return Alias The loader instance.
+	 * @return AliasLoader The loader instance.
 	 */
-	public static function alias(array $map = null)
+	public static function alias(array $map = [])
 	{
-		if($map)
-			return self::alias()->set($map);
+		if(empty($map))
+			return self::$alias;
 		
-		if(is_null(self::$alias))
-			self::facaded()->register(self::$alias = new Alias);
+		if(!isset(self::$alias))
+			self::facaded()->register(
+				self::$alias = new AliasLoader
+			);
 		
+		self::$alias->add($map);
 		return self::$alias;
 	}
 	
 	/**
 	 * Allows the registration of the objects loader.
 	 * @param array|null $map Objects mapping to be set in the loader.
-	 * @return Object The loader instance.
+	 * @return ObjectLoader The loader instance.
 	 */
-	public static function object(array $map = null)
+	public static function class(array $map = [])
 	{
-		if($map)
-			return self::object()->set($map);
+		if(empty($map))
+			return self::$object;
 		
-		if(is_null(self::$object))
-			self::facaded()->register(self::$object = new Object);
+		if(!isset(self::$object))
+			self::facaded()->register(
+				self::$object = new ObjectLoader
+			);
 		
+		self::$object->add($map);
 		return self::$object;
 	}
 	
 	/**
 	 * Allows the registration of the namespaces loader.
 	 * @param array|null $map Namespaces mapping to be set in the loader.
-	 * @return Space The loader instance.
+	 * @return SpaceLoader The loader instance.
 	 */
-	public static function space(array $map = null)
+	public static function namespace(array $map = [])
 	{
-		if($map)
-			return self::space()->set($map);
+		if(empty($map))
+			return self::$space;
 		
-		if(is_null(self::$space))
-			self::facaded()->register(self::$space = new Space);
+		if(!isset(self::$space))
+			self::facaded()->register(
+				self::$space = new SpaceLoader
+			);
 		
+		self::$space->add($map);
 		return self::$space;
 	}
 	
