@@ -19,13 +19,22 @@ if(!function_exists('dump')) {
 	}
 }
 
+if(!function_exists('listable')) {
+	function listable($data) : bool
+	{
+		return is_array($data)
+			or $data instanceof \Zettacast\Contract\Collection\Listable
+			or $data instanceof Traversable;
+	}
+}
+
 if(!function_exists('toarray')) {
 	/**
 	 * Transforms given data into an array.
 	 * @param mixed $data Data to be transformed into array.
 	 * @return array Given data as array.
 	 */
-	function toarray($data)
+	function toarray($data) : array
 	{
 		if($data instanceof \Zettacast\Contract\Collection\Listable)
 			return $data->all();
