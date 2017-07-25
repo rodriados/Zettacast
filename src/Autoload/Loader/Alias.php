@@ -48,7 +48,7 @@ final class Alias
 		if(!$this->data->knows($name))
 			return false;
 		
-		return class_alias($this->data->resolve($alias), $name, true);
+		return class_alias($this->data->identify($alias), $name, true);
 	}
 	
 	/**

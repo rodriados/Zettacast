@@ -63,7 +63,9 @@ class Aliaser
 	 */
 	public function register(string $alias, $target)
 	{
-		$this->data->set($alias, $target);
+		if($alias != $target)
+			$this->data->set($alias, $target);
+		
 		return $this;
 	}
 	
@@ -72,10 +74,10 @@ class Aliaser
 	 * @param string $alias Alias name to be resolved.
 	 * @return mixed Resolved value.
 	 */
-	public function resolve(string $alias)
+	public function identify(string $alias)
 	{
 		return $this->data->has($alias)
-			? $this->resolve($this->data->get($alias))
+			? $this->identify($this->data->get($alias))
 			: $alias;
 	}
 	
