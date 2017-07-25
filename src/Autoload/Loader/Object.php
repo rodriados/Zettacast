@@ -8,6 +8,7 @@
  */
 namespace Zettacast\Autoload\Loader;
 
+use Zettacast\Collection\Collection;
 use Zettacast\Contract\Autoload\Loader;
 
 /**
@@ -20,11 +21,20 @@ class Object
 	implements Loader
 {
 	/**
-	 * Listed objects. The entries in this array should not override Zettacast
-	 * classes or unexpected errors may occur.
-	 * @var array Maps objects to their actual paths.
+	 * Listed objects. The entries in this collection should not override
+	 * Zettacast classes or unexpected errors may occur.
+	 * @var Collection Mappings of objects to their actual paths.
 	 */
-	protected $objects;
+	protected $data;
+	
+	/**
+	 * Object loader constructor. This constructor simply sets all of its
+	 * properties to empty collections.
+	 */
+	public function __construct()
+	{
+		$this->data = new Collection;
+	}
 	
 	/**
 	 * Tries to load an invoked and not yet loaded object.
@@ -33,60 +43,50 @@ class Object
 	 */
 	public function load(string $obj): bool
 	{
-		$objname = ltrim($obj, '\\');
+		$name = ltrim($obj, '\\');
 		
-		if(empty($this->objects) or !isset($this->objects[$objname]))
+		if(!$this->data->has($name))
 			return false;
 		
-		$fname = $this->objects[$objname];
-		
-		if(!file_exists($fname))
+		if(!file_exists($filename = $this->data->get($name)))
 			return false;
 		
-		require $fname;
+		require $filename;
 		return true;
 	}
 	
 	/**
 	 * Resets the loader to its initial state.
-	 * @return void No return expected.
+	 * @return self Object loader for method chaining.
 	 */
 	public function reset()
 	{
-		$this->objects = [];
+		$this->data->clear();
+		return $this;
 	}
 	
 	/**
-	 * Adds new object map entries. Conflicting entries will simply be
-	 * overwritten to the newest value.
-	 * @param array $map Map of objects to be added.
+	 * Registers a new object file.
+	 * @param string $obj Object name to be registered.
+	 * @param string $file File in which object can be found.
+	 * @return self Object loader for method chaining.
 	 */
-	public function add(array $map)
+	public function set(string $obj, string $file)
 	{
-		foreach($map as $objname => $objpath)
-			$this->objects[ltrim($objname, '\\')] = $objpath;
+		$this->data->set($obj, $file);
+		return $this;
 	}
 	
 	/**
 	 * Removes an entry from the map. Classes to be loaded using this loader
 	 * will not be unloaded if they have already been loaded.
-	 * @param array|string $objlist Objects to be removed.
+	 * @param string $obj Object to be removed.
+	 * @return self Object loader for method chaining.
 	 */
-	public function del($objlist)
+	public function remove($obj)
 	{
-		foreach((array)$objlist as $objname)
-			if(isset($this->objects[$objname]))
-				unset($this->objects[$objname]);
-	}
-	
-	/**
-	 * Resets and erases all previous entries and put new ones in the list.
-	 * @param array $map New object mappings.
-	 */
-	public function set(array $map)
-	{
-		$this->reset();
-		$this->add($map);
+		$this->data->remove($obj);
+		return $this;
 	}
 	
 }

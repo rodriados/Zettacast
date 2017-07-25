@@ -67,11 +67,11 @@ final class Framework
 	
 	/**
 	 * Resets the loader to its initial state.
-	 * @return void No return expected.
+	 * @return self Framework loader for method chaining.
 	 */
 	public function reset()
 	{
-		;
+		return $this;
 	}
 	
 	/**

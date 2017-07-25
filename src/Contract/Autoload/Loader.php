@@ -24,7 +24,7 @@ interface Loader
 	
 	/**
 	 * Resets the loader to its initial state.
-	 * @return null No return value required.
+	 * @return static Loader for method chaining.
 	 */
 	public function reset();
 	

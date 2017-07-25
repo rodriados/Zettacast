@@ -8,6 +8,7 @@
  */
 namespace Zettacast\Autoload\Loader;
 
+use Zettacast\Collection\Collection;
 use Zettacast\Contract\Autoload\Loader;
 
 /**
@@ -20,11 +21,20 @@ class Space
 	implements Loader
 {
 	/**
-	 * Listed namespaces. The entries in this array should not override
+	 * Listed namespaces. The entries in this collection should not override
 	 * Zettacast namespaces or unexpected errors may occur.
-	 * @var array Maps namespaces to their actual paths.
+	 * @var Collection Maps namespaces to their actual paths.
 	 */
-	protected $spaces;
+	protected $data;
+	
+	/**
+	 * Space loader constructor. This constructor simply sets all of its
+	 * properties to empty collections.
+	 */
+	public function __construct()
+	{
+		$this->data = new Collection;
+	}
 	
 	/**
 	 * Tries to load an invoked and not yet loaded object.
@@ -33,76 +43,63 @@ class Space
 	 */
 	public function load(string $obj): bool
 	{
-		if(empty($this->spaces))
+		if($this->data->empty())
 			return false;
 		
 		$obj = ltrim($obj, '\\');
-		$qnsname = explode('\\', $obj);
-		$objname = array_pop($qnsname);
+		$nspname = explode('\\', $obj);
+		$objname = array_pop($nspname);
 		
-		while($qnsname) {
-			$space = implode('\\', $qnsname);
+		while($nspname) {
+			$space = implode('\\', $nspname);
 			
-			if(isset($this->spaces[$space])) {
-				$fname = $this->spaces[$space].'/'.$objname.'.php';
+			if($this->data->has($space)) {
+				$filename = $this->data->get($space).'/'.$objname.'.php';
 				break;
 			}
 			
-			$objname = array_pop($qnsname).'/'.$objname;
+			$objname = array_pop($nspname).'/'.$objname;
 		}
 		
-		if(!isset($fname) or !file_exists($fname))
+		if(!isset($filename) || !file_exists($filename))
 			return false;
 		
-		require $fname;
+		require $filename;
 		return true;
 	}
 	
 	/**
 	 * Resets the loader to its initial state.
-	 * @return void No return expected.
+	 * @return self Space loader for method chaining.
 	 */
 	public function reset()
 	{
-		$this->spaces = [];
+		$this->data->clear();
+		return $this;
 	}
 	
 	/**
-	 * Adds new namespace map entries. Conflicting entries will simply be
-	 * overwritten to the newest value.
-	 * @param array $map Map of namespaces to be added.
+	 * Registers a new namespace folder.
+	 * @param string $space Namespace to be registered.
+	 * @param string $folder Folder containing namespace's objects.
+	 * @return self Object loader for method chaining.
 	 */
-	public function add(array $map)
+	public function set(string $space, string $folder)
 	{
-		foreach($map as $sname => $spath) {
-			$sname = strtolower(ltrim($sname, '\\'));
-			$this->spaces[$sname] = rtrim($spath, '/');
-		}
+		$this->data->set(ltrim($space, '\\'), rtrim($folder, '/'));
+		return $this;
 	}
 	
 	/**
 	 * Removes an entry from the map. Classes to be loaded using this loader
 	 * will not be unloaded if they have already been loaded.
-	 * @param array|string $slist Namespaces to be removed.
+	 * @param string $space Namespace to be removed.
+	 * @return self Space loader for method chaining.
 	 */
-	public function del($slist)
+	public function remove($space)
 	{
-		foreach((array)$slist as $sname) {
-			$sname = strtolower(ltrim($sname, '\\'));
-			
-			if(isset($this->spaces[$sname]))
-				unset($this->spaces[$sname]);
-		}
-	}
-	
-	/**
-	 * Resets and erases all previous entries and put new ones in the list.
-	 * @param array $map New namespace mappings.
-	 */
-	public function set(array $map)
-	{
-		$this->reset();
-		$this->add($map);
+		$this->data->remove(ltrim($space, '\\'));
+		return $this;
 	}
 	
 }

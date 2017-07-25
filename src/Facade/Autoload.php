@@ -54,7 +54,7 @@ final class Autoload
 	
 	/**
 	 * Allows the registration of the aliased objects loader.
-	 * @param array|null $map Objects mapping to be set in the loader.
+	 * @param array $map Objects alias mapping to be set in the loader.
 	 * @return AliasLoader The loader instance.
 	 */
 	public static function alias(array $map = [])
@@ -63,11 +63,11 @@ final class Autoload
 			return self::$alias;
 		
 		if(!isset(self::$alias))
-			self::facaded()->register(
-				self::$alias = new AliasLoader
-			);
+			self::facaded()->register(self::$alias = new AliasLoader);
 		
-		self::$alias->add($map);
+		foreach($map as $alias => $target)
+			self::$alias->set($alias, $target);
+
 		return self::$alias;
 	}
 	
@@ -82,11 +82,11 @@ final class Autoload
 			return self::$object;
 		
 		if(!isset(self::$object))
-			self::facaded()->register(
-				self::$object = new ObjectLoader
-			);
+			self::facaded()->register(self::$object = new ObjectLoader);
 		
-		self::$object->add($map);
+		foreach($map as $obj => $file)
+			self::$object->set($obj, $file);
+
 		return self::$object;
 	}
 	
@@ -101,11 +101,11 @@ final class Autoload
 			return self::$space;
 		
 		if(!isset(self::$space))
-			self::facaded()->register(
-				self::$space = new SpaceLoader
-			);
+			self::facaded()->register(self::$space = new SpaceLoader);
 		
-		self::$space->add($map);
+		foreach($map as $space => $folder)
+			self::$space->set($space, $folder);
+		
 		return self::$space;
 	}
 	
