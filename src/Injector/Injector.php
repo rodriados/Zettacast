@@ -123,7 +123,7 @@ class Injector
 	}
 	
 	/**
-	 * Creates a factory for given the abstraction.
+	 * Creates a factory for the given abstraction.
 	 * @param string $abstract Abstraction to be wrapped.
 	 * @param array $outer Default parameters to be sent to object.
 	 * @return Closure Factory for abstraction.
