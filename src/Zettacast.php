@@ -8,14 +8,6 @@
  */
 namespace Zettacast;
 
-require "../zettacast/Collection/Contract/Collection.php";
-require "../zettacast/Collection/Base.php";
-require "../zettacast/Collection/Basic.php";
-require "../zettacast/Injector/Contract/Injector.php";
-require "../zettacast/Injector/Injector.php";
-require "../zettacast/Injector/Binder.php";
-require "../zettacast/Injector/Builder.php";
-
 use Zettacast\Helper\Singleton;
 use Zettacast\Injector\Injector;
 
@@ -41,10 +33,10 @@ final class Zettacast
 	 * depending on the environment framework is executing.
 	 * @var string Execution mode constants.
 	 */
-	const LOCAL = 0x001;
-	const TESTING = 0x002;
-	const DEVELOPMENT = 0x004;
-	const PRODUCTION = 0x008;
+	const LOCAL         = 0x001;
+	const TESTING       = 0x002;
+	const DEVELOPMENT   = 0x004;
+	const PRODUCTION    = 0x008;
 	/**#@-*/
 	
 	/**#@+
@@ -53,9 +45,9 @@ final class Zettacast
 	 * it's an asynchronous request, such as AJAX.
 	 * @var int Input mode constants.
 	 */
-	const APPLICATION = 0x010;
-	const COMMANDLINE = 0x020;
-	const ASYNCHRONOUS = 0x040;
+	const APPLICATION   = 0x010;
+	const COMMANDLINE   = 0x020;
+	const ASYNCHRONOUS  = 0x040;
 	/**#@-*/
 	
 	/**
@@ -92,9 +84,10 @@ final class Zettacast
 		$this->share('path', $root.'/app');
 		$this->share('path.base', $root);
 		$this->share('path.public', $root.'/public');
-		$this->share('path.zetta', $root.'/zettacast');
+		$this->share('path.zetta', $root.'/src');
+		
+		$this->share(self::class, $this);
 		$this->share(Injector::class, $this);
-		/*$this->fworkbind();*/
 	}
 	
 }

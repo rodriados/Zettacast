@@ -37,7 +37,7 @@ define('PUBLICPATH', DOCROOT.'/public');
  * requested classes, interfaces or the like for the framework when needed.
  */
 require FWORKPATH.'/Helper/functions.php';
-require FWORKPATH."/Autoload/Autoload.php";
+require FWORKPATH.'/Autoload/Autoload.php';
 $loader = new Zettacast\Autoload\Autoload;
 
 /*
@@ -45,5 +45,10 @@ $loader = new Zettacast\Autoload\Autoload;
  * their instances built with dependency injection, that is, you will not need
  * to be worried with instantiating complex objects: we can do it for you.
  */
-#zetta()->share(Zettacast\Autoload\Autoload::class, $loader);
-zetta();
+zetta()->share(Zettacast\Autoload\Autoload::class, $loader);
+
+/*
+ * Creates all needed bindings for framework's dependency injector. This will
+ * make the modules loosely coupled, and easily testable.
+ */
+require FWORKPATH.'/bindings.php';
