@@ -93,11 +93,11 @@ class Builder
 		$info = $context ?? $this->injector->resolve($abstract);
 		$concrete = $info ? $info->concrete : $abstract;
 		
-		$object = $concrete instanceof Closure
-			? $concrete($this->injector, ...$params)
-			: $abstract == $concrete
+		$object = !is_callable($concrete)
+			? $abstract == $concrete
 				? $this->build($concrete, $params)
-				: $this->make($concrete, $params);
+				: $this->make($concrete, $params)
+			: $concrete($this->injector, ...$params);
 		
 		if(!$context && $info && $info->shared)
 			$this->shared->set($abstract, $object);
@@ -158,9 +158,11 @@ class Builder
 	 */
 	protected function resolve(array $requested, array $params = []) : array
 	{
-		foreach($requested as $dependency)
+		foreach($requested as $id => $dependency)
 			if(isset($params[$dependency->name]))
 				$solved[] = $params[$dependency->name];
+			elseif(isset($params[$id]))
+				$solved[] = $params[$id];
 			elseif(!is_null($dependency->getClass()))
 				$solved[] = $this->buildObject($dependency);
 			else /* not explicitly given param nor typed argument */
@@ -181,7 +183,7 @@ class Builder
 		$info = $this->injector->when($context)->resolve('$'.$param->name);
 		
 		if(!is_null($info))
-			return $info->concrete instanceof Closure
+			return is_callable($info->concrete)
 				? ($info->concrete)($this->injector)
 				: $this->make($info->concrete);
 		

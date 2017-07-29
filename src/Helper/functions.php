@@ -66,13 +66,14 @@ if(!function_exists('zetta')) {
 	/**
 	 * Gets the current framework instance.
 	 * @param string $abstract Abstraction to be made.
+	 * @param mixed ...$args Arguments to be passed to constructing object.
 	 * @return Zettacast\Zettacast|mixed Requested abstraction instance.
 	 */
-	function zetta(string $abstract = null)
+	function zetta(string $abstract = null, ...$args)
 	{
 		if(is_null($abstract))
-			return Zettacast\Zettacast::instance();
+			return \Zettacast\Zettacast::instance();
 		
-		return Zettacast\Zettacast::instance()->make($abstract);
+		return \Zettacast\Zettacast::instance()->make($abstract, $args);
 	}
 }

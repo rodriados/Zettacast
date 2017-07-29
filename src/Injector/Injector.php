@@ -83,7 +83,7 @@ class Injector
 	/**
 	 * Creates a new abstraction binding, allowing for them to be instantiated.
 	 * @param string $abstract Abstraction to be bound.
-	 * @param string|Closure $concrete Concrete object to abstraction.
+	 * @param string|callable $concrete Concrete object to abstraction.
 	 * @param bool $shared Should abstraction become a singleton?
 	 * @return static Injector for method chaining.
 	 */
