@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Helper\Facadable trait file.
+ * Zettacast\Helper\Facade trait file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -14,7 +14,7 @@ namespace Zettacast\Helper;
  * instance can be accessed by the usage of static methods.
  * @package Zettacast\Helper
  */
-trait Facadable
+trait Facade
 {
 	/**
 	 * Façaded object instance. This is the instance to be called when using a

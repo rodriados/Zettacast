@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettcast\Helper\Extendable trait file.
+ * Zettcast\Helper\Extensor trait file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -16,7 +16,7 @@ use Closure;
  * runtime. Added methods can be both for instances or static scopes.
  * @package Zettacast\Helper
  */
-trait Extendable
+trait Extensor
 {
 	/**
 	 * The registered string functions.

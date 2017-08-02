@@ -8,8 +8,8 @@
  */
 namespace Zettacast\Facade;
 
+use Zettacast\Helper\Facade;
 use Zettacast\Autoload\Loader\Space;
-use Zettacast\Helper\Facadable;
 use Zettacast\Autoload\Loader\Alias as AliasLoader;
 use Zettacast\Autoload\Loader\Space as SpaceLoader;
 use Zettacast\Autoload\Loader\Object as ObjectLoader;
@@ -22,7 +22,7 @@ use Zettacast\Autoload\Autoload as baseclass;
  */
 final class Autoload
 {
-	use Facadable;
+	use Facade;
 	
 	/**
 	 * Aliased objects loader instance.

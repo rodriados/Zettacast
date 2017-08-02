@@ -8,7 +8,7 @@
  */
 namespace Zettacast\Facade;
 
-use Zettacast\Helper\Extendable;
+use Zettacast\Helper\Extensor;
 use Zettacast\Collection\Sequence as baseclass;
 
 /**
@@ -64,9 +64,9 @@ use Zettacast\Collection\Sequence as baseclass;
  */
 final class Sequence
 {
-	use Extendable
+	use Extensor
 	{
-		Extendable::__callStatic as private callExtended;
+		Extensor::__callStatic as private callExtensor;
 	}
 	
 	/**
@@ -80,7 +80,7 @@ final class Sequence
 		if(count($args) >= 1 && is_callable([baseclass::class, $method]))
 			return self::build(array_shift($args))->$method(...$args);
 		
-		return self::callExtended($method, $args);
+		return self::callExtensor($method, $args);
 	}
 	
 	/**
