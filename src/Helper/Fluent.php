@@ -48,6 +48,15 @@ class Fluent
 	}
 	
 	/**
+	 * Fluently unsets a property or method registered in the object.
+	 * @param string $name Name to be unset.
+	 */
+	public function __unset(string $name)
+	{
+		unset($this->fluent[$name]);
+	}
+	
+	/**
 	 * Calls a method fluently attached to object.
 	 * @param string $fn Method name to be called.
 	 * @param array $args Arguments to be passed to method.
