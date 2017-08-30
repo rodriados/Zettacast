@@ -22,4 +22,13 @@ zetta()
 ->alias('stack', 'Zettacast\Collection\Stack')
 ->alias('sequence', 'Zettacast\Collection\Sequence')
 ->alias('collection', 'Zettacast\Collection\Collection')
+
+# Filesystem module
+->alias('file', 'Zettacast\Filesystem\File')
+->alias('stream', 'Zettacast\Filesystem\Stream\Stream')
+->alias('filesystem', 'Zettacast\Filesystem\Filesystem')
+->bind('Zettacast\Contract\Filesystem\Driver', 'Zettacast\Filesystem\Driver\Local')
+->bind('Zettacast\Contract\Filesystem\Stream', 'Zettacast\Filesystem\Stream\Stream')
+->bind('Zettacast\Contract\Filesystem\Filesystem', 'Zettacast\Filesystem\Filesystem')
+
 ;
