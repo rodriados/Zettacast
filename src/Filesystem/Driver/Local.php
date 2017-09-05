@@ -221,6 +221,22 @@ class Local
 	}
 	
 	/**
+	 * Retrieves contents from a file and puts it into a stream.
+	 * @param string $file Source file to be read.
+	 * @param resource|StreamContract $stream Target stream to put content on.
+	 * @param int $length Maximum number of bytes to be written to stream.
+	 * @return int Length of data read from file.
+	 */
+	public function readTo(string $file, $stream, int $length = null) : int
+	{
+		$fcontent = $this->read($file);
+
+		return $stream instanceof StreamContract
+			? $stream->write($fcontent, $length)
+			: fwrite($stream, $fcontent, $length ?? strlen($fcontent));
+	}
+	
+	/**
 	 * Removes a file from driver.
 	 * @param string $path Path to file to be removed from driver.
 	 * @return bool Was file or directory successfully removed?
@@ -268,6 +284,20 @@ class Local
 	}
 	
 	/**
+	 * Retrieves content from stream and appends it to a file.
+	 * @param resource|StreamContract $stream Source content is retrieved from.
+	 * @param string $file Target file to be written to.
+	 * @param int $length Maximum number of bytes to be written to file.
+	 * @return int Total length of data written to file.
+	 */
+	public function updateFrom($stream, string $file, int $length = null) : int
+	{
+		return $stream instanceof StreamContract
+			? $this->update($file, $stream->read($length))
+			: $this->update($file, stream_get_contents($stream, $length));
+	}
+	
+	/**
 	 * Writes the content to a file, that will be created if needed.
 	 * @param string $filename Target file path to be written.
 	 * @param mixed $content Content to be written to path.
@@ -280,6 +310,20 @@ class Local
 		return $this->ensure(dirname($tgt))
 			? file_put_contents($tgt, $content)
 			: 0;
+	}
+	
+	/**
+	 * Retrieves content from stream and writes it to a file.
+	 * @param resource|StreamContract $stream Stream content is retrieved from.
+	 * @param string $file Target file to be written to.
+	 * @param int $length Maximum number of bytes to be written to file.
+	 * @return int Total length of data written to file.
+	 */
+	public function writeFrom($stream, string $file, int $length = null) : int
+	{
+		return $stream instanceof StreamContract
+			? $this->write($file, $stream->read($length))
+			: $this->write($file, stream_get_contents($stream, $length));
 	}
 	
 	/**

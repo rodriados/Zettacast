@@ -1,6 +1,6 @@
 <?php
 /**
- * File façade file.
+ * Filesystem façade file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -10,14 +10,13 @@ namespace Zettacast\Facade;
 
 use Zettacast\Helper\Facade;
 use Zettacast\Collection\Sequence;
-use Zettacast\Filesystem\Filesystem;
 use Zettacast\Filesystem\Stream\Virtual;
-use Zettacast\Filesystem\File as baseclass;
+use Zettacast\Filesystem\Filesystem as baseclass;
 use Zettacast\Contract\Filesystem\Stream as StreamContract;
 
 /**
- * Zettacast's File façade class.
- * This class exposes package:filesystem\File methods to external usage.
+ * Zettacast's Filesystem façade class.
+ * This class exposes package:filesystem\Filesystem methods to external usage.
  * @method static bool copy(string $path, string $target)
  * @method static bool has(string $path)
  * @method static mixed info(string $path = null, string $data = null)
@@ -42,12 +41,23 @@ final class File
 	use Facade;
 	
 	/**
+	 * Checks whether a path exists in the filesystem.
+	 * @param string $path Path to be checked.
+	 * @return bool Was the path found?
+	 */
+	public static function exists(string $path) : bool
+	{
+		return self::facaded()->has($path);
+	}
+	
+	/**
 	 * Creates a new temporary file, to be removed at this object destruction.
+	 * @param string $content Initial content of temporary file.
 	 * @return Virtual New temporary file.
 	 */
-	public static function temp() : Virtual
+	public static function virtual(string $content = null) : Virtual
 	{
-		return baseclass::temp();
+		return new Virtual($content);
 	}
 	
 	/**
@@ -57,7 +67,7 @@ final class File
 	 */
 	protected static function accessor()
 	{
-		return Filesystem::class;
+		return baseclass::class;
 	}
 	
 }

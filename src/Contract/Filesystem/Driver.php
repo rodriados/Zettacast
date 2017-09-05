@@ -92,6 +92,15 @@ interface Driver
 	public function read(string $filename) : string;
 	
 	/**
+	 * Retrieves contents from a file and puts it into a stream.
+	 * @param string $file Source file to be read.
+	 * @param resource|Stream $stream Target stream to put content on.
+	 * @param int $length Maximum number of bytes to be written to stream.
+	 * @return int Length of data read from file.
+	 */
+	public function readTo(string $file, $stream, int $length = null) : int;
+	
+	/**
 	 * Removes a file from driver.
 	 * @param string $path Path to file to be removed from driver.
 	 * @return bool Was file or directory successfully removed?
@@ -114,11 +123,29 @@ interface Driver
 	public function update(string $filename, $content) : int;
 	
 	/**
+	 * Retrieves content from stream and appends it to a file.
+	 * @param resource|Stream $stream Source content is retrieved from.
+	 * @param string $file Target file to be written to.
+	 * @param int $length Maximum number of bytes to be written to file.
+	 * @return int Total length of data written to file.
+	 */
+	public function updateFrom($stream, string $file, int $length = null) : int;
+	
+	/**
 	 * Writes the content to a file, that will be created if needed.
 	 * @param string $filename Target file path to be written.
 	 * @param mixed $content Content to be written to path.
 	 * @return int Number of written characters.
 	 */
 	public function write(string $filename, $content) : int;
+	
+	/**
+	 * Retrieves content from stream and writes it to a file.
+	 * @param resource|Stream $stream Stream content is retrieved from.
+	 * @param string $file Target file to be written to.
+	 * @param int $length Maximum number of bytes to be written to file.
+	 * @return int Total length of data written to file.
+	 */
+	public function writeFrom($stream, string $file, int $length = null) : int;
 	
 }

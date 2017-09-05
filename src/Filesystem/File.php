@@ -40,8 +40,9 @@ class File
 	 * Creates a new temporary file, to be removed at this object destruction.
 	 * @return Virtual New temporary file.
 	 */
-	public static function temp()
+	public static function virtual()
 	{
 		return new Virtual;
 	}
+	
 }

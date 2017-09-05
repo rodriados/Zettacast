@@ -25,10 +25,10 @@ zetta()
 
 # Filesystem module
 ->alias('file', 'Zettacast\Filesystem\File')
+->alias('info', 'Zettacast\Filesystem\Info')
 ->alias('stream', 'Zettacast\Filesystem\Stream\Stream')
 ->alias('filesystem', 'Zettacast\Filesystem\Filesystem')
 ->bind('Zettacast\Contract\Filesystem\Driver', 'Zettacast\Filesystem\Driver\Local')
 ->bind('Zettacast\Contract\Filesystem\Stream', 'Zettacast\Filesystem\Stream\Stream')
-->bind('Zettacast\Contract\Filesystem\Filesystem', 'Zettacast\Filesystem\Filesystem')
 
 ;

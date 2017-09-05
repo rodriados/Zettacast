@@ -23,7 +23,7 @@ class Virtual
 	public function __construct(string $contents = null)
 	{
 		parent::__construct('php://temp', 'r+');
-		$this->write($contents);
+		!is_null($contents) && $this->write($contents);
 		$this->rewind();
 	}
 	
