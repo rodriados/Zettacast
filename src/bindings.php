@@ -23,6 +23,9 @@ zetta()
 ->alias('sequence', 'Zettacast\Collection\Sequence')
 ->alias('collection', 'Zettacast\Collection\Collection')
 
+# Config module
+->alias('config', 'Zettacast\Config\Repository')
+
 # Filesystem module
 ->alias('file', 'Zettacast\Filesystem\File')
 ->alias('info', 'Zettacast\Filesystem\Info')

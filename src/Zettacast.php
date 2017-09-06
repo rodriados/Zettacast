@@ -8,6 +8,7 @@
  */
 namespace Zettacast;
 
+use Zettacast\Facade\Config;
 use Zettacast\Helper\Singleton;
 use Zettacast\Injector\Injector;
 
@@ -51,27 +52,6 @@ final class Zettacast
 	/**#@-*/
 	
 	/**
-	 * Internationalization locale. This property informs the language the
-	 * application is being presented to the used.
-	 * @var string Application's language.
-	 */
-	public static $locale = 'en_US';
-	
-	/**
-	 * User's timezone. This property informs the timezone to be shown whenever
-	 * a date or hour is presented to the user.
-	 * @var string Application's timezone.
-	 */
-	public static $timezone = 'UTC';
-	
-	/**
-	 * Application's encoding. This property informs the encoding used to show
-	 * texts for the user.
-	 * @var string Application's encoding.
-	 */
-	public static $encoding = 'UTF-8';
-	
-	/**
 	 * This method is responsible for setting the minimal configuration and
 	 * gathering information about the environment so the framework can work
 	 * correctly and execute the application as expected.
@@ -88,6 +68,9 @@ final class Zettacast
 		
 		$this->share(self::class, $this);
 		$this->share(Injector::class, $this);
+		
+		setlocale(LC_ALL, Config::get('app.locale', 'en_US'));
+		date_default_timezone_set(Config::get('app.timezone', 'UTC'));
 	}
 	
 }
