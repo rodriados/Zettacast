@@ -18,8 +18,13 @@ use Zettacast\Filesystem\Filesystem;
  * @version 1.0
  */
 class Repository
-	extends Dot
 {
+	/**
+	 * Holds all data contained by the repository.
+	 * @var Dot Repository data.
+	 */
+	protected $dot;
+	
 	/**
 	 * Lists all files that have already been loaded by this repository.
 	 * @var Sequence List of loaded files.
@@ -39,7 +44,7 @@ class Repository
 	 */
 	public function __construct(string $location)
 	{
-		parent::__construct();
+		$this->dot = new Dot;
 		$this->files = new Sequence;
 		$this->folder = new Filesystem($location);
 	}
@@ -51,12 +56,12 @@ class Repository
 	 * @param mixed $default Default value to be returned if key is not found.
 	 * @return mixed The retrieved value.
 	 */
-	public function get($key, $default = null)
+	public function get(string $key, $default = null)
 	{
 		$group = explode('.', $key)[0];
 		$this->load($group);
 		
-		return parent::get($key, $default);
+		return $this->dot->get($key, $default);
 	}
 	
 	/**
@@ -73,8 +78,35 @@ class Repository
 			return false;
 		
 		$this->files->push($file);
-		$this->set($file, include $this->folder->realpath($file.'.php'));
+		$this->dot->set($file, include $this->folder->realpath($file.'.php'));
 		return true;
+	}
+	
+	/**
+	 * Makes a configuration value not available for retrieving. Although the
+	 * current request will be not able to access such value anymore, the
+	 * configuration files are untouched.
+	 * @param string $key Key to be removed.
+	 * @return static Instance for method chaining.
+	 */
+	public function remove(string $key)
+	{
+		$this->dot->remove($key);
+		return $this;
+	}
+	
+	/**
+	 * Modifies a configuration value, thus making the old value unavailable
+	 * for retrieving. But similarly to removing it, the configuration files
+	 * are untouched.
+	 * @param string $key Key to be modified.
+	 * @param mixed $value Value to substitute the old one.
+	 * @return static Instance for method chaining.
+	 */
+	public function set(string $key, $value)
+	{
+		$this->dot->set($key, $value);
+		return $this;
 	}
 	
 }

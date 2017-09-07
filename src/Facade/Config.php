@@ -14,7 +14,10 @@ use Zettacast\Config\Repository as baseclass;
 /**
  * Zettacast's Config façade class.
  * This class exposes package:config\Repository methods to external usage.
- * @method static mixed get(string $key, $default)
+ * @method static mixed get(string $key, $default = null)
+ * @method static bool load(string $file)
+ * @method static baseclass remove(string $key)
+ * @method static baseclass set(string $key, $default)
  * @version 1.0
  */
 final class Config

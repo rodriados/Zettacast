@@ -7,18 +7,6 @@
  * @copyright 2015-2017 Rodrigo Siqueira
  */
 
-if(!function_exists('dump')) {
-	/**
-	 * Dumps the passed variables and ends execution.
-	 * @param array ...$vars Variables to be dumped.
-	 */
-	function dump(...$vars)
-	{
-		var_dump(...$vars);
-		exit;
-	}
-}
-
 if(!function_exists('listable')) {
 	function listable($data) : bool
 	{
@@ -59,6 +47,19 @@ if(!function_exists('with')) {
 		return $object instanceof Closure
 			? $object()
 			: $object;
+	}
+}
+
+if(!function_exists('config')) {
+	/**
+	 * Retrieves a configuration value from repository.
+	 * @param string $key Key to be retrieved from repository.
+	 * @param mixed $default Value to be returned if key cannot be retrieved.
+	 * @return mixed The retrieved value, or default if not found.
+	 */
+	function config(string $key, $default = null)
+	{
+		return \Zettacast\Facade\Config::get($key, $default);
 	}
 }
 
