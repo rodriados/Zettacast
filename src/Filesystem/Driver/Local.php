@@ -18,7 +18,7 @@ use Zettacast\Contract\Filesystem\Driver as DriverContract;
 /**
  * Driver for local files. This driver handles all operations to the local
  * filesystem, where the framework is installed. It cannot handle files out of
- * the document root, though
+ * the document root, though.
  * @method string basename(string $path = null)
  * @method string dirname(string $path = null)
  * @method bool executable(string $path = null)
@@ -69,7 +69,7 @@ class Local
 	 */
 	public function __call(string $name, array $args)
 	{
-		return $this->info($args[0] ?? '', $name);
+		return $this->info($args[0] ?? null, $name);
 	}
 	
 	/**
@@ -107,7 +107,7 @@ class Local
 	 */
 	public function info(string $path = null, string $data = null)
 	{
-		$src = $this->prefix($path ?? '');
+		$src = $this->prefix($path ?? '.');
 		
 		return !is_null($data)
 			? method_exists(Info::class, $data)
@@ -335,7 +335,7 @@ class Local
 	{
 		if(!is_dir($path)) {
 			$umask = umask(0);
-			@mkdir($path, 0755, true);
+			@mkdir($path, 0755);
 			umask($umask);
 		}
 		
