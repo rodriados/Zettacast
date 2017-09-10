@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Config\Repository class file.
+ * Zettacast\Config\Warehouse class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -11,22 +11,27 @@ namespace Zettacast\Config;
 use Zettacast\Collection\Dot;
 use Zettacast\Collection\Sequence;
 use Zettacast\Filesystem\Filesystem;
+use ArrayAccess as ArrayAccessContract;
+use Zettacast\Collection\Concerns\ArrayAccess;
 
 /**
- * Manages all configuration data known to the framework. Configuration files
- * are found in the application folder.
+ * Manages all configuration data found in a directory. The data are lazily
+ * retrieved from the files. That is, the file is only loaded when requested.
  * @version 1.0
  */
-class Repository
+class Warehouse
+	implements ArrayAccessContract
 {
+	use ArrayAccess;
+	
 	/**
-	 * Holds all data contained by the repository.
+	 * Holds all data contained in the warehouse.
 	 * @var Dot Repository data.
 	 */
 	protected $dot;
 	
 	/**
-	 * Lists all files that have already been loaded by this repository.
+	 * Lists all files that have already been loaded by the warehouse.
 	 * @var Sequence List of loaded files.
 	 */
 	protected $files;
@@ -38,7 +43,7 @@ class Repository
 	protected $folder;
 	
 	/**
-	 * Repository constructor.
+	 * Warehouse constructor.
 	 * This constructor simply initializes all instance properties.
 	 * @param string $location Configuration files folder location.
 	 */
@@ -50,7 +55,7 @@ class Repository
 	}
 	
 	/**
-	 * Retrieves a configuration value from the repository. If no correspondent
+	 * Retrieves a configuration value from the warehouse. If no correspondent
 	 * value can be found, the default one is returned.
 	 * @param string $key Configuration value to be retrieved.
 	 * @param mixed $default Default value to be returned if key is not found.
@@ -58,27 +63,39 @@ class Repository
 	 */
 	public function get(string $key, $default = null)
 	{
-		$group = explode('.', $key)[0];
+		$group = explode('.', $key, 2)[0];
 		$this->load($group);
 		
 		return $this->dot->get($key, $default);
 	}
 	
 	/**
-	 * Loads a configuration file to memory.
+	 * Checks whether a value is registered in the warehouse.
+	 * @param string $key Key to be searched for.
+	 * @return bool Is value known to the warehouse?
+	 */
+	public function has(string $key) : bool
+	{
+		$group = explode('.', $key, 2)[0];
+		$this->load($group);
+		
+		return $this->dot->has($key);
+	}
+	
+	/**
+	 * Loads configuration file to memory.
 	 * @param string $file File to be loaded.
 	 * @return bool Did the file load correctly?
 	 */
 	public function load(string $file) : bool
 	{
-		if(in_array($file, $this->files->all()))
-			return true;
-		
-		if(!$this->folder->has($file.'.php'))
+		$fname = $this->folder->realpath("$file.php");
+
+		if(!$fname || $this->files->search($fname) !== false)
 			return false;
 		
-		$this->files->push($file);
-		$this->dot->set($file, include $this->folder->realpath($file.'.php'));
+		$this->files->push($fname);
+		$this->dot->set($file, require $fname);
 		return true;
 	}
 	

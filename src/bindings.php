@@ -24,7 +24,7 @@ zetta()
 ->alias('collection', 'Zettacast\Collection\Collection')
 
 # Config module
-->alias('config', 'Zettacast\Config\Repository')
+->alias('config', 'Zettacast\Config\Warehouse')
 
 # Filesystem module
 ->alias('file', 'Zettacast\Filesystem\File')

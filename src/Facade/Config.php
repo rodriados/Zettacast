@@ -9,8 +9,7 @@
 namespace Zettacast\Facade;
 
 use Zettacast\Helper\Facade;
-use Zettacast\Config\Config as DataConfig;
-use Zettacast\Config\Repository as baseclass;
+use Zettacast\Config\Warehouse as baseclass;
 
 /**
  * Zettacast's Config façade class.
@@ -26,23 +25,14 @@ final class Config
 	use Facade;
 	
 	/**
-	 * Creates a new imutable configuration instance.
-	 * @param array $data Data to be stored by instance.
-	 * @return DataConfig The created configuration instance.
-	 */
-	public static function make(array $data = [])
-	{
-		return new DataConfig($data);
-	}
-	
-	/**
 	 * Informs what the façaded object accessor is, allowing it to be further
 	 * used when calling façaded methods.
 	 * @return mixed Façaded object accessor.
 	 */
 	protected static function accessor()
 	{
-		return new baseclass(APPPATH.'/config');
+		zetta()->share(baseclass::class, new baseclass(APPPATH.'/config'));
+		return baseclass::class;
 	}
 	
 }
