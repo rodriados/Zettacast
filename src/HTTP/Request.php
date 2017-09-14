@@ -32,7 +32,7 @@ class Request
 	{
 		$this->method = $method;
 		$this->content = new Collection($content);
-		$this->uri = !$uri instanceof URI ? new URI(...toarray($uri)) : $uri;
+		$this->uri = !$uri instanceof URL ? new URL(...toarray($uri)) : $uri;
 		
 		$this->files = null;
 		$this->header = null;
@@ -56,7 +56,7 @@ class Request
 		   && in_array($method, ['PUT', 'DELETE', 'PATCH']))
 			parse_str(file_get_contents('php://input'), $data);
 		
-		$request = new static($method, URI::capture(), $data ?? $_POST);
+		$request = new static($method, URL::capture(), $data ?? $_POST);
 		$request->files = Upload::capture();
 		$request->cookie = new Collection($_COOKIE);
 		$request->header = $header;
