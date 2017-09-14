@@ -14,7 +14,7 @@ use Zettacast\Contract\HTTP\Request as RequestContract;
 class Request
 	implements RequestContract
 {
-	protected $uri;
+	protected $url;
 	
 	protected $cookie;
 	
@@ -28,11 +28,11 @@ class Request
 	
 	protected $method;
 	
-	public function __construct(string $method, $uri, array $content = [])
+	public function __construct(string $method, $url, array $content = [])
 	{
 		$this->method = $method;
 		$this->content = new Collection($content);
-		$this->uri = !$uri instanceof URL ? new URL(...toarray($uri)) : $uri;
+		$this->url = !$url instanceof URL ? new URL($url) : $url;
 		
 		$this->files = null;
 		$this->header = null;

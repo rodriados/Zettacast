@@ -34,4 +34,11 @@ zetta()
 ->bind('Zettacast\Contract\Filesystem\Driver', 'Zettacast\Filesystem\Driver\Local')
 ->bind('Zettacast\Contract\Filesystem\Stream', 'Zettacast\Filesystem\Stream\Stream')
 
+# HTTP module
+->alias('url', 'Zettacast\HTTP\URL')
+->alias('request', 'Zettacast\Contract\HTTP\Request')
+->alias('response', 'Zettacast\Contract\HTTP\Response')
+->bind('Zettacast\Contract\HTTP\Kernel', 'Zettacast\HTTP\Kernel')
+->bind('Zettacast\Contract\HTTP\Request', 'Zettacast\HTTP\Request')
+
 ;

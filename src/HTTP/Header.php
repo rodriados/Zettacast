@@ -55,6 +55,20 @@ class Header
 	}
 	
 	/**
+	 * Adds a value to an already existing header, or creates it.
+	 * @param mixed $key Header key to be added or created.
+	 * @param mixed $value Value to be added to header.
+	 * @return static Collection for method chaining.
+	 */
+	public function add($key, $value)
+	{
+		$this->has($key)
+			? array_push($this->data[$key], $value)
+			: $this->set($key, $value);
+		return $this;
+	}
+	
+	/**
 	 * Sets a value to the given key.
 	 * @param mixed $key Key to created or updated.
 	 * @param mixed $value Value to be stored in key.

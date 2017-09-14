@@ -8,30 +8,34 @@
  */
 namespace Zettacast\HTTP;
 
-use Zettacast\Zettacast;
-use Zettacast\Contract\HTTP\Request;
-use Zettacast\Contract\HTTP\Response;
+use Zettacast\Facade\Request as RequestFacade;
 use Zettacast\Contract\HTTP\Kernel as KernelContract;
+use Zettacast\Contract\HTTP\Request as RequestContract;
+use Zettacast\Contract\HTTP\Response as ResponseContract;
 
 class Kernel
 	implements KernelContract
 {
-	public function __construct(Zettacast $zetta)
+	public function __construct()
 	{
-		$zetta->bootstrap();
-		$zetta->share(self::class, $this);
-		$zetta->share(KernelContract::class, $this);
+		zetta()->bootstrap();
+		zetta()->share(self::class, $this);
+		zetta()->share(KernelContract::class, $this);
 	}
 	
-	public function handle(Request $request) : Response
-	{
-		require APPPATH.'/view/index.php';
-		return new \Zettacast\HTTP\Response;
-	}
-	
-	public function complete(Request $request, Response $response)
+	public function commit(RequestContract $req, ResponseContract $resp)
 	{
 		// TODO: Implement complete() method.
+	}
+	
+	public function handle(RequestContract $req) : ResponseContract
+	{
+		zetta()->share(RequestContract::class, $req);
+		RequestFacade::unfacade();
+		
+		require APPPATH.'/view/index.php';
+		$resp = new Response;
+		return $resp;
 	}
 	
 }

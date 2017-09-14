@@ -21,22 +21,7 @@ trait Facade
 	 * façaded method.
 	 * @var mixed Façaded object instance.
 	 */
-	protected static $instance;
-	
-	/**
-	 * Retrieves the instance of the object being façaded.
-	 * @return mixed Façaded object instance.
-	 */
-	protected static function facaded()
-	{
-		if(isset(self::$instance))
-			return self::$instance;
-		
-		$access = static::accessor();
-		
-		return self::$instance = is_object($access)
-			? $access : zetta($access);
-	}
+	protected static $instance = null;
 	
 	/**
 	 * Handles dynamic static calls to the façaded object.
@@ -46,8 +31,32 @@ trait Facade
 	 */
 	public static function __callStatic(string $method, array $args)
 	{
-		$instance = static::facaded();
+		$instance = static::facade();
 		return $instance->$method(...$args);
+	}
+	
+	/**
+	 * Clears the resolved object and allows it to be facaded again. This is
+	 * needed when the facaded instance must be changed.
+	 */
+	public static function unfacade()
+	{
+		self::$instance = null;
+	}
+	
+	/**
+	 * Retrieves the instance of the object being façaded.
+	 * @return mixed Façaded object instance.
+	 */
+	protected static function facade()
+	{
+		if(isset(self::$instance))
+			return self::$instance;
+		
+		$access = static::accessor();
+		
+		return self::$instance = is_object($access)
+			? $access : zetta($access);
 	}
 	
 	/**

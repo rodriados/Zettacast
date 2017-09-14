@@ -28,9 +28,9 @@ require __DIR__.'/../app/bootstrap.php';
  * request and produce the expected response from it.
  */
 /** @var \Zettacast\HTTP\Kernel $kernel */
-$kernel = zetta(Zettacast\HTTP\Kernel::class);
+$kernel = zetta(Zettacast\Contract\HTTP\Kernel::class);
 $request = Zettacast\HTTP\Request::capture();
 $response = $kernel->handle($request);
 
 $response->send();
-$kernel->complete($request, $response);
+$kernel->commit($request, $response);

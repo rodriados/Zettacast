@@ -11,7 +11,7 @@ namespace Zettacast\Contract\HTTP;
 interface Kernel
 {
 	
-	public function complete(Request $request, Response $response);
+	public function commit(Request $request, Response $response);
 	
 	public function handle(Request $request) : Response;
 	

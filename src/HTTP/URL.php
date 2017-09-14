@@ -8,6 +8,7 @@
  */
 namespace Zettacast\HTTP;
 
+use Zettacast\Collection\Collection;
 use Zettacast\HTTP\Exception\InvalidURLException;
 
 /**
@@ -49,7 +50,7 @@ class URL
 	
 	/**
 	 * Query variables related to this URL.
-	 * @var array Variables to be sent via the URL.
+	 * @var Collection Variables to be sent via the URL.
 	 */
 	protected $query;
 	
@@ -61,7 +62,88 @@ class URL
 	public function __construct($data, array $query = [])
 	{
 		is_string($data) ? $this->parse($data) : $this->initialize($data);
-		$this->query = array_merge($this->query ?? [], $query);
+		$this->query = with(new Collection($this->query ?? []))->merge($query);
+	}
+	
+	/**
+	 * Allows the object to be represented as a string.
+	 * @return string String representation for this object.
+	 */
+	public function __toString() : string
+	{
+		return $this->full();
+	}
+	
+	/**
+	 * Builds the full URL.
+	 * @return string Full URL.
+	 */
+	public function full() : string
+	{
+		$query = $this->query->all();
+		$url  = $this->scheme . '://';
+		$url .= $this->user ? $this->user . '@' : null;
+		$url .= $this->host() . $this->path();
+		$url .= $query ? '?'. http_build_query($query) : null;
+		return $url;
+	}
+	
+	/**
+	 * Informs URL's host name. Appends the port if it is not the default one.
+	 * @return string URL's host name and port.
+	 */
+	public function host() : string
+	{
+		$secure = $this->scheme == 'https';
+		$host = $this->host ?? config('app.url', 'localhost');
+		$port = $this->port;
+		
+		return $port && ($secure && $port != 443 || !$secure && $port != 80)
+			? $host.':'.$port
+			: $host;
+	}
+	
+	/**
+	 * Informs URL's full path part.
+	 * @return string URL's path.
+	 */
+	public function path() : string
+	{
+		$path = implode('/', $this->segments);
+		return '/'.$path;
+	}
+	
+	/**
+	 * Retrieves a segment from the URL's path, or all of them.
+	 * @param int $index Segment index to be retrieved.
+	 * @return string|string[] The requested segment or all of them.
+	 */
+	public function segment(int $index = null)
+	{
+		return !is_null($index)
+			? ($this->segments[$index - 1] ?? null)
+			: $this->segments;
+	}
+	
+	/**
+	 * Retrieves a query variable out of the URL.
+	 * @param string $key Target key to be retrieved.
+	 * @return mixed|Collection The requested variable or the whole collection.
+	 */
+	public function query(string $key = null)
+	{
+		return !is_null($key)
+			? $this->query->get($key)
+			: $this->query;
+	}
+	
+	/**
+	 * Retrieves user information from the URL.
+	 * @return string User information contained in the URL.
+	 */
+	public function user()
+	{
+		return $this->user;
 	}
 	
 	/**
@@ -74,7 +156,7 @@ class URL
 		$secure = !empty($s['HTTPS']) && $s['HTTPS'] !== 'off';
 		
 		$data['scheme'] = $secure ? 'https' : 'http';
-		$data['host'] = $s['HTTP_HOST'] ?? $s['SERVER_NAME'] ?? '127.0.0.1';
+		$data['host'] = $s['HTTP_HOST'] ?? $s['SERVER_NAME'] ?? 'localhost';
 		$data['port'] = $s['SERVER_PORT'] ?? ($secure ? 443 : 80);
 		$data['path'] = explode('?', $s['REQUEST_URI'], 2)[0];
 		
@@ -87,15 +169,15 @@ class URL
 	 */
 	protected function initialize(array $data)
 	{
-		$this->scheme   = $data['scheme'] ?? 'http';
-		$this->user     = $data['user'] ?? null;
-		$this->host     = $data['host'] ?? null;
-		$this->port     = $data['port'] ?? null;
-		$this->segments = explode('/', $data['path'] ?? null);
+		$this->scheme   = $data['scheme'] ?: 'http';
+		$this->user     = rawurldecode($data['user'] ?? null) ?: null;
+		$this->host     = rawurldecode($data['host'] ?? null) ?: null;
+		$this->port     = (int)($data['port'] ?? null);
+		$this->segments = explode('/', trim($data['path'] ?? null, '/'));
 		parse_str($data['query'] ?? null, $this->query);
 
 		if(isset($data['pass']))
-			$this->user .= ':'.$data['pass'];
+			$this->user .= ':' . rawurldecode($data['pass']);
 	}
 	
 	/**
