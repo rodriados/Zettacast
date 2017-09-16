@@ -9,7 +9,7 @@
 namespace Zettacast\Autoload\Loader;
 
 use Zettacast\Collection\Collection;
-use Zettacast\Contract\Autoload\Loader;
+use Zettacast\Autoload\LoaderInterface;
 
 /**
  * The Space loader class is responsible for implementing the loading of
@@ -17,8 +17,7 @@ use Zettacast\Contract\Autoload\Loader;
  * @package Zettacast\Autoload
  * @version 1.0
  */
-class Space
-	implements Loader
+class Space implements LoaderInterface
 {
 	/**
 	 * Listed namespaces. The entries in this collection should not override
@@ -54,11 +53,11 @@ class Space
 			$space = implode('\\', $nspname);
 			
 			if($this->data->has($space)) {
-				$filename = $this->data->get($space).'/'.$objname.'.php';
+				$filename = $this->data->get($space) . '/' . $objname . '.php';
 				break;
 			}
 			
-			$objname = array_pop($nspname).'/'.$objname;
+			$objname = array_pop($nspname) . '/' . $objname;
 		}
 		
 		if(!isset($filename) || !file_exists($filename))
@@ -70,7 +69,7 @@ class Space
 	
 	/**
 	 * Resets the loader to its initial state.
-	 * @return self Space loader for method chaining.
+	 * @return $this Space loader for method chaining.
 	 */
 	public function reset()
 	{
@@ -82,11 +81,14 @@ class Space
 	 * Registers a new namespace folder.
 	 * @param string $space Namespace to be registered.
 	 * @param string $folder Folder containing namespace's objects.
-	 * @return self Object loader for method chaining.
+	 * @return $this Object loader for method chaining.
 	 */
 	public function set(string $space, string $folder)
 	{
-		$this->data->set(ltrim($space, '\\'), rtrim($folder, '/'));
+		$space = ltrim($space, '\\');
+		$folder = rtrim($folder, '/');
+		
+		$this->data->set($space, $folder);
 		return $this;
 	}
 	
@@ -94,11 +96,13 @@ class Space
 	 * Removes an entry from the map. Classes to be loaded using this loader
 	 * will not be unloaded if they have already been loaded.
 	 * @param string $space Namespace to be removed.
-	 * @return self Space loader for method chaining.
+	 * @return $this Space loader for method chaining.
 	 */
-	public function remove($space)
+	public function del($space)
 	{
-		$this->data->remove(ltrim($space, '\\'));
+		$space = ltrim($space, '\\');
+		
+		$this->data->remove($space);
 		return $this;
 	}
 	

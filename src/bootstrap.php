@@ -28,6 +28,7 @@ define('ZBOOTMEMO', memory_get_usage(true));
  */
 define('DOCROOT',    realpath(dirname(__DIR__)));
 define('APPPATH',    DOCROOT.'/app');
+define('PKGPATH',    DOCROOT.'/package');
 define('FWORKPATH',  DOCROOT.'/src');
 define('PUBLICPATH', DOCROOT.'/public');
 /**#@-*/

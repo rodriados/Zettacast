@@ -9,7 +9,7 @@
 namespace Zettacast\Autoload\Loader;
 
 use Zettacast\Helper\Aliaser;
-use Zettacast\Contract\Autoload\Loader;
+use Zettacast\Autoload\LoaderInterface;
 
 /**
  * The Alias loader class is responsible for implementing the use of class
@@ -17,8 +17,7 @@ use Zettacast\Contract\Autoload\Loader;
  * @package Zettacast\Autoload
  * @version 1.0
  */
-final class Alias
-	implements Loader
+class Alias implements LoaderInterface
 {
 	/**
 	 * Maps alias to classes' full names. The entries in this array should not
@@ -43,17 +42,16 @@ final class Alias
 	 */
 	public function load(string $alias): bool
 	{
-		$name = ltrim($alias, '\\');
+		$alias = ltrim($alias, '\\');
 		
-		if(!$this->data->knows($name))
-			return false;
-		
-		return class_alias($this->data->identify($alias), $name, true);
+		return $this->data->knows($alias)
+			? class_alias($this->data->identify($alias), $alias, true)
+			: false;
 	}
 	
 	/**
 	 * Resets the loader to its initial state.
-	 * @return self Alias loader for method chaining.
+	 * @return $this Alias loader for method chaining.
 	 */
 	public function reset()
 	{
@@ -65,10 +63,13 @@ final class Alias
 	 * Registers a new alias.
 	 * @param string $alias Aliased name to be registered.
 	 * @param string $target Original name the alias refers to.
-	 * @return self Alias loader for method chaining.
+	 * @return $this Alias loader for method chaining.
 	 */
 	public function set(string $alias, string $target)
 	{
+		$alias = ltrim($alias, '\\');
+		$target = ltrim($target, '\\');
+		
 		$this->data->register($alias, $target);
 		return $this;
 	}
@@ -78,10 +79,12 @@ final class Alias
 	 * will not be unloaded in they have already been loaded, but they will
 	 * not be able to be loaded using alias anymore.
 	 * @param string $alias Alias to be removed.
-	 * @return self Alias loader for method chaining.
+	 * @return $this Alias loader for method chaining.
 	 */
-	public function remove($alias)
+	public function del(string $alias)
 	{
+		$alias = ltrim($alias, '\\');
+		
 		$this->data->unregister($alias);
 		return $this;
 	}

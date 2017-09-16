@@ -6,14 +6,13 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-use Zettacast\Zettacast;
 use Zettacast\Facade\Autoload;
 
 /*
  * This allows you to add your application's or any other classes to the
  * autoloader object and easily access these classes from anywhere.
  */
-Autoload::class([
+Autoload::addClass([
 	// Add here the classes you want to add. Example:
 	//'Math' => APP.'/class/math.php',
 ]);
@@ -22,7 +21,7 @@ Autoload::class([
  * This allows you to add your application's or any other namespaces to the
  * autoloader object and easily access these namespaces from anywhere.
  */
-Autoload::namespace([
+Autoload::addNamespace([
 	// Add here the namespaces you want to add. Example:
 	//'Mail' => APP.'/class/mail',
 ]);
@@ -31,7 +30,7 @@ Autoload::namespace([
  * This allows you to add alias to your application's classes or any other
  * objects and easily access them from anywhere.
  */
-Autoload::alias([
+Autoload::addAlias([
 	// Add here the alias you want to add. Example:
 	// 'SendMail' => 'App\Package\Mail\Send'
 ]);

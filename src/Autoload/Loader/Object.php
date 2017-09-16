@@ -9,7 +9,7 @@
 namespace Zettacast\Autoload\Loader;
 
 use Zettacast\Collection\Collection;
-use Zettacast\Contract\Autoload\Loader;
+use Zettacast\Autoload\LoaderInterface;
 
 /**
  * The Object loader class is responsible for implementing the loading of
@@ -17,8 +17,7 @@ use Zettacast\Contract\Autoload\Loader;
  * @package Zettacast\Autoload
  * @version 1.0
  */
-class Object
-	implements Loader
+class Object implements LoaderInterface
 {
 	/**
 	 * Listed objects. The entries in this collection should not override
@@ -43,12 +42,12 @@ class Object
 	 */
 	public function load(string $obj): bool
 	{
-		$name = ltrim($obj, '\\');
+		$obj = ltrim($obj, '\\');
 		
-		if(!$this->data->has($name))
-			return false;
-		
-		if(!file_exists($filename = $this->data->get($name)))
+		if(
+			!$this->data->has($obj) ||
+		    !file_exists($filename = $this->data->get($obj))
+		)
 			return false;
 		
 		require $filename;
@@ -57,7 +56,7 @@ class Object
 	
 	/**
 	 * Resets the loader to its initial state.
-	 * @return self Object loader for method chaining.
+	 * @return $this Object loader for method chaining.
 	 */
 	public function reset()
 	{
@@ -69,10 +68,12 @@ class Object
 	 * Registers a new object file.
 	 * @param string $obj Object name to be registered.
 	 * @param string $file File in which object can be found.
-	 * @return self Object loader for method chaining.
+	 * @return $this Object loader for method chaining.
 	 */
 	public function set(string $obj, string $file)
 	{
+		$obj = ltrim($obj, '\\');
+		
 		$this->data->set($obj, $file);
 		return $this;
 	}
@@ -81,10 +82,12 @@ class Object
 	 * Removes an entry from the map. Classes to be loaded using this loader
 	 * will not be unloaded if they have already been loaded.
 	 * @param string $obj Object to be removed.
-	 * @return self Object loader for method chaining.
+	 * @return $this Object loader for method chaining.
 	 */
-	public function remove($obj)
+	public function del(string $obj)
 	{
+		$obj = ltrim($obj, '\\');
+		
 		$this->data->remove($obj);
 		return $this;
 	}
