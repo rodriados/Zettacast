@@ -14,8 +14,12 @@ use Zettacast\Collection\Sequence as baseclass;
 /**
  * Zettacast's Sequence façade class.
  * This class exposes package:collection\Sequence methods to external usage.
+ * @method static mixed get($target, int $index, $default = null)
+ * @method static bool has($target, int $index)
+ * @method static baseclass set($target, int $index, $value)
+ * @method static baseclass del($target, int $index)
  * @method static array all($target)
- * @method static baseclass apply($target, callable $fn, ...$userdata)
+ * @method static baseclass apply($target, callable $fn, $userdata = null)
  * @method static array chunk($target, int $size)
  * @method static array clear($target)
  * @method static baseclass copy($target)
@@ -23,11 +27,9 @@ use Zettacast\Collection\Sequence as baseclass;
  * @method static baseclass current($target)
  * @method static bool empty($target)
  * @method static bool every($target, callable $fn = null)
- * @method static baseclass except($target, int ...$keys)
+ * @method static baseclass except($target, int|int[] $keys)
  * @method static baseclass filter($target, callable $fn = null)
  * @method static baseclass first($target)
- * @method static baseclass get($target, int $index, $default = null)
- * @method static bool has($target, int $index)
  * @method static baseclass intersect($target, $items)
  * @method static baseclass iterate($target)
  * @method static baseclass key($target)
@@ -35,7 +37,7 @@ use Zettacast\Collection\Sequence as baseclass;
  * @method static baseclass map($target, callable $fn)
  * @method static baseclass merge($target, $items)
  * @method static baseclass next($target)
- * @method static baseclass only($target, int ...$keys)
+ * @method static baseclass only($target, int|int[] $keys)
  * @method static baseclass pipe($target, callable $fn)
  * @method static baseclass pop($target)
  * @method static baseclass prev($target)
@@ -43,12 +45,10 @@ use Zettacast\Collection\Sequence as baseclass;
  * @method static baseclass push($target, $value)
  * @method static baseclass random($target, int $sample = 1)
  * @method static baseclass reduce($target, callable $fn, $initial = null)
- * @method static baseclass remove($target, int $index)
  * @method static baseclass reverse($target)
  * @method static baseclass rewind($target)
  * @method static baseclass rotate($target, int $rotations = 1)
  * @method static baseclass search($target, $needle, bool $strict = false)
- * @method static baseclass set($target, int $index, $value)
  * @method static baseclass shift($target)
  * @method static baseclass shuffle($target)
  * @method static baseclass slice($target, int $index, int $length = null)
@@ -59,13 +59,12 @@ use Zettacast\Collection\Sequence as baseclass;
  * @method static baseclass tap($target, callable $fn)
  * @method static baseclass unshift($target, $value)
  * @method static bool valid($target)
- * @method static baseclass walk($target, callable $fn, ...$userdata)
+ * @method static baseclass walk($target, callable $fn, $userdata = null)
  * @version 1.0
  */
 final class Sequence
 {
-	use Extensor
-	{
+	use Extensor {
 		Extensor::__callStatic as private callExtensor;
 	}
 	
@@ -77,10 +76,9 @@ final class Sequence
 	 */
 	public static function __callStatic(string $method, array $args)
 	{
-		if(count($args) >= 1 && is_callable([baseclass::class, $method]))
-			return self::build(array_shift($args))->$method(...$args);
-		
-		return self::callExtensor($method, $args);
+		return count($args) >= 1 && is_callable([baseclass::class, $method])
+			? self::build(array_shift($args))->$method(...$args)
+			: self::callExtensor($method, $args);
 	}
 	
 	/**
@@ -88,18 +86,18 @@ final class Sequence
 	 * @param array|\Traversable $target Instance initial values.
 	 * @return baseclass New created instance.
 	 */
-	public static function build($target = [])
+	public static function build($target = []): baseclass
 	{
 		return new baseclass($target);
 	}
 	
 	/**
 	 * Creates a new sequence and fills it with the given value.
-	 * @param mixed $value Value to fill collection with.
 	 * @param int $count Number of elements to be filled.
+	 * @param mixed $value Value to fill collection with.
 	 * @return baseclass New sequence instance.
 	 */
-	public static function fill($value, int $count)
+	public static function fill(int $count, $value): baseclass
 	{
 		return self::build(array_fill(0, $count, $value));
 	}
@@ -111,7 +109,7 @@ final class Sequence
 	 * @param int $step Increment step for each element in range.
 	 * @return baseclass New sequence instance.
 	 */
-	public static function range($start, $end, int $step = 1)
+	public static function range($start, $end, int $step = 1): baseclass
 	{
 		return self::build(range($start, $end, $step));
 	}

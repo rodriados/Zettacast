@@ -88,7 +88,7 @@ class Aliaser
 	 */
 	public function unregister(string $alias)
 	{
-		$this->data->remove($alias);
+		$this->data->del($alias);
 		return $this;
 	}
 	

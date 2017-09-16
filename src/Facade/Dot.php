@@ -14,19 +14,19 @@ use Zettacast\Collection\Dot as baseclass;
 /**
  * Zettacast's Dot façade class.
  * This class exposes package:collection\Dot methods to external usage.
- * @method static baseclass filter($target, callable $fn = null)
- * @method static baseclass get($target, $key, $default = null)
+ * @method static mixed get($target, $key, $default = null)
  * @method static bool has($target, $key)
- * @method static baseclass pluck($target, $value, $key = null)
  * @method static baseclass set($target, $key, $value)
- * @method static baseclass remove($target, $key)
- * @method static baseclass apply($target, callable $fn, ...$userdata)
+ * @method static baseclass del($target, $key)
+ * @method static baseclass filter($target, callable $fn = null)
+ * @method static baseclass pluck($target, $value, $key = null)
+ * @method static baseclass apply($target, callable $fn, $userdata = null)
  * @method static baseclass collapse($target)
  * @method static baseclass flatten($target)
  * @method static baseclass iterate($target, bool $listall = false)
  * @method static baseclass map($target, callable $fn)
  * @method static baseclass reduce($target, callable $fn, $initial = null)
- * @method static baseclass walk($target, callable $fn, ...$userdata)
+ * @method static baseclass walk($target, callable $fn, $userdata = null)
  * @method static baseclass add($target, $key, $value)
  * @method static array all($target)
  * @method static array chunk($target, int $size)
@@ -38,13 +38,13 @@ use Zettacast\Collection\Dot as baseclass;
  * @method static array divide($target)
  * @method static bool empty($target)
  * @method static bool every($target, callable $fn = null)
- * @method static baseclass except($target, ...$keys)
+ * @method static baseclass except($target, mixed|mixed[] $keys)
  * @method static baseclass intersect($target, $items, bool $keys = false)
  * @method static baseclass key($target)
  * @method static Collection keys($target)
  * @method static baseclass merge($target, $items)
  * @method static baseclass next($target)
- * @method static baseclass only($target, ...$keys)
+ * @method static baseclass only($target, mixed|mixed[] $keys)
  * @method static baseclass pipe($target, callable $fn)
  * @method static baseclass prev($target)
  * @method static baseclass pull($target, $key, $default = null)
@@ -64,8 +64,7 @@ use Zettacast\Collection\Dot as baseclass;
  */
 final class Dot
 {
-	use Extensor
-	{
+	use Extensor {
 		Extensor::__callStatic as private callExtensor;
 	}
 	
@@ -77,10 +76,9 @@ final class Dot
 	 */
 	public static function __callStatic(string $method, array $args)
 	{
-		if(count($args) >= 1 && is_callable([baseclass::class, $method]))
-			return self::build(array_shift($args))->$method(...$args);
-		
-		return self::callExtensor($method, $args);
+		return count($args) >= 1 && is_callable([baseclass::class, $method])
+			? self::build(array_shift($args))->$method(...$args)
+			: self::callExtensor($method, $args);
 	}
 	
 	/**
@@ -88,7 +86,7 @@ final class Dot
 	 * @param array|\Traversable $target Instance initial values.
 	 * @return baseclass New created instance.
 	 */
-	public static function build($target = [])
+	public static function build($target = []): baseclass
 	{
 		return new baseclass($target);
 	}

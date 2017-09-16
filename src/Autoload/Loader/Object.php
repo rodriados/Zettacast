@@ -88,7 +88,7 @@ class Object implements LoaderInterface
 	{
 		$obj = ltrim($obj, '\\');
 		
-		$this->data->remove($obj);
+		$this->data->del($obj);
 		return $this;
 	}
 	

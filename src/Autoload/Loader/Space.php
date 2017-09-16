@@ -102,7 +102,7 @@ class Space implements LoaderInterface
 	{
 		$space = ltrim($space, '\\');
 		
-		$this->data->remove($space);
+		$this->data->del($space);
 		return $this;
 	}
 	
