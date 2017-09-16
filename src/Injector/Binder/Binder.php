@@ -9,7 +9,7 @@
 namespace Zettacast\Injector\Binder;
 
 use Zettacast\Collection\Collection;
-use Zettacast\Contract\Injector\Binder as BinderContract;
+use Zettacast\Injector\BinderInterface;
 
 /**
  * The binder class is responsible for linking abstractions to concrete
@@ -17,8 +17,7 @@ use Zettacast\Contract\Injector\Binder as BinderContract;
  * @package Zettacast\Injector
  * @version 1.0
  */
-class Binder
-	implements BinderContract
+class Binder implements BinderInterface
 {
 	/**
 	 * Collection of abstraction bindings. Abstraction bindings allow the usage
@@ -42,7 +41,7 @@ class Binder
 	 * @param string $abstract Abstraction to be bound.
 	 * @param string|\Closure $concrete Concrete object to abstraction.
 	 * @param bool $shared Should abstraction become a singleton?
-	 * @return static Binder for method chaining.
+	 * @return $this Binder for method chaining.
 	 */
 	public function bind(string $abstract, $concrete, bool $shared = false)
 	{
@@ -59,7 +58,7 @@ class Binder
 	 * @param string $abstract Abstraction to be checked.
 	 * @return bool Is abstract bound?
 	 */
-	public function bound(string $abstract) : bool
+	public function bound(string $abstract): bool
 	{
 		return $this->links->has($abstract);
 	}
@@ -67,7 +66,7 @@ class Binder
 	/**
 	 * Gets the concrete type for a given abstraction.
 	 * @param string $abstract Abstraction to be concretized.
-	 * @return object|null Object containing concrete and sharing info.
+	 * @return mixed Object containing concrete and sharing info.
 	 */
 	public function resolve(string $abstract)
 	{
@@ -77,11 +76,11 @@ class Binder
 	/**
 	 * Removes a link from an abstraction.
 	 * @param string $abstract Abstraction to be unbound.
-	 * @return static Binder for method chaining.
+	 * @return $this Binder for method chaining.
 	 */
 	public function unbind(string $abstract)
 	{
-		$this->links->remove($abstract);
+		$this->links->del($abstract);
 		return $this;
 	}
 	

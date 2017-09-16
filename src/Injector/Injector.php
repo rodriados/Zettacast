@@ -8,13 +8,10 @@
  */
 namespace Zettacast\Injector;
 
-use Closure;
 use Zettacast\Helper\Aliaser;
 use Zettacast\Collection\Collection;
 use Zettacast\Injector\Binder\Binder;
 use Zettacast\Injector\Binder\Scoped;
-use Zettacast\Contract\Injector\Binder as BinderContract;
-use Zettacast\Contract\Injector\Injector as InjectorContract;
 
 /**
  * The Injector class is responsible for handling dependency injection. This
@@ -23,8 +20,7 @@ use Zettacast\Contract\Injector\Injector as InjectorContract;
  * @package Zettacast\Injector
  * @version 1.0
  */
-class Injector
-	implements InjectorContract, BinderContract
+class Injector implements InjectorInterface, BinderInterface
 {
 	/**
 	 * Collection of object aliases. Aliases allow full class names to be
@@ -56,8 +52,8 @@ class Injector
 	protected $builder;
 	
 	/**
-	 * Injector constructor. This constructor simply sets all properties to
-	 * empty collections. Each of these collections have a special use.
+	 * Injector constructor.
+	 * This constructor simply instantiates all properties.
 	 */
 	public function __construct()
 	{
@@ -71,12 +67,13 @@ class Injector
 	 * Creates a new object alias.
 	 * @param string $alias Alias to be used for abstraction.
 	 * @param string $abstract Abstraction to be aliased.
-	 * @return static Injector for method chaining.
+	 * @return $this Injector for method chaining.
 	 */
 	public function alias(string $alias, string $abstract)
 	{
 		$this->drop($alias);
 		$this->alias->register($alias, $abstract);
+		
 		return $this;
 	}
 	
@@ -85,7 +82,7 @@ class Injector
 	 * @param string $abstract Abstraction to be bound.
 	 * @param string|callable $concrete Concrete object to abstraction.
 	 * @param bool $shared Should abstraction become a singleton?
-	 * @return static Injector for method chaining.
+	 * @return $this Injector for method chaining.
 	 */
 	public function bind(string $abstract, $concrete, bool $shared = false)
 	{
@@ -104,7 +101,7 @@ class Injector
 	 * @param string $abstract Abstraction to be checked.
 	 * @return bool Is abstract bound?
 	 */
-	public function bound(string $abstract) : bool
+	public function bound(string $abstract): bool
 	{
 		return $this->binder->bound($this->alias->identify($abstract));
 	}
@@ -112,13 +109,14 @@ class Injector
 	/**
 	 * Drops all data related to an abstraction.
 	 * @param string $abstract Abstraction to be forgotten.
-	 * @return static Injector for method chaining.
+	 * @return $this Injector for method chaining.
 	 */
 	public function drop(string $abstract)
 	{
-		$this->shared->remove($abstract);
+		$this->shared->del($abstract);
 		$this->binder->unbind($abstract);
 		$this->alias->unregister($abstract);
+		
 		return $this;
 	}
 	
@@ -126,9 +124,9 @@ class Injector
 	 * Creates a factory for the given abstraction.
 	 * @param string $abstract Abstraction to be wrapped.
 	 * @param array $outer Default parameters to be sent to object.
-	 * @return Closure Factory for abstraction.
+	 * @return \Closure Factory for abstraction.
 	 */
-	public function factory(string $abstract, array $outer = []) : Closure
+	public function factory(string $abstract, array $outer = []): \Closure
 	{
 		return function(array $inner = []) use($abstract, $outer) {
 			return $this->builder->init()->make(
@@ -141,7 +139,7 @@ class Injector
 	/**
 	 * Reverses a chain of alias and returns real name.
 	 * @param string $alias Alias to be reversed.
-	 * @return mixed Real name.
+	 * @return mixed Unaliased abstraction name.
 	 */
 	public function identify(string $alias)
 	{
@@ -165,7 +163,7 @@ class Injector
 	/**
 	 * Gets the concrete type for a given abstraction.
 	 * @param string $abstract Abstraction to be concretized.
-	 * @return object|null Object containing concrete and sharing info.
+	 * @return mixed Object containing concrete and sharing info.
 	 */
 	public function resolve(string $abstract)
 	{
@@ -176,19 +174,20 @@ class Injector
 	 * Shares an existing instance to injector.
 	 * @param string $abstract Abstraction to be resolved.
 	 * @param mixed $instance Shared instance to registered.
-	 * @return static Injector for method chaining.
+	 * @return $this Injector for method chaining.
 	 */
 	public function share(string $abstract, $instance)
 	{
 		$this->alias->unregister($abstract);
 		$this->shared->set($abstract, $instance);
+		
 		return $this;
 	}
 	
 	/**
 	 * Unregisters an alias.
 	 * @param string $alias Alias name to be unregistered.
-	 * @return static Injector for method chaining.
+	 * @return $this Injector for method chaining.
 	 */
 	public function unalias(string $alias)
 	{
@@ -199,7 +198,7 @@ class Injector
 	/**
 	 * Removes an abstraction binding.
 	 * @param string $abstract Abstraction to be unbound.
-	 * @return static Injector for method chaining.
+	 * @return $this Injector for method chaining.
 	 */
 	public function unbind(string $abstract)
 	{
@@ -212,7 +211,7 @@ class Injector
 	 * @param string $scope Creation scope to which binding is applied.
 	 * @return Scoped Scoped binder instance.
 	 */
-	public function when(string $scope) : Scoped
+	public function when(string $scope): Scoped
 	{
 		return new Scoped($scope, $this->binder);
 	}
@@ -221,9 +220,9 @@ class Injector
 	 * Wraps a function and solves all of its dependencies.
 	 * @param callable $fn Function to be wrapped.
 	 * @param array $params Default parameters to be used when invoked.
-	 * @return Closure Wrapped function.
+	 * @return \Closure Wrapped function.
 	 */
-	public function wrap(callable $fn, array $params = []) : Closure
+	public function wrap(callable $fn, array $params = []): \Closure
 	{
 		return $this->builder->init()->wrap($fn, $params);
 	}

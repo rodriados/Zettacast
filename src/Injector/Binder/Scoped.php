@@ -8,7 +8,7 @@
  */
 namespace Zettacast\Injector\Binder;
 
-use Zettacast\Contract\Injector\Binder as BinderContract;
+use Zettacast\Injector\BinderInterface;
 
 /**
  * The Scoped binder class is responsible for linking abstractions to different
@@ -18,14 +18,13 @@ use Zettacast\Contract\Injector\Binder as BinderContract;
  * @package Zettacast\Injector
  * @version 1.0
  */
-class Scoped
-	implements BinderContract
+class Scoped implements BinderInterface
 {
 	/**
 	 * Abstraction binder. This binder will be manipulated so all scoped
 	 * bindings are stored in the same place as normal bindings, just in a
 	 * slightly different way.
-	 * @var BinderContract Abstraction binder object.
+	 * @var BinderInterface Abstraction binder object.
 	 */
 	protected $binder;
 	
@@ -39,9 +38,9 @@ class Scoped
 	 * Scoped binder constructor. This constructor receives a real binder
 	 * to which scoped bindings will be stored.
 	 * @param string $scope Creation scope to which abstractions will be bound.
-	 * @param BinderContract $binder Host binder to scoped bindings.
+	 * @param BinderInterface $binder Host binder to scoped bindings.
 	 */
-	public function __construct(string $scope, BinderContract $binder)
+	public function __construct(string $scope, BinderInterface $binder)
 	{
 		$this->scope = $scope;
 		$this->binder = $binder;
@@ -52,7 +51,7 @@ class Scoped
 	 * @param string $abstract Abstraction to be bound.
 	 * @param string|\Closure $concrete Concrete object to abstraction.
 	 * @param bool $shared Should abstraction become a singleton?
-	 * @return static Binder for method chaining.
+	 * @return $this Binder for method chaining.
 	 */
 	public function bind(string $abstract, $concrete, bool $shared = false)
 	{
@@ -65,7 +64,7 @@ class Scoped
 	 * @param string $abstract Abstraction to be checked.
 	 * @return bool Is abstract bound?
 	 */
-	public function bound(string $abstract) : bool
+	public function bound(string $abstract): bool
 	{
 		return $this->binder->bound($abstract.'@'.$this->scope);
 	}
@@ -73,7 +72,7 @@ class Scoped
 	/**
 	 * Gets the concrete type for a given abstraction.
 	 * @param string $abstract Abstraction to be concretized.
-	 * @return object|null Object containing concrete and sharing info.
+	 * @return mixed Object containing concrete and sharing info.
 	 */
 	public function resolve(string $abstract)
 	{
@@ -83,7 +82,7 @@ class Scoped
 	/**
 	 * Removes a link from an abstraction.
 	 * @param string $abstract Abstraction to be unbound.
-	 * @return static Binder for method chaining.
+	 * @return $this Binder for method chaining.
 	 */
 	public function unbind(string $abstract)
 	{

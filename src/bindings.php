@@ -11,7 +11,7 @@ zetta()
 
 # Injector module
 ->alias('injector', 'Zettacast\Injector\Injector')
-->bind('Zettacast\Contract\Injector\Injector', 'Zettacast\Injector\Injector')
+->bind('Zettacast\Injector\InjectorInterface', 'Zettacast\Injector\Injector')
 
 # Autoload module
 ->alias('autoload', 'Zettacast\Autoload\Autoload')

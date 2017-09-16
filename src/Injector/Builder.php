@@ -8,11 +8,6 @@
  */
 namespace Zettacast\Injector;
 
-use Closure;
-use ReflectionClass;
-use ReflectionMethod;
-use ReflectionFunction;
-use ReflectionParameter;
 use Zettacast\Collection\Stack;
 use Zettacast\Collection\Collection;
 use Zettacast\Injector\Exception\Unresolvable;
@@ -56,16 +51,15 @@ class Builder
 	 */
 	public function __construct(Injector $injector, Collection &$shared)
 	{
-		$this->stack = new Stack;
-		
 		$this->injector = $injector;
 		$this->shared = &$shared;
+		$this->stack = new Stack;
 	}
 	
 	/**
 	 * Initializes a new building stack, discarding any remanescent object from
 	 * previous unsuccessful builds.
-	 * @return static Builder for method chaining.
+	 * @return $this Builder for method chaining.
 	 */
 	public function init()
 	{
@@ -109,13 +103,13 @@ class Builder
 	 * Wraps a function and solves all of its dependencies.
 	 * @param callable $fn Function to be wrapped.
 	 * @param array $outer Parameters to be used when invoked.
-	 * @return Closure Wrapped function.
+	 * @return \Closure Wrapped function.
 	 */
-	public function wrap(callable $fn, array $outer = []) : Closure
+	public function wrap(callable $fn, array $outer = []): \Closure
 	{
 		$reflector = is_string($fn) && strpos($fn, '::') !== false
-			? new ReflectionMethod(...explode('::', $fn))
-			: new ReflectionFunction($fn);
+			? new \ReflectionMethod(...explode('::', $fn))
+			: new \ReflectionFunction($fn);
 
 		return function(array $inner = []) use($reflector, $outer) {
 			return $reflector->invokeArgs($this->resolve(
@@ -135,7 +129,7 @@ class Builder
 	 */
 	protected function build(string $concrete, array $params = [])
 	{
-		$reflector = new ReflectionClass($concrete);
+		$reflector = new \ReflectionClass($concrete);
 		
 		if(!$reflector->isInstantiable())
 			throw new Uninstantiable($concrete);
@@ -152,11 +146,11 @@ class Builder
 	
 	/**
 	 * Resolves all dependencies from a building or wrapping request.
-	 * @param ReflectionParameter[] $requested Requested dependencies.
+	 * @param \ReflectionParameter[] $requested Requested dependencies.
 	 * @param array $params Parameters to be used instead of building.
 	 * @return array Resolved dependencies.
 	 */
-	protected function resolve(array $requested, array $params = []) : array
+	protected function resolve(array $requested, array $params = []): array
 	{
 		foreach($requested as $id => $dependency)
 			if(isset($params[$dependency->name]))
@@ -173,11 +167,11 @@ class Builder
 	
 	/**
 	 * Tries to resolve a primitive dependency.
-	 * @param ReflectionParameter $param Parameter to be resolved.
+	 * @param \ReflectionParameter $param Parameter to be resolved.
 	 * @return mixed Resolved primitive.
 	 * @throws Unresolvable Primitive value could not be resolved.
 	 */
-	private function buildPrimitive(ReflectionParameter $param)
+	private function buildPrimitive(\ReflectionParameter $param)
 	{
 		$context = $this->stack->peek();
 		$info = $this->injector->when($context)->resolve('$'.$param->name);
@@ -195,11 +189,11 @@ class Builder
 	
 	/**
 	 * Tries to resolve an object dependency.
-	 * @param ReflectionParameter $param Parameter to be resolved.
+	 * @param \ReflectionParameter $param Parameter to be resolved.
 	 * @return mixed Resolved object.
 	 * @throws Unresolvable Dependency could not be resolved.
 	 */
-	private function buildObject(ReflectionParameter $param)
+	private function buildObject(\ReflectionParameter $param)
 	{
 		try {
 			return $this->make($param->getClass()->getName());

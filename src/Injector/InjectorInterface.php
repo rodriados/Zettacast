@@ -1,28 +1,26 @@
 <?php
 /**
- * Zettacast\Contract\Injector\Injector interface class file.
+ * Zettacast\Injector\InjectorInterface interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Contract\Injector;
-
-use Closure;
+namespace Zettacast\Injector;
 
 /**
  * This interface declares all needed methods for a properly working injector.
  * @package Zettacast\Injector
  */
-interface Injector
+interface InjectorInterface
 {
 	/**
 	 * Creates a factory for the given abstraction.
 	 * @param string $abstract Abstraction to be wrapped.
 	 * @param array $outer Default parameters to be sent to object.
-	 * @return Closure Factory for abstraction.
+	 * @return \Closure Factory for abstraction.
 	 */
-	public function factory(string $abstract, array $outer = []) : Closure;
+	public function factory(string $abstract, array $outer = []): \Closure;
 	
 	/**
 	 * Resolve the given abstraction and inject dependencies if needed.
@@ -36,8 +34,8 @@ interface Injector
 	 * Wraps a function and solves all of its dependencies.
 	 * @param callable $fn Function to be wrapped.
 	 * @param array $params Default parameters to be used when invoked.
-	 * @return Closure Wrapped function.
+	 * @return \Closure Wrapped function.
 	 */
-	public function wrap(callable $fn, array $params = []) : Closure;
+	public function wrap(callable $fn, array $params = []): \Closure;
 	
 }
