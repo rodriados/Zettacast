@@ -34,7 +34,7 @@ class Sequence implements SequenceInterface
 	public function __construct($data = null)
 	{
 		$data = !is_null($data)
-			? toarray($data)
+			? toArray($data)
 			: [];
 		
 		$this->data = new \SplDoublyLinkedList;
@@ -108,7 +108,7 @@ class Sequence implements SequenceInterface
 	 */
 	public function all(): array
 	{
-		return toarray($this->data);
+		return toArray($this->data);
 	}
 	
 	/**
@@ -119,7 +119,7 @@ class Sequence implements SequenceInterface
 	 */
 	public function apply(callable $fn, $userdata = null)
 	{
-		$userdata = toarray($userdata);
+		$userdata = toArray($userdata);
 		
 		foreach($this->iterate() as $key => $value)
 			$this->data[$key] = $fn($value, $key, ...$userdata);
@@ -215,7 +215,7 @@ class Sequence implements SequenceInterface
 	public function except($keys)
 	{
 		return $this->new(
-			array_diff_key($this->all(), array_flip(toarray($keys)))
+			array_diff_key($this->all(), array_flip(toArray($keys)))
 		);
 	}
 	
@@ -250,7 +250,7 @@ class Sequence implements SequenceInterface
 	public function intersect($items)
 	{
 		return $this->new(
-			array_intersect($this->all(), toarray($items))
+			array_intersect($this->all(), toArray($items))
 		);
 	}
 	
@@ -327,7 +327,7 @@ class Sequence implements SequenceInterface
 	public function only($keys)
 	{
 		return $this->new(
-			array_intersect_key($this->all(), array_flip(toarray($keys)))
+			array_intersect_key($this->all(), array_flip(toArray($keys)))
 		);
 	}
 	
@@ -516,10 +516,10 @@ class Sequence implements SequenceInterface
 	public function splice(int $offset, int $length = null, $replace = [])
 	{
 		return $this->new(array_splice(
-			toarray($this->data),
-			$offset,
-			$length ?: $this->count(),
-			$replace
+			                  toArray($this->data),
+			                  $offset,
+			                  $length ?: $this->count(),
+			                  $replace
 		));
 	}
 	
@@ -586,7 +586,7 @@ class Sequence implements SequenceInterface
 	 */
 	public function walk(callable $fn, $userdata = null)
 	{
-		$userdata = toarray($userdata);
+		$userdata = toArray($userdata);
 		
 		foreach($this->iterate() as $key => $value)
 			$fn($value, $key, ...$userdata);

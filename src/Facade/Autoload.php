@@ -87,7 +87,7 @@ final class Autoload
 	public static function delAlias($target)
 	{
 		if(isset(self::$alias))
-			foreach(toarray($target) as $alias)
+			foreach(toArray($target) as $alias)
 				self::$alias->del($alias);
 	}
 	
@@ -98,7 +98,7 @@ final class Autoload
 	public static function delClass($target)
 	{
 		if(isset(self::$object))
-			foreach(toarray($target) as $obj)
+			foreach(toArray($target) as $obj)
 				self::$object->del($obj);
 	}
 	
@@ -109,7 +109,7 @@ final class Autoload
 	public static function delNamespace($target)
 	{
 		if(isset(self::$space))
-			foreach(toarray($target) as $space)
+			foreach(toArray($target) as $space)
 				self::$space->del($space);
 	}
 	

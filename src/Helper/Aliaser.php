@@ -37,7 +37,7 @@ class Aliaser
 	 * Clears and removes all known aliases and returns the old ones.
 	 * @return Collection All previously known aliases.
 	 */
-	public function clear()
+	public function clear(): Collection
 	{
 		$old = $this->data;
 		$this->data = new Collection;
@@ -50,7 +50,7 @@ class Aliaser
 	 * @param string $alias Alias to be checked.
 	 * @return bool Is alias known?
 	 */
-	public function knows(string $alias) : bool
+	public function knows(string $alias): bool
 	{
 		return $this->data->has($alias);
 	}
@@ -59,7 +59,7 @@ class Aliaser
 	 * Registers a new alias.
 	 * @param string $alias Alias name to be registered.
 	 * @param mixed $target Aliased object.
-	 * @return static Aliaser for method chaining.
+	 * @return $this Aliaser for method chaining.
 	 */
 	public function register(string $alias, $target)
 	{
@@ -84,7 +84,7 @@ class Aliaser
 	/**
 	 * Unregisters an alias.
 	 * @param string $alias Alias name to be unregistered.
-	 * @return static Aliaser for method chaining.
+	 * @return $this Aliaser for method chaining.
 	 */
 	public function unregister(string $alias)
 	{

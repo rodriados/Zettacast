@@ -47,7 +47,7 @@ class Queue implements QueueInterface
 	 */
 	public function all(): array
 	{
-		return toarray($this->data);
+		return toArray($this->data);
 	}
 	
 	/**

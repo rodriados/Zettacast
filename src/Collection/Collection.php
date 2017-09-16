@@ -36,7 +36,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	public function __construct($data = null)
 	{
 		$this->data = !is_null($data)
-			? toarray($data)
+			? toArray($data)
 			: [];
 	}
 	
@@ -120,7 +120,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 */
 	public function apply(callable $fn, $userdata = null)
 	{
-		$userdata = toarray($userdata);
+		$userdata = toArray($userdata);
 		
 		foreach($this->iterate() as $key => $value)
 			$this->data[$key] = $fn($value, $key, ...$userdata);
@@ -191,7 +191,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	public function diff($items, bool $keys = false)
 	{
 		$fn = $keys ? 'array_diff_assoc' : 'array_diff';
-		return $this->new($fn($this->data, toarray($items)));
+		return $this->new($fn($this->data, toArray($items)));
 	}
 	
 	/**
@@ -239,7 +239,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	public function except($keys)
 	{
 		return $this->new(
-			array_diff_key($this->data, array_flip(toarray($keys)))
+			array_diff_key($this->data, array_flip(toArray($keys)))
 		);
 	}
 	
@@ -266,7 +266,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	public function intersect($items, bool $keys = false)
 	{
 		$fn = $keys ? 'array_intersect_assoc' : 'array_intersect';
-		return $this->new($fn($this->data, toarray($items)));
+		return $this->new($fn($this->data, toArray($items)));
 	}
 	
 	/**
@@ -317,7 +317,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 */
 	public function merge($items)
 	{
-		return $this->new(array_merge($this->data, toarray($items)));
+		return $this->new(array_merge($this->data, toArray($items)));
 	}
 	
 	/**
@@ -337,7 +337,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	public function only($keys)
 	{
 		return $this->new(
-			array_intersect_key($this->data, array_flip(toarray($keys)))
+			array_intersect_key($this->data, array_flip(toArray($keys)))
 		);
 	}
 	
@@ -408,7 +408,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 */
 	public function replace($items)
 	{
-		return $this->new(array_replace($this->data, toarray($items)));
+		return $this->new(array_replace($this->data, toArray($items)));
 	}
 	
 	/**
@@ -480,7 +480,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 */
 	public function union($items)
 	{
-		return $this->new($this->data + toarray($items));
+		return $this->new($this->data + toArray($items));
 	}
 	
 	/**
@@ -518,7 +518,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 */
 	public function walk(callable $fn, $userdata = null)
 	{
-		$userdata = toarray($userdata);
+		$userdata = toArray($userdata);
 		
 		foreach($this->iterate() as $key => $value)
 			$fn($value, $key, ...$userdata);
@@ -533,7 +533,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 */
 	public function zip(...$items): array
 	{
-		$items = array_map('toarray', $items);
+		$items = array_map('toArray', $items);
 		
 		return array_map(function(...$params) {
 			return $this->new($params);
@@ -559,7 +559,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 */
 	protected function ref(&$target)
 	{
-		if(!listable($target))
+		if(!isListable($target))
 			return $target;
 		
 		$obj = $this->new();

@@ -47,7 +47,7 @@ class Dot extends Recursive
 		$node = &$this->data;
 		
 		foreach($dot as $segment) {
-			if(!listable($node) || !isset($node[$segment]))
+			if(!isListable($node) || !isset($node[$segment]))
 				return $default;
 			
 			$node instanceof Collection
@@ -69,7 +69,7 @@ class Dot extends Recursive
 		$node = &$this->data;
 		
 		foreach($dot as $segment) {
-			if(!listable($node) || !isset($node[$segment]))
+			if(!isListable($node) || !isset($node[$segment]))
 				return false;
 			
 			$node instanceof Collection
@@ -93,7 +93,7 @@ class Dot extends Recursive
 		$node = &$this->data;
 		
 		foreach($dot as $segment) {
-			if(!isset($node[$segment]) || !listable($node[$segment]))
+			if(!isset($node[$segment]) || !isListable($node[$segment]))
 				$node[$segment] = [];
 			
 			$node instanceof Collection
@@ -117,7 +117,7 @@ class Dot extends Recursive
 		$node = &$this->data;
 		
 		foreach($dot as $segment) {
-			if(!listable($node) or !isset($node[$segment]))
+			if(!isListable($node) or !isset($node[$segment]))
 				return $this;
 			
 			$node instanceof Collection
@@ -144,7 +144,7 @@ class Dot extends Recursive
 			array_push($scope, $key);
 			
 			if($fn($value, implode($this->dot, $scope)))
-				$result[$key] = listable($value)
+				$result[$key] = isListable($value)
 					? $this->new($value)->filter($fn)
 					: $value;
 			

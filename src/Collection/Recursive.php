@@ -38,10 +38,10 @@ class Recursive extends Collection
 	 */
 	public function apply(callable $fn, $userdata = null)
 	{
-		$userdata = toarray($userdata);
+		$userdata = toArray($userdata);
 		
 		foreach(parent::iterate() as $key => $value)
-			$this->data[$key] = listable($value)
+			$this->data[$key] = isListable($value)
 				? $this->new($value)->apply($fn, ...$userdata)
 				: $fn($value, $key, ...$userdata);
 
@@ -56,7 +56,7 @@ class Recursive extends Collection
 	{
 		return $this->new(
 			array_reduce($this->data, function($carry, $value) {
-				return array_merge($carry, toarray($value));
+				return array_merge($carry, toArray($value));
 			}, [])
 		);
 	}
@@ -73,7 +73,7 @@ class Recursive extends Collection
 		
 		foreach(parent::iterate() as $key => $value)
 			if($fn($value, $key))
-				$result[$key] = listable($value)
+				$result[$key] = isListable($value)
 					? $this->new($value)->filter($fn)
 					: $value;
 		
@@ -101,7 +101,7 @@ class Recursive extends Collection
 	public function iterate(bool $listall = false): \Generator
 	{
 		foreach(parent::iterate() as $key => $value) {
-			$check = listable($value);
+			$check = isListable($value);
 			
 			if(!$check || $check && $listall)
 				yield $key => $value;
@@ -123,7 +123,7 @@ class Recursive extends Collection
 	public function map(callable $fn)
 	{
 		foreach(parent::iterate() as $key => $value)
-			$result[$key] = listable($value)
+			$result[$key] = isListable($value)
 				? $this->new($value)->map($fn)
 				: $fn($value, $key);
 		
@@ -149,10 +149,10 @@ class Recursive extends Collection
 	 */
 	public function walk(callable $fn, $userdata = null)
 	{
-		$userdata = toarray($userdata);
+		$userdata = toArray($userdata);
 		
 		foreach(parent::iterate() as $key => $value)
-			listable($value)
+			isListable($value)
 				? $this->ref($value)->walk($fn, ...$userdata)
 				: $fn($value, $key, ...$userdata);
 		
