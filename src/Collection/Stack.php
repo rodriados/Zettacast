@@ -8,16 +8,13 @@
  */
 namespace Zettacast\Collection;
 
-use SplDoublyLinkedList;
-
 /**
  * Stack class. This class has methods appliable for all kinds of stacks. Only
  * integer key types are acceptable.
  * @package Zettacast\Collection
  * @version 1.0
  */
-class Stack
-	extends Queue
+class Stack extends Queue
 {
 	/**
 	 * Stack constructor. This constructor simply creates a new base for all
@@ -33,10 +30,11 @@ class Stack
 	 * Clears all data stored in object and returns it.
 	 * @return array All data stored in collection before clearing.
 	 */
-	public function clear() : array
+	public function clear(): array
 	{
 		$old = parent::clear();
 		$this->forceLIFO();
+		
 		return $old;
 	}
 	
@@ -66,7 +64,7 @@ class Stack
 	 */
 	private function forceLIFO()
 	{
-		$this->data->setIteratorMode(SplDoublyLinkedList::IT_MODE_LIFO);
+		$this->data->setIteratorMode(\SplDoublyLinkedList::IT_MODE_LIFO);
 	}
 	
 }

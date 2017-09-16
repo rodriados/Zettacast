@@ -15,17 +15,31 @@ namespace Zettacast\Collection;
  * @package Zettacast\Collection
  * @version 1.0
  */
-class Recursive
-	extends Collection
+class Recursive extends Collection
 {
+	/**
+	 * Gets an element stored in collection.
+	 * @param mixed $key Key of requested element.
+	 * @param mixed $default Default value fallback.
+	 * @return mixed Requested element or default fallback.
+	 */
+	public function get($key, $default = null)
+	{
+		return $this->has($key)
+			? $this->ref($this->data[$key])
+			: $default;
+	}
+	
 	/**
 	 * Applies a callback to all values stored in collection.
 	 * @param callable $fn Callback to be applied. Parameters: value, key.
-	 * @param mixed ...$userdata Optional extra parameters for function.
-	 * @return static Collection for method chaining.
+	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
+	 * @return $this Collection for method chaining.
 	 */
-	public function apply(callable $fn, ...$userdata)
+	public function apply(callable $fn, $userdata = null)
 	{
+		$userdata = toarray($userdata);
+		
 		foreach(parent::iterate() as $key => $value)
 			$this->data[$key] = listable($value)
 				? $this->new($value)->apply($fn, ...$userdata)
@@ -48,7 +62,7 @@ class Recursive
 	}
 	
 	/**
-	 * Filters elements according to the given tests. If no tests function is
+	 * Filters elements according to the given test. If no test function is
 	 * given, it fallbacks to removing all false equivalent values.
 	 * @param callable $fn Test function. Parameters: value, key.
 	 * @return static Collection of all filtered values.
@@ -70,7 +84,7 @@ class Recursive
 	 * Flattens the recursive collection into a single level collection.
 	 * @return Collection The flattened collection.
 	 */
-	public function flatten()
+	public function flatten(): Collection
 	{
 		foreach($this->iterate() as $value)
 			$elems[] = $value;
@@ -79,24 +93,12 @@ class Recursive
 	}
 	
 	/**
-	 * Gets an element stored in collection.
-	 * @param mixed $key Key of requested element.
-	 * @param mixed $default Default value fallback.
-	 * @return mixed Requested element or default fallback.
-	 */
-	public function get($key, $default = null)
-	{
-		return $this->has($key)
-			? $this->ref($this->data[$key])
-			: $default;
-	}
-	
-	/**
 	 * Creates a generator that iterates over the collection.
 	 * @param bool $listall Should listable objects be yield as well?
 	 * @yield mixed Collection's stored values.
+	 * @return \Generator
 	 */
-	public function iterate(bool $listall = false)
+	public function iterate(bool $listall = false): \Generator
 	{
 		foreach(parent::iterate() as $key => $value) {
 			$check = listable($value);
@@ -136,17 +138,19 @@ class Recursive
 	 */
 	public function reduce(callable $fn, $initial = null)
 	{
-		return array_reduce($this->flatten()->data, $fn, $initial);
+		return array_reduce($this->flatten()->all(), $fn, $initial);
 	}
 	
 	/**
 	 * Iterates over collection and executes a function over every element.
 	 * @param callable $fn Iteration function. Parameters: value, key.
-	 * @param mixed ...$userdata Optional extra parameters for function.
-	 * @return static Collection for method chaining.
+	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
+	 * @return $this Collection for method chaining.
 	 */
-	public function walk(callable $fn, ...$userdata)
+	public function walk(callable $fn, $userdata = null)
 	{
+		$userdata = toarray($userdata);
+		
 		foreach(parent::iterate() as $key => $value)
 			listable($value)
 				? $this->ref($value)->walk($fn, ...$userdata)

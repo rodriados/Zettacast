@@ -1,20 +1,19 @@
 <?php
 /**
- * Zettacast\Contract\Collection\Collection interface file.
+ * Zettacast\Collection\CollectionInterface interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Contract\Collection;
+namespace Zettacast\Collection;
 
 /**
  * Collection interface. This interface exposes all methods needed for a class
  * to work as a collection.
- * @package Zettacast\Contract\Collection
+ * @package Zettacast\Collection
  */
-interface Collection
-	extends Listable
+interface CollectionInterface extends ListableInterface
 {
 	/**
 	 * Get an element stored in collection.
@@ -29,13 +28,7 @@ interface Collection
 	 * @param mixed $key Key to be check if exists.
 	 * @return bool Does key exist?
 	 */
-	public function has($key) : bool;
-	
-	/**
-	 * Removes an element from collection.
-	 * @param mixed $key Key to be removed.
-	 */
-	public function remove($key);
+	public function has($key): bool;
 	
 	/**
 	 * Sets a value to the given key.
@@ -43,5 +36,11 @@ interface Collection
 	 * @param mixed $value Value to be stored in key.
 	 */
 	public function set($key, $value);
+	
+	/**
+	 * Removes an element from collection.
+	 * @param mixed $key Key to be removed.
+	 */
+	public function del($key);
 	
 }

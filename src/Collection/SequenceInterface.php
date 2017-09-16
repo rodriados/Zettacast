@@ -1,22 +1,20 @@
 <?php
 /**
- * Zettacast\Contract\Collection\Sequence interface file.
+ * Zettacast\Collection\SequenceInterface interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Contract\Collection;
+namespace Zettacast\Collection;
 
-interface Sequence
-	extends Listable
+/**
+ * Sequence interface. This interface exposes all methods needed for a class
+ * to work as a sequence.
+ * @package Zettacast\Collection
+ */
+interface SequenceInterface extends ListableInterface
 {
-	/**
-	 * Returns the first element in the sequence.
-	 * @return mixed Sequence's first element.
-	 */
-	public function first();
-	
 	/**
 	 * Accesses the element stored in the given index.
 	 * @param int $index Index to be accessed.
@@ -30,7 +28,26 @@ interface Sequence
 	 * @param int $index Index to be checked.
 	 * @return bool Does given index exist?
 	 */
-	public function has(int $index) : bool;
+	public function has(int $index): bool;
+	
+	/**
+	 * Sets a value to the given index.
+	 * @param int $index Index to be updated.
+	 * @param mixed $value Value to be stored in index.
+	 */
+	public function set(int $index, $value);
+	
+	/**
+	 * Removes an element from sequence.
+	 * @param mixed $index Index to be removed.
+	 */
+	public function del(int $index);
+	
+	/**
+	 * Returns the first element in the sequence.
+	 * @return mixed Sequence's first element.
+	 */
+	public function first();
 	
 	/**
 	 * Returns the last element in the sequence.
@@ -45,25 +62,10 @@ interface Sequence
 	public function pop();
 	
 	/**
-	 * Pushes an element to the top of the sequence.
-	 * @param mixed $value Element to be pushed to the top of the sequence.
-	 * @return static Sequence for method chaining.
+	 * Pushes an element onto the end of the sequence.
+	 * @param mixed $value Value to be appended onto the sequence.
 	 */
 	public function push($value);
-	
-	/**
-	 * Removes an element from sequence.
-	 * @param mixed $index Index to be removed.
-	 * @return static Sequence for method chaining.
-	 */
-	public function remove(int $index);
-	
-	/**
-	 * Sets a value to the given index.
-	 * @param int $index Index to be updated.
-	 * @param mixed $value Value to be stored in index.
-	 */
-	public function set(int $index, $value);
 	
 	/**
 	 * Shifts a value off the bottom of the sequence.
@@ -74,7 +76,6 @@ interface Sequence
 	/**
 	 * Pushes an element onto the beginning of the sequence.
 	 * @param mixed $value Value to be prepended onto the sequence.
-	 * @return static Sequence for method chaining.
 	 */
 	public function unshift($value);
 	

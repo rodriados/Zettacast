@@ -14,8 +14,7 @@ namespace Zettacast\Collection;
  * @package Zettacast\Collection
  * @version 1.0
  */
-class Dot
-	extends Recursive
+class Dot extends Recursive
 {
 	/**
 	 * Depth-separator. This variable holds the symbol that indicates depth
@@ -34,31 +33,6 @@ class Dot
 	{
 		$this->dot = $dot;
 		parent::__construct($data);
-	}
-	
-	/**
-	 * Filters elements according to the given tests. If no tests function is
-	 * given, it fallbacks to removing all false equivalent values.
-	 * @param callable $fn Test function. Parameters: value, key.
-	 * @return static Collection of all filtered values.
-	 */
-	public function filter(callable $fn = null)
-	{
-		static $scope = [];
-		$fn = $fn ?? 'with';
-		
-		foreach($this->data as $key => $value) {
-			array_push($scope, $key);
-			
-			if($fn($value, implode($this->dot, $scope)))
-				$result[$key] = listable($value)
-					? $this->new($value)->filter($fn)
-					: $value;
-			
-			array_pop($scope);
-		}
-		
-		return $this->new($result ?? []);
 	}
 	
 	/**
@@ -89,7 +63,7 @@ class Dot
 	 * @param mixed $key Key to be check if exists.
 	 * @return bool Does key exist?
 	 */
-	public function has($key) : bool
+	public function has($key): bool
 	{
 		$dot = $this->undot($key);
 		$node = &$this->data;
@@ -107,30 +81,10 @@ class Dot
 	}
 	
 	/**
-	 * Plucks an array of values from collection.
-	 * @param string|array $value Requested keys to pluck.
-	 * @param string|array $key Keys to index plucked array.
-	 * @return Collection The plucked values.
-	 */
-	public function pluck($value, $key = null)
-	{
-		foreach($this->data as $item) {
-			$ref = $this->ref($item);
-			
-			(is_null($key) || !($keyvalue = $ref->get($key)))
-				? ($result[/*nokey*/] = $ref->get($value))
-				: ($result[$keyvalue] = $ref->get($value));
-				
-		}
-		
-		return new Collection($result ?? []);
-	}
-	
-	/**
 	 * Sets a value to the given key.
 	 * @param mixed $key Key to created or updated.
 	 * @param mixed $value Value to be stored in key.
-	 * @return static Collection for method chaining.
+	 * @return $this Collection for method chaining.
 	 */
 	public function set($key, $value)
 	{
@@ -154,9 +108,9 @@ class Dot
 	/**
 	 * Removes an element from collection.
 	 * @param mixed $key Key to be removed.
-	 * @return static Collection for method chaining.
+	 * @return $this Collection for method chaining.
 	 */
-	public function remove($key)
+	public function del($key)
 	{
 		$dot = $this->undot($key);
 		$last = array_pop($dot);
@@ -176,6 +130,51 @@ class Dot
 	}
 	
 	/**
+	 * Filters elements according to the given test. If no test function is
+	 * given, it fallbacks to removing all false equivalent values.
+	 * @param callable $fn Test function. Parameters: value, key.
+	 * @return static Collection of all filtered values.
+	 */
+	public function filter(callable $fn = null)
+	{
+		static $scope = [];
+		$fn = $fn ?? 'with';
+		
+		foreach($this->data as $key => $value) {
+			array_push($scope, $key);
+			
+			if($fn($value, implode($this->dot, $scope)))
+				$result[$key] = listable($value)
+					? $this->new($value)->filter($fn)
+					: $value;
+			
+			array_pop($scope);
+		}
+		
+		return $this->new($result ?? []);
+	}
+	
+	/**
+	 * Plucks an array of values from collection.
+	 * @param string|array $value Requested keys to pluck.
+	 * @param string|array $key Keys to index plucked array.
+	 * @return Collection The plucked values.
+	 */
+	public function pluck($value, $key = null): Collection
+	{
+		foreach($this->data as $item) {
+			$ref = $this->ref($item);
+			
+			is_null($key) || !($keyvalue = $ref->get($key))
+				? ($result[/*nokey*/] = $ref->get($value))
+				: ($result[$keyvalue] = $ref->get($value));
+				
+		}
+		
+		return new Collection($result ?? []);
+	}
+	
+	/**
 	 * Creates a new instance of class based on an already existing instance.
 	 * @param mixed $target Data to be fed into the new instance.
 	 * @return static The new instance.
@@ -191,7 +190,7 @@ class Dot
 	 * @param string $key Dot expression key to be split.
 	 * @return array Dot expression segments.
 	 */
-	protected function undot(string $key) : array
+	protected function undot(string $key): array
 	{
 		return explode($this->dot, trim($key, $this->dot));
 	}

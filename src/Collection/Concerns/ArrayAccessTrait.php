@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Collection\Concerns\ArrayAccess trait file.
+ * Zettacast\Collection\Concerns\ArrayAccessTrait trait file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -14,14 +14,14 @@ namespace Zettacast\Collection\Concerns;
  * @package Zettacast\Collection
  * @version 1.0
  */
-trait ArrayAccess
+trait ArrayAccessTrait
 {
 	/**
 	 * Checks whether an offset exists in collection.
 	 * @param mixed $offset Offset to be checked.
 	 * @return bool Does the offset exist?
 	 */
-	final public function offsetExists($offset) : bool
+	final public function offsetExists($offset): bool
 	{
 		return $this->has($offset);
 	}
@@ -52,7 +52,7 @@ trait ArrayAccess
 	 */
 	final public function offsetUnset($offset)
 	{
-		return $this->remove($offset);
+		return $this->del($offset);
 	}
 	
 	/**
@@ -67,13 +67,13 @@ trait ArrayAccess
 	 * @param mixed $key Key to be check if exists.
 	 * @return bool Does key exist?
 	 */
-	abstract public function has($key) : bool;
+	abstract public function has($key): bool;
 	
 	/**
 	 * Removes an element from collection.
 	 * @param mixed $key Key to be removed.
 	 */
-	abstract public function remove($key);
+	abstract public function del($key);
 	
 	/**
 	 * Sets a value to the given key.

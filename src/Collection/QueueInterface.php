@@ -1,20 +1,19 @@
 <?php
 /**
- * Zettacast\Contract\Collection\Queue interface file.
+ * Zettacast\Collection\QueueInterface interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Contract\Collection;
+namespace Zettacast\Collection;
 
 /**
  * Queue interface. This interface exposes all methods needed for a class
  * to work as a queue.
- * @package Zettacast\Contract\Collection
+ * @package Zettacast\Collection
  */
-interface Queue
-	extends Listable
+interface QueueInterface extends ListableInterface
 {
 	/**
 	 * Peeks at the node that is on the top of the queue.
