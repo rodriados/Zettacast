@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Autoload\Loader\Space class file.
+ * Zettacast\Autoload\Loader\NamespaceLoader class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -17,7 +17,7 @@ use Zettacast\Autoload\LoaderInterface;
  * @package Zettacast\Autoload
  * @version 1.0
  */
-class Space implements LoaderInterface
+class NamespaceLoader implements LoaderInterface
 {
 	/**
 	 * Listed namespaces. The entries in this collection should not override

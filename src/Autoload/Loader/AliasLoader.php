@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Autoload\Loader\Alias class file.
+ * Zettacast\Autoload\Loader\AliasLoader class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -17,7 +17,7 @@ use Zettacast\Autoload\LoaderInterface;
  * @package Zettacast\Autoload
  * @version 1.0
  */
-class Alias implements LoaderInterface
+class AliasLoader implements LoaderInterface
 {
 	/**
 	 * Maps alias to classes' full names. The entries in this array should not

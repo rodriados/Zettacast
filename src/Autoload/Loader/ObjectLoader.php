@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Autoload\Loader\Object class file.
+ * Zettacast\Autoload\Loader\ObjectLoader class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -17,7 +17,7 @@ use Zettacast\Autoload\LoaderInterface;
  * @package Zettacast\Autoload
  * @version 1.0
  */
-class Object implements LoaderInterface
+class ObjectLoader implements LoaderInterface
 {
 	/**
 	 * Listed objects. The entries in this collection should not override

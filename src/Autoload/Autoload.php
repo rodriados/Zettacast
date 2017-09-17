@@ -9,16 +9,16 @@
 namespace Zettacast\Autoload;
 
 require FWORKPATH."/Autoload/LoaderInterface.php";
-require FWORKPATH."/Autoload/Loader/Framework.php";
+require FWORKPATH."/Autoload/Loader/FrameworkLoader.php";
 
-use Zettacast\Autoload\Loader\Framework;
+use Zettacast\Autoload\Loader\FrameworkLoader;
 
 /**
  * The autoload class is responsible for loading all classes required by the
  * framework or the application itself. It also lets you set explicit paths for
  * classes to be loaded from.
  * @package Zettacast\Autoload
- * @version 1.1
+ * @version 1.0
  */
 final class Autoload
 {
@@ -32,7 +32,7 @@ final class Autoload
 	/**
 	 * Stores the default loader instance for Zettacast classes. This loader is
 	 * special and cannot be closed.
-	 * @var Framework Zettacast main loader instance.
+	 * @var FrameworkLoader Zettacast main loader instance.
 	 */
 	private $framework;
 	
@@ -49,7 +49,7 @@ final class Autoload
 		string $pkg = PKGPATH
 	) {
 		$this->loaders = [];
-		$this->framework = new Framework($fwork, $app, $pkg);
+		$this->framework = new FrameworkLoader($fwork, $app, $pkg);
 		$this->register($this->framework);
 	}
 	

@@ -9,10 +9,10 @@
 namespace Zettacast\Facade;
 
 use Zettacast\Helper\Facade;
+use Zettacast\Autoload\Loader\AliasLoader;
+use Zettacast\Autoload\Loader\ObjectLoader;
+use Zettacast\Autoload\Loader\NamespaceLoader;
 use Zettacast\Autoload\Autoload as baseclass;
-use Zettacast\Autoload\Loader\Alias as AliasLoader;
-use Zettacast\Autoload\Loader\Space as SpaceLoader;
-use Zettacast\Autoload\Loader\Object as ObjectLoader;
 
 /**
  * Zettacast's Autoload façade class.
@@ -37,7 +37,7 @@ final class Autoload
 	
 	/**
 	 * Namespaced objects loader instance.
-	 * @var SpaceLoader Loader instance.
+	 * @var NamespaceLoader Loader instance.
 	 */
 	private static $space = null;
 	
@@ -74,7 +74,7 @@ final class Autoload
 	public static function addNamespace(array $map = [])
 	{
 		if(!isset(self::$space) && !empty($map))
-			self::facaded()->register(self::$space = new SpaceLoader);
+			self::facaded()->register(self::$space = new NamespaceLoader);
 		
 		foreach($map as $space => $folder)
 			self::$space->set($space, $folder);

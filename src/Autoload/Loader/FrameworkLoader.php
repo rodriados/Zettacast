@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Autoload\Loader\Framework class file.
+ * Zettacast\Autoload\Loader\FrameworkLoader class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -18,7 +18,7 @@ use Zettacast\Autoload\LoaderInterface;
  * @package Zettacast\Autoload
  * @version 1.0
  */
-final class Framework implements LoaderInterface
+final class FrameworkLoader implements LoaderInterface
 {
 	/**
 	 * Application's directory path.
