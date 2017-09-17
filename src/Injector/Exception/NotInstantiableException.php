@@ -10,7 +10,7 @@ namespace Zettacast\Injector\Exception;
 
 use Exception;
 
-class Uninstantiable
+class NotInstantiableException
 	extends Exception
 {
 	public function __construct(string $concrete) {

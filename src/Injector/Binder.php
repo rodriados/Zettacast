@@ -1,15 +1,14 @@
 <?php
 /**
- * Zettacast\Injector\Binder\Binder class file.
+ * Zettacast\Injector\Binder class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Injector\Binder;
+namespace Zettacast\Injector;
 
 use Zettacast\Collection\Collection;
-use Zettacast\Injector\BinderInterface;
 
 /**
  * The binder class is responsible for linking abstractions to concrete
@@ -58,7 +57,7 @@ class Binder implements BinderInterface
 	 * @param string $abstract Abstraction to be checked.
 	 * @return bool Is abstract bound?
 	 */
-	public function bound(string $abstract): bool
+	public function isBound(string $abstract): bool
 	{
 		return $this->links->has($abstract);
 	}

@@ -11,7 +11,7 @@ namespace Zettacast\Injector\Exception;
 use Exception;
 use ReflectionParameter;
 
-class Unresolvable
+class NotResolvableException
 	extends Exception
 {
 	public function __construct(

@@ -1,24 +1,22 @@
 <?php
 /**
- * Zettacast\Injector\Binder\Scoped class file.
+ * Zettacast\Injector\ContextBinder class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Injector\Binder;
-
-use Zettacast\Injector\BinderInterface;
+namespace Zettacast\Injector;
 
 /**
- * The Scoped binder class is responsible for linking abstractions to different
- * concrete implementations in different creation scopes. This class acts as
- * a parasite to other binders, injecting its information among their data and
- * retrieving it from them when needed.
+ * The Context binder class is responsible for linking abstractions to
+ * different concrete implementations in different creation scopes. This class
+ * acts as a parasite to other binders, injecting its information among their
+ * data and retrieving it from them when needed.
  * @package Zettacast\Injector
  * @version 1.0
  */
-class Scoped implements BinderInterface
+class ContextBinder implements BinderInterface
 {
 	/**
 	 * Abstraction binder. This binder will be manipulated so all scoped
@@ -64,9 +62,9 @@ class Scoped implements BinderInterface
 	 * @param string $abstract Abstraction to be checked.
 	 * @return bool Is abstract bound?
 	 */
-	public function bound(string $abstract): bool
+	public function isBound(string $abstract): bool
 	{
-		return $this->binder->bound($abstract.'@'.$this->scope);
+		return $this->binder->isBound($abstract.'@'.$this->scope);
 	}
 	
 	/**

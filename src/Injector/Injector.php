@@ -10,8 +10,6 @@ namespace Zettacast\Injector;
 
 use Zettacast\Helper\Aliaser;
 use Zettacast\Collection\Collection;
-use Zettacast\Injector\Binder\Binder;
-use Zettacast\Injector\Binder\Scoped;
 
 /**
  * The Injector class is responsible for handling dependency injection. This
@@ -20,7 +18,7 @@ use Zettacast\Injector\Binder\Scoped;
  * @package Zettacast\Injector
  * @version 1.0
  */
-class Injector implements InjectorInterface, BinderInterface
+class Injector implements InjectorInterface
 {
 	/**
 	 * Collection of object aliases. Aliases allow full class names to be
@@ -101,9 +99,9 @@ class Injector implements InjectorInterface, BinderInterface
 	 * @param string $abstract Abstraction to be checked.
 	 * @return bool Is abstract bound?
 	 */
-	public function bound(string $abstract): bool
+	public function isBound(string $abstract): bool
 	{
-		return $this->binder->bound($this->alias->identify($abstract));
+		return $this->binder->isBound($this->alias->identify($abstract));
 	}
 	
 	/**
@@ -207,13 +205,13 @@ class Injector implements InjectorInterface, BinderInterface
 	}
 	
 	/**
-	 * Creates a new scoped binder instance.
+	 * Creates a new context binder instance.
 	 * @param string $scope Creation scope to which binding is applied.
-	 * @return Scoped Scoped binder instance.
+	 * @return ContextBinder Context binder instance.
 	 */
-	public function when(string $scope): Scoped
+	public function when(string $scope): ContextBinder
 	{
-		return new Scoped($scope, $this->binder);
+		return new ContextBinder($scope, $this->binder);
 	}
 	
 	/**

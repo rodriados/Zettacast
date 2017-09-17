@@ -9,9 +9,9 @@
 namespace Zettacast\Injector;
 
 use Zettacast\Collection\Stack;
-use Zettacast\Collection\Collection;
-use Zettacast\Injector\Exception\Unresolvable;
-use Zettacast\Injector\Exception\Uninstantiable;
+use Zettacast\Collection\CollectionInterface;
+use Zettacast\Injector\Exception\NotResolvableException;
+use Zettacast\Injector\Exception\NotInstantiableException;
 
 /**
  * The builder class is responsible for directly handling dependency injection.
@@ -25,7 +25,7 @@ class Builder
 	/**
 	 * Collection of shared data. Objects or any kind of data can be shared in
 	 * the injector. Shared objects will be instantiated only once.
-	 * @var Collection Shared data collection.
+	 * @var CollectionInterface Shared data collection.
 	 */
 	protected $shared;
 	
@@ -46,11 +46,13 @@ class Builder
 	/**
 	 * Builder constructor. This constructor simply sets all properties to
 	 * the received parameters or empty objects.
-	 * @param Injector $injector Currently active injector instance.
-	 * @param Collection $shared Collection of shared objects.
+	 * @param InjectorInterface $injector Currently active injector instance.
+	 * @param CollectionInterface $shared Collection of shared objects.
 	 */
-	public function __construct(Injector $injector, Collection &$shared)
-	{
+	public function __construct(
+		InjectorInterface $injector,
+		CollectionInterface &$shared
+	) {
 		$this->injector = $injector;
 		$this->shared = &$shared;
 		$this->stack = new Stack;
@@ -124,15 +126,15 @@ class Builder
 	 * @param string $concrete Type to be instantiated.
 	 * @param array $params Parameters to be used when instantiating.
 	 * @return mixed Resolved and dependency injected object.
-	 * @throws Uninstantiable Type is not instantiable.
-	 * @throws Unresolvable The dependency cannot be resolved.
+	 * @throws NotInstantiableException Type is not instantiable.
+	 * @throws NotResolvableException The dependency cannot be resolved.
 	 */
 	protected function build(string $concrete, array $params = [])
 	{
 		$reflector = new \ReflectionClass($concrete);
 		
 		if(!$reflector->isInstantiable())
-			throw new Uninstantiable($concrete);
+			throw new NotInstantiableException($concrete);
 		
 		if(is_null($constructor = $reflector->getConstructor()))
 			return $reflector->newInstance();
@@ -169,7 +171,7 @@ class Builder
 	 * Tries to resolve a primitive dependency.
 	 * @param \ReflectionParameter $param Parameter to be resolved.
 	 * @return mixed Resolved primitive.
-	 * @throws Unresolvable Primitive value could not be resolved.
+	 * @throws NotResolvableException Primitive value could not be resolved.
 	 */
 	private function buildPrimitive(\ReflectionParameter $param)
 	{
@@ -184,14 +186,14 @@ class Builder
 		if($param->isDefaultValueAvailable())
 			return $param->getDefaultValue();
 			
-		throw new Unresolvable($param);
+		throw new NotResolvableException($param);
 	}
 	
 	/**
 	 * Tries to resolve an object dependency.
 	 * @param \ReflectionParameter $param Parameter to be resolved.
 	 * @return mixed Resolved object.
-	 * @throws Unresolvable Dependency could not be resolved.
+	 * @throws NotResolvableException Dependency could not be resolved.
 	 */
 	private function buildObject(\ReflectionParameter $param)
 	{
@@ -201,7 +203,7 @@ class Builder
 			if($param->isOptional())
 				return $param->getDefaultValue();
 			
-			throw new Unresolvable($param, $e);
+			throw new NotResolvableException($param, $e);
 		}
 	}
 	

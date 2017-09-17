@@ -27,7 +27,7 @@ interface BinderInterface
 	 * @param string $abstract Abstraction to be checked.
 	 * @return bool Is abstract bound?
 	 */
-	public function bound(string $abstract): bool;
+	public function isBound(string $abstract): bool;
 	
 	/**
 	 * Gets the concrete type for a given abstraction.
