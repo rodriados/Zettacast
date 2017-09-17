@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Collection\Dot class file.
+ * Zettacast\Collection\DotCollection class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -9,12 +9,12 @@
 namespace Zettacast\Collection;
 
 /**
- * Dot class. This collection implements dot access methods, that is
+ * DotCollection class. This collection implements dot access methods, that is
  * it's possible to access its recursive data via dot notation.
  * @package Zettacast\Collection
  * @version 1.0
  */
-class Dot extends Recursive
+class DotCollection extends RecursiveCollection
 {
 	/**
 	 * Depth-separator. This variable holds the symbol that indicates depth

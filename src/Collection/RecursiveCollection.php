@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Collection\Recursive class file.
+ * Zettacast\Collection\RecursiveCollection class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -15,7 +15,7 @@ namespace Zettacast\Collection;
  * @package Zettacast\Collection
  * @version 1.0
  */
-class Recursive extends Collection
+class RecursiveCollection extends Collection
 {
 	/**
 	 * Gets an element stored in collection.

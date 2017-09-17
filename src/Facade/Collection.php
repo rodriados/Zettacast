@@ -9,6 +9,7 @@
 namespace Zettacast\Facade;
 
 use Zettacast\Helper\Extensor;
+use Zettacast\Collection\DotCollection;
 use Zettacast\Collection\Collection as baseclass;
 
 /**
@@ -97,6 +98,16 @@ final class Collection
 	public static function combine(array $keys, array $values): baseclass
 	{
 		return self::build(array_combine($keys, $values));
+	}
+	
+	/**
+	 * Builds a new instance of a dot collection object.
+	 * @param array|\Traversable $target Instance initial values.
+	 * @return DotCollection New created instance.
+	 */
+	public static function dot($target = []): DotCollection
+	{
+		return new DotCollection($target);
 	}
 	
 	/**
