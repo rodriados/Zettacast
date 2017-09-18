@@ -9,7 +9,7 @@
 namespace Zettacast\Autoload\Loader;
 
 use Zettacast\Collection\Collection;
-use Zettacast\Autoload\LoaderInterface;
+use Zettacast\Contract\Autoload\LoaderInterface;
 
 /**
  * The Object loader class is responsible for implementing the loading of

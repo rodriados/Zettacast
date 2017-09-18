@@ -1,12 +1,12 @@
 <?php
 /**
- * Zettacast\Autoload\LoaderInterface interface file.
+ * Zettacast\Contract\Autoload\LoaderInterface interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Autoload;
+namespace Zettacast\Contract\Autoload;
 
 /**
  * The Loader interface is responsible for exposing the common methods of
@@ -24,7 +24,6 @@ interface LoaderInterface
 	
 	/**
 	 * Resets the loader to its initial state.
-	 * @return static Loader for method chaining.
 	 */
 	public function reset();
 	

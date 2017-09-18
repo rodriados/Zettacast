@@ -19,10 +19,8 @@ use Zettacast\Autoload\Autoload as baseclass;
  * This class exposes package:autoload methods to external usage.
  * @version 1.0
  */
-final class Autoload
+final class Autoload extends Facade
 {
-	use Facade;
-	
 	/**
 	 * Aliased objects loader instance.
 	 * @var AliasLoader Loader instance.

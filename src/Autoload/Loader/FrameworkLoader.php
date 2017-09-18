@@ -9,7 +9,7 @@
 namespace Zettacast\Autoload\Loader;
 
 use const ZETTACAST;
-use Zettacast\Autoload\LoaderInterface;
+use Zettacast\Contract\Autoload\LoaderInterface;
 
 /**
  * The Framework loader class is responsible for loading all classes required
@@ -33,23 +33,23 @@ final class FrameworkLoader implements LoaderInterface
 	protected $fwork;
 	
 	/**
-	 * Packages' directory path.
-	 * @var string Path to packages' files.
+	 * Resources' directory path.
+	 * @var string Path to resources' files.
 	 */
-	protected $pkg;
+	protected $rsrc;
 	
 	/**
 	 * Autoload constructor.
 	 * Initializes the class and set values to instance properties.
 	 * @param string $fwork Framework files' path.
 	 * @param string $app Application files' path.
-	 * @param string $pkg Package files' path.
+	 * @param string $rsrc Resource files' path.
 	 */
-	public function __construct(string $fwork, string $app, string $pkg)
+	public function __construct(string $fwork, string $app, string $rsrc)
 	{
 		$this->fwork = $fwork;
+		$this->rsrc = $rsrc;
 		$this->app = $app;
-		$this->pkg = $pkg;
 	}
 	
 	/**
@@ -64,8 +64,8 @@ final class FrameworkLoader implements LoaderInterface
 		$name = explode('\\', ltrim($class, '\\'));
 		
 		return $name[0] == ZETTACAST || $name == 'App'
-			? $this->internal($name)
-			: $this->package($name);
+			? $this->loadInternal($name)
+			: $this->loadResource($name);
 	}
 	
 	/**
@@ -83,7 +83,7 @@ final class FrameworkLoader implements LoaderInterface
 	 * @param array $name Class to be loaded exploded to qualified names.
 	 * @return bool Was the class successfully loaded?
 	 */
-	protected function internal(array $name): bool
+	protected function loadInternal(array $name): bool
 	{
 		$name[0] = ($name[0] == ZETTACAST)
 			? $this->fwork
@@ -100,15 +100,15 @@ final class FrameworkLoader implements LoaderInterface
 	}
 	
 	/**
-	 * Tries to load an invoked and not yet loaded package class. This method
+	 * Tries to load an invoked and not yet loaded resource class. This method
 	 * is a fallback for classes not located within framework's directories, so
-	 * it searches in package's directory.
+	 * it searches in resources' directory.
 	 * @param array $name Class to be loaded exploded to qualified names.
 	 * @return bool Was the class successfully loaded?
 	 */
-	protected function package(array $name): bool
+	protected function loadResource(array $name): bool
 	{
-		array_unshift($name, $this->pkg);
+		array_unshift($name, $this->rsrc);
 		$cpath = implode('/', $name);
 		$fname = $cpath . '.php';
 		

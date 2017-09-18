@@ -8,10 +8,11 @@
  */
 namespace Zettacast\Autoload;
 
-require FWORKPATH."/Autoload/LoaderInterface.php";
+require FWORKPATH."/Contract/Autoload/LoaderInterface.php";
 require FWORKPATH."/Autoload/Loader/FrameworkLoader.php";
 
 use Zettacast\Autoload\Loader\FrameworkLoader;
+use Zettacast\Contract\Autoload\LoaderInterface;
 
 /**
  * The autoload class is responsible for loading all classes required by the
@@ -41,15 +42,15 @@ final class Autoload
 	 * Initializes the class and set values to instance properties.
 	 * @param string $fwork Framework files' path.
 	 * @param string $app Application files' path.
-	 * @param string $pkg Packages files' path.
+	 * @param string $rsrc Resources files' path.
 	 */
 	public function __construct(
 		string $fwork = FWORKPATH,
 		string $app = APPPATH,
-		string $pkg = PKGPATH
+		string $rsrc = RSRCPATH
 	) {
 		$this->loaders = [];
-		$this->framework = new FrameworkLoader($fwork, $app, $pkg);
+		$this->framework = new FrameworkLoader($fwork, $app, $rsrc);
 		$this->register($this->framework);
 	}
 	

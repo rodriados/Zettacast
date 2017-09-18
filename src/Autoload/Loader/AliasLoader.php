@@ -9,7 +9,7 @@
 namespace Zettacast\Autoload\Loader;
 
 use Zettacast\Helper\Aliaser;
-use Zettacast\Autoload\LoaderInterface;
+use Zettacast\Contract\Autoload\LoaderInterface;
 
 /**
  * The Alias loader class is responsible for implementing the use of class

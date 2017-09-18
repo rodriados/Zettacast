@@ -26,11 +26,12 @@ define('ZBOOTMEMO', memory_get_usage(true));
  * location or name of the folders.
  * @var string Directory constants.
  */
-define('DOCROOT',    realpath(dirname(__DIR__)));
-define('APPPATH',    DOCROOT.'/app');
-define('PKGPATH',    DOCROOT.'/package');
-define('FWORKPATH',  DOCROOT.'/src');
-define('PUBLICPATH', DOCROOT.'/public');
+define('DOCROOT',       realpath(dirname(__DIR__)));
+define('APPPATH',       DOCROOT.'/app');
+define('RSRCPATH',      DOCROOT.'/resource');
+define('CONFIGPATH',    DOCROOT.'/config');
+define('FWORKPATH',     DOCROOT.'/src');
+define('PUBLICPATH',    DOCROOT.'/public');
 /**#@-*/
 
 /*
