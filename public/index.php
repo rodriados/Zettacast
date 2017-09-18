@@ -27,7 +27,7 @@ require __DIR__.'/../app/bootstrap.php';
  * Now that we have our framework on, we must take care of the incoming HTTP
  * request and produce the expected response from it.
  */
-require APPPATH.'/view/index.php';
+require APPPATH.'/View/index.php';
 /*
 $kernel = zetta(Zettacast\HTTP\Kernel::class);
 $request = Zettacast\HTTP\Request::capture();

@@ -1,0 +1,25 @@
+{
+	"name": "rodriados/zettacast",
+	"description": "Zettacast: A simple, fast and lightweight PHP Framework.",
+	"keywords": [
+		"framework", "http", "dependency injection", "DI"
+	],
+	"license": "MIT",
+	"author": [
+		{
+			"name": "Rodrigo Siqueira",
+			"email": "rodriados@gmail.com"
+		}
+	],
+	"require": {
+		"php": ">=7.0.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"Zettacast\\": "src/"
+		}
+	},
+	"archive": {
+		"exclude": ["/tests"]
+	}
+}

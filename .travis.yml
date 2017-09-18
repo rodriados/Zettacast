@@ -1,0 +1,7 @@
+language: php
+php:
+  - '7.0'
+  - '7.1'
+install: wget https://phar.phpunit.de/phpunit-6.2.3.phar
+script: php phpunit-6.2.3.phar --bootstrap src/bootstrap.php tests
+sudo: false
