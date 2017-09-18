@@ -18,10 +18,9 @@ interface StorageInterface
 	/**
 	 * Retrieves an element stored in object.
 	 * @param mixed $key Key of requested element.
-	 * @param mixed $default Default value fallback.
-	 * @return mixed Requested element or default fallback.
+	 * @return mixed Requested element or null if not found.
 	 */
-	public function get($key, $default = null);
+	public function get($key);
 	
 	/**
 	 * Checks whether an element key is known.

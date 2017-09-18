@@ -44,8 +44,8 @@ class AliasLoader implements LoaderInterface
 	{
 		$alias = ltrim($alias, '\\');
 		
-		return $this->data->knows($alias)
-			? class_alias($this->data->identify($alias), $alias, true)
+		return $this->data->has($alias)
+			? class_alias($this->data->get($alias), $alias, true)
 			: false;
 	}
 	
@@ -70,7 +70,7 @@ class AliasLoader implements LoaderInterface
 		$alias = ltrim($alias, '\\');
 		$target = ltrim($target, '\\');
 		
-		$this->data->register($alias, $target);
+		$this->data->set($alias, $target);
 		return $this;
 	}
 	
@@ -85,7 +85,7 @@ class AliasLoader implements LoaderInterface
 	{
 		$alias = ltrim($alias, '\\');
 		
-		$this->data->unregister($alias);
+		$this->data->del($alias);
 		return $this;
 	}
 	

@@ -9,6 +9,7 @@
 namespace Zettacast\Helper;
 
 use Zettacast\Collection\Collection;
+use Zettacast\Contract\StorageInterface;
 
 /**
  * The Aliaser class is responsible for managing aliases. An alias must always
@@ -16,7 +17,7 @@ use Zettacast\Collection\Collection;
  * @package Zettacast\Helper
  * @version 1.0
  */
-class Aliaser
+class Aliaser implements StorageInterface
 {
 	/**
 	 * Collection of aliases. Stores all aliases registered in the object.
@@ -34,15 +35,16 @@ class Aliaser
 	}
 	
 	/**
-	 * Clears and removes all known aliases and returns the old ones.
-	 * @return Collection All previously known aliases.
+	 * Retrieves an alias known to the object.
+	 * @param mixed $alias Requested alias value.
+	 * @return mixed Requested element or the original alias.
 	 */
-	public function clear(): Collection
+	public function get($alias)
 	{
-		$old = $this->data;
-		$this->data = new Collection;
+		while($this->data->has($alias))
+			$alias = $this->data->get($alias);
 		
-		return $old;
+		return $alias;
 	}
 	
 	/**
@@ -50,7 +52,7 @@ class Aliaser
 	 * @param string $alias Alias to be checked.
 	 * @return bool Is alias known?
 	 */
-	public function knows(string $alias): bool
+	public function has($alias): bool
 	{
 		return $this->data->has($alias);
 	}
@@ -61,7 +63,7 @@ class Aliaser
 	 * @param mixed $target Aliased object.
 	 * @return $this Aliaser for method chaining.
 	 */
-	public function register(string $alias, $target)
+	public function set($alias, $target)
 	{
 		if($alias != $target)
 			$this->data->set($alias, $target);
@@ -70,26 +72,23 @@ class Aliaser
 	}
 	
 	/**
-	 * Resolves an alias.
-	 * @param string $alias Alias name to be resolved.
-	 * @return mixed Resolved value.
-	 */
-	public function identify(string $alias)
-	{
-		return $this->data->has($alias)
-			? $this->identify($this->data->get($alias))
-			: $alias;
-	}
-	
-	/**
 	 * Unregisters an alias.
 	 * @param string $alias Alias name to be unregistered.
 	 * @return $this Aliaser for method chaining.
 	 */
-	public function unregister(string $alias)
+	public function del($alias)
 	{
 		$this->data->del($alias);
 		return $this;
+	}
+	
+	/**
+	 * Clears and removes all known aliases and returns the old ones.
+	 * @return array All previously known aliases.
+	 */
+	public function clear(): array
+	{
+		return $this->data->clear();
 	}
 	
 }
