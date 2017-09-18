@@ -9,7 +9,7 @@
 
 use Zettacast\Zettacast;
 use Zettacast\Facade\Config;
-use Zettacast\Collection\ListableInterface;
+use Zettacast\Contract\ListableInterface;
 
 if(!function_exists('config')) {
 	/**

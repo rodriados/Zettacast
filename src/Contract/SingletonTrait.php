@@ -1,22 +1,22 @@
 <?php
 /**
- * Zettacast\Helper\Singleton trait file.
+ * Zettacast\Contract\SingletonContract trait file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2016 Rodrigo Siqueira
  */
-namespace Zettacast\Helper;
+namespace Zettacast\Contract;
 
 /**
  * Implements singleton methods. This trait transforms every class in which it
  * is used in a singleton object. Singletons are instantiated only once and
  * everytime a method within a singleton object is called, the unique instance
  * of the object is used.
- * @package Zettacast\Helper
+ * @package Zettacast\Contract
  * @version 1.0
  */
-trait Singleton
+trait SingletonTrait
 {
 	/**
 	 * Object's singleton instance. Every operation made into the object in

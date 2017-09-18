@@ -1,20 +1,20 @@
 <?php
 /**
- * Zettcast\Helper\Extensor trait file.
+ * Zettcast\Contract\ExtensorTrait trait file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2016 Rodrigo Siqueira
  */
-namespace Zettacast\Helper;
+namespace Zettacast\Contract;
 
 /**
  * Implements methods that allow class extension. This trait allows the object
  * it is used within to be extended, that is to have methods included during
  * runtime. Added methods can be both for instances or static scopes.
- * @package Zettacast\Helper
+ * @package Zettacast\Contract
  */
-trait Extensor
+trait ExtensorTrait
 {
 	/**
 	 * The registered string functions.

@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Helper\Facade trait file.
+ * Zettacast\Helper\Facade abstract class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -9,12 +9,12 @@
 namespace Zettacast\Helper;
 
 /**
- * Implements methods that allow class to become a façade. This trait turns
- * the object it is used within into an another object instance, so this
- * instance can be accessed by the usage of static methods.
+ * Implements methods that allow class to become a façade. This abstraction
+ * turns the inherited object into an another class instance, so this instance
+ * can be accessed by the usage of static methods.
  * @package Zettacast\Helper
  */
-trait Facade
+abstract class Facade
 {
 	/**
 	 * Façaded object instance. This is the instance to be called when using a
