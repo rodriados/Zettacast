@@ -59,10 +59,10 @@ final class Autoload
 	 * @param LoaderInterface $loader Target to check whether registered.
 	 * @return bool Is loader already registered?
 	 */
-	public function inStack(LoaderInterface $loader)
+	public function isRegistered(LoaderInterface $loader)
 	{
 		return isset($this->loaders[$hash = spl_object_hash($loader)])
-			and $this->loaders[$hash];
+			&& $this->loaders[$hash];
 	}
 	
 	/**
@@ -74,7 +74,7 @@ final class Autoload
 	 */
 	public function register(LoaderInterface $loader)
 	{
-		if($this->inStack($loader)) {
+		if($this->isRegistered($loader)) {
 			return false;
 		}
 		
@@ -88,7 +88,7 @@ final class Autoload
 	 */
 	public function unregister(LoaderInterface $loader)
 	{
-		if($this->inStack($loader)) {
+		if($this->isRegistered($loader)) {
 			unset($this->loaders[spl_object_hash($loader)]);
 			spl_autoload_unregister([$loader, 'load']);
 		}
