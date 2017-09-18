@@ -1,12 +1,14 @@
 <?php
 /**
- * Zettacast\Collection\QueueInterface interface file.
+ * Zettacast\Contract\Collection\QueueInterface interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Collection;
+namespace Zettacast\Contract\Collection;
+
+use Zettacast\Contract\ListableInterface;
 
 /**
  * Queue interface. This interface exposes all methods needed for a class

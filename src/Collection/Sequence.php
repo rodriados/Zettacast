@@ -8,7 +8,8 @@
  */
 namespace Zettacast\Collection;
 
-use Zettacast\Collection\Concerns\ArrayAccessTrait;
+use Zettacast\Contract\ArrayAccessTrait;
+use Zettacast\Contract\Collection\SequenceInterface;
 
 /**
  * Sequence class. This class has methods appliable for all kinds of sequences.
@@ -16,7 +17,7 @@ use Zettacast\Collection\Concerns\ArrayAccessTrait;
  * @package Zettacast\Collection
  * @version 1.0
  */
-class Sequence implements SequenceInterface
+class Sequence implements SequenceInterface, \ArrayAccess
 {
 	use ArrayAccessTrait;
 	
@@ -58,7 +59,7 @@ class Sequence implements SequenceInterface
 	 * @param mixed $default Default value as fallback.
 	 * @return mixed Element stored in given index.
 	 */
-	public function get(int $index, $default = null)
+	public function get($index, $default = null)
 	{
 		return $this->has($index)
 			? $this->data[$index]
@@ -70,7 +71,7 @@ class Sequence implements SequenceInterface
 	 * @param int $index Index to be checked.
 	 * @return bool Does given index exist?
 	 */
-	public function has(int $index): bool
+	public function has($index): bool
 	{
 		return isset($this->data[$index]);
 	}
@@ -81,7 +82,7 @@ class Sequence implements SequenceInterface
 	 * @param mixed $value Value to be stored in index.
 	 * @return $this Sequence for method chaining.
 	 */
-	public function set(int $index, $value)
+	public function set($index, $value)
 	{
 		if($index <= $this->count())
 			$this->data->add($index, $value);
@@ -94,7 +95,7 @@ class Sequence implements SequenceInterface
 	 * @param mixed $index Index to be removed.
 	 * @return $this Sequence for method chaining.
 	 */
-	public function del(int $index)
+	public function del($index)
 	{
 		if($this->has($index))
 			unset($this->data[$index]);

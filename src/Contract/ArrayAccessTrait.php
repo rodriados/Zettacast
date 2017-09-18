@@ -1,33 +1,23 @@
 <?php
 /**
- * Zettacast\Collection\Concerns\ArrayAccessTrait trait file.
+ * Zettacast\Contract\ArrayAccessTrait trait file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Collection\Concerns;
+namespace Zettacast\Contract;
 
 /**
  * This trait implements methods needed for a class to allow array-like access
  * to its contents.
- * @package Zettacast\Collection
+ * @package Zettacast\Contract
  * @version 1.0
  */
 trait ArrayAccessTrait
 {
 	/**
-	 * Checks whether an offset exists in collection.
-	 * @param mixed $offset Offset to be checked.
-	 * @return bool Does the offset exist?
-	 */
-	final public function offsetExists($offset): bool
-	{
-		return $this->has($offset);
-	}
-	
-	/**
-	 * Access data in collection using array notation.
+	 * Access data in object using array notation.
 	 * @param mixed $offset Offset to be accessed.
 	 * @return mixed Offset value.
 	 */
@@ -37,7 +27,17 @@ trait ArrayAccessTrait
 	}
 	
 	/**
-	 * Sets data in collection using array notation.
+	 * Checks whether an offset exists in the object.
+	 * @param mixed $offset Offset to be checked.
+	 * @return bool Does the offset exist?
+	 */
+	final public function offsetExists($offset): bool
+	{
+		return $this->has($offset);
+	}
+	
+	/**
+	 * Sets data in object using array notation.
 	 * @param mixed $offset Offset to be set.
 	 * @param mixed $value Data to be saved.
 	 */
@@ -47,7 +47,7 @@ trait ArrayAccessTrait
 	}
 	
 	/**
-	 * Erases data in collection using array notation.
+	 * Deletes data from the object using array notation.
 	 * @param mixed $offset Offset to be erased.
 	 */
 	final public function offsetUnset($offset)
@@ -56,7 +56,7 @@ trait ArrayAccessTrait
 	}
 	
 	/**
-	 * Gets an element stored in collection.
+	 * Gets an element stored in object.
 	 * @param mixed $key Key of requested element.
 	 * @return mixed Requested element or default fallback.
 	 */
@@ -70,16 +70,16 @@ trait ArrayAccessTrait
 	abstract public function has($key): bool;
 	
 	/**
-	 * Removes an element from collection.
-	 * @param mixed $key Key to be removed.
-	 */
-	abstract public function del($key);
-	
-	/**
 	 * Sets a value to the given key.
 	 * @param mixed $key Key to created or updated.
 	 * @param mixed $value Value to be stored in key.
 	 */
 	abstract public function set($key, $value);
+	
+	/**
+	 * Deletes an element from object.
+	 * @param mixed $key Key to be removed.
+	 */
+	abstract public function del($key);
 	
 }

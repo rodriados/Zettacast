@@ -1,23 +1,23 @@
 <?php
 /**
- * Zettacast\Collection\Concerns\ObjectAccessTrait trait file.
+ * Zettacast\Contract\ObjectAccessTrait trait file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Collection\Concerns;
+namespace Zettacast\Contract;
 
 /**
  * This trait implements methods needed for a class to allow object-like access
  * to its contents.
- * @package Zettacast\Collection
+ * @package Zettacast\Contract
  * @version 1.0
  */
 trait ObjectAccessTrait
 {
 	/**
-	 * Access data in collection using array notation.
+	 * Access data in object using object notation.
 	 * @param mixed $key Offset to be accessed.
 	 * @return mixed Offset value.
 	 */
@@ -27,7 +27,7 @@ trait ObjectAccessTrait
 	}
 	
 	/**
-	 * Checks whether an offset exists in collection.
+	 * Checks whether an offset exists in the object.
 	 * @param mixed $key Offset to be checked.
 	 * @return bool Does the offset exist?
 	 */
@@ -37,7 +37,7 @@ trait ObjectAccessTrait
 	}
 	
 	/**
-	 * Sets data in collection using array notation.
+	 * Sets data in object using object notation.
 	 * @param mixed $key Offset to be set.
 	 * @param mixed $value Data to be saved.
 	 */
@@ -47,7 +47,7 @@ trait ObjectAccessTrait
 	}
 	
 	/**
-	 * Erases data in collection using array notation.
+	 * Deletes data from object using object notation.
 	 * @param mixed $key Offset to be erased.
 	 */
 	final public function __unset($key)
@@ -56,7 +56,7 @@ trait ObjectAccessTrait
 	}
 	
 	/**
-	 * Get an element stored in collection.
+	 * Gets an element stored in object.
 	 * @param mixed $key Key of requested element.
 	 * @return mixed Requested element or default fallback.
 	 */
@@ -70,16 +70,16 @@ trait ObjectAccessTrait
 	abstract public function has($key): bool;
 	
 	/**
-	 * Removes an element from collection.
-	 * @param mixed $key Key to be removed.
-	 */
-	abstract public function del($key);
-	
-	/**
 	 * Sets a value to the given key.
 	 * @param mixed $key Key to created or updated.
 	 * @param mixed $value Value to be stored in key.
 	 */
 	abstract public function set($key, $value);
+	
+	/**
+	 * Deletes an element from object.
+	 * @param mixed $key Key to be removed.
+	 */
+	abstract public function del($key);
 	
 }

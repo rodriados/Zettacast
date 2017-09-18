@@ -8,8 +8,9 @@
  */
 namespace Zettacast\Collection;
 
-use Zettacast\Collection\Concerns\ArrayAccessTrait;
-use Zettacast\Collection\Concerns\ObjectAccessTrait;
+use Zettacast\Contract\ArrayAccessTrait;
+use Zettacast\Contract\ObjectAccessTrait;
+use Zettacast\Contract\Collection\CollectionInterface;
 
 /**
  * Collection class. This class has methods appliable for all kinds of

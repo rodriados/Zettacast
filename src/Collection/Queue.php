@@ -8,6 +8,8 @@
  */
 namespace Zettacast\Collection;
 
+use Zettacast\Contract\Collection\QueueInterface;
+
 /**
  * Queue class. This class has methods appliable for all kinds of queues. Only
  * integer key types are acceptable.
