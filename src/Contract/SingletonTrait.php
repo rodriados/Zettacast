@@ -34,7 +34,7 @@ trait SingletonTrait
 	{
 		if(!isset(self::$instance)) {
 			self::$instance = new static;
-			zetta()->share(static::class, self::$instance);
+			zetta()->set(static::class, self::$instance);
 		}
 		
 		return self::$instance;

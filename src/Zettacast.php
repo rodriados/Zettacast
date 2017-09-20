@@ -8,18 +8,17 @@
  */
 namespace Zettacast;
 
-use Zettacast\Helper\Singleton;
 use Zettacast\Injector\Injector;
+use Zettacast\Contract\SingletonTrait;
 
 /**
  * Boots framework and starts its main classes and modules, allowing its
  * correct usage and execution.
  * @version 1.0
  */
-final class Zettacast
-	extends Injector
+final class Zettacast extends Injector
 {
-	use Singleton;
+	use SingletonTrait;
 	
 	/**
 	 * Informs Zettacast current version.
@@ -59,13 +58,13 @@ final class Zettacast
 	{
 		parent::__construct();
 		
-		$this->share('path', $root.'/app');
-		$this->share('path.base', $root);
-		$this->share('path.public', $root.'/public');
-		$this->share('path.zetta', $root.'/src');
+		$this->set('path', $root.'/app');
+		$this->set('path.base', $root);
+		$this->set('path.public', $root.'/public');
+		$this->set('path.zetta', $root.'/src');
 		
-		$this->share(self::class, $this);
-		$this->share(Injector::class, $this);
+		$this->set(self::class, $this);
+		$this->set(Injector::class, $this);
 	}
 	
 	/**
@@ -83,7 +82,7 @@ final class Zettacast
 		#set_exception_handler([Handler::class, 'exception']);
 		#register_shutdown_function([Handler::class, 'shutdown']);
 		
-		$this->share('mode', isset($_SERVER['argv']) ? self::CLI : self::APP);
+		$this->set('mode', isset($_SERVER['argv']) ? self::CLI : self::APP);
 	}
 	
 }

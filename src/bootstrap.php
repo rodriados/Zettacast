@@ -47,7 +47,7 @@ $loader = new Zettacast\Autoload\Autoload;
  * their instances built with dependency injection, that is, you will not need
  * to be worried with instantiating complex objects: we can do it for you.
  */
-zetta()->share(Zettacast\Autoload\Autoload::class, $loader);
+zetta()->set(Zettacast\Autoload\Autoload::class, $loader);
 
 /*
  * Creates all needed bindings for framework's dependency injector. This will

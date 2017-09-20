@@ -10,27 +10,27 @@
 zetta()
 
 # Injector module
-->alias('injector', 'Zettacast\Injector\Injector')
+->bind('injector', 'Zettacast\Injector\Injector')
 ->bind('Zettacast\Injector\InjectorInterface', 'Zettacast\Injector\Injector')
 
 # Autoload module
-->alias('autoload', 'Zettacast\Autoload\Autoload')
+->bind('autoload', 'Zettacast\Autoload\Autoload')
 
 # Collection module
-->alias('dot', 'Zettacast\Collection\Dot')
-->alias('queue', 'Zettacast\Collection\Queue')
-->alias('stack', 'Zettacast\Collection\Stack')
-->alias('sequence', 'Zettacast\Collection\Sequence')
-->alias('collection', 'Zettacast\Collection\Collection')
+->bind('queue', 'Zettacast\Collection\Queue')
+->bind('stack', 'Zettacast\Collection\Stack')
+->bind('dot', 'Zettacast\Collection\DotCollection')
+->bind('sequence', 'Zettacast\Collection\Sequence')
+->bind('collection', 'Zettacast\Collection\Collection')
 
 # Config module
-->alias('config', 'Zettacast\Config\Warehouse')
+->bind('config', 'Zettacast\Config\Warehouse')
 
 # Filesystem module
-->alias('file', 'Zettacast\Filesystem\File')
-->alias('info', 'Zettacast\Filesystem\Info')
-->alias('stream', 'Zettacast\Filesystem\Stream\Stream')
-->alias('filesystem', 'Zettacast\Filesystem\Filesystem')
+->bind('file', 'Zettacast\Filesystem\File')
+->bind('info', 'Zettacast\Filesystem\Info')
+->bind('stream', 'Zettacast\Filesystem\Stream\Stream')
+->bind('filesystem', 'Zettacast\Filesystem\Filesystem')
 ->bind('Zettacast\Contract\Filesystem\Driver', 'Zettacast\Filesystem\Driver\Local')
 ->bind('Zettacast\Contract\Filesystem\Stream', 'Zettacast\Filesystem\Stream\Stream')
 

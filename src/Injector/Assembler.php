@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Injector\Builder class file.
+ * Zettacast\Injector\Assembler class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -9,64 +9,41 @@
 namespace Zettacast\Injector;
 
 use Zettacast\Collection\Stack;
-use Zettacast\Collection\CollectionInterface;
-use Zettacast\Injector\Exception\NotResolvableException;
-use Zettacast\Injector\Exception\NotInstantiableException;
+use Zettacast\Contract\Injector\InjectorInterface;
+use Zettacast\Exception\Injector\InjectorException;
 
 /**
- * The builder class is responsible for directly handling dependency injection.
- * This class tries to create new object instances and directly injects any
- * given dependency if needed.
+ * The assembler class is responsible for directly handling dependency
+ * injection, and assembling object instances. This class tries to create new
+ * object instances and directly injects any given dependency if needed.
  * @package Zettacast\Injector
  * @version 1.0
  */
-class Builder
+class Assembler
 {
 	/**
-	 * Collection of shared data. Objects or any kind of data can be shared in
-	 * the injector. Shared objects will be instantiated only once.
-	 * @var CollectionInterface Shared data collection.
-	 */
-	protected $shared;
-	
-	/**
 	 * Currently active injector instance. This object will be responsible for
-	 * handling any abstraction the builder may find.
-	 * @var Injector Currently active injector instance.
+	 * resolving any abstractions the assembler may find.
+	 * @var InjectorInterface Currently active injector instance.
 	 */
 	protected $injector;
 	
 	/**
 	 * Building stack. This stack, registers all objects being currently built
-	 * in this builder.
+	 * in this assembler.
 	 * @var Stack Building stack.
 	 */
 	private $stack;
 	
 	/**
-	 * Builder constructor. This constructor simply sets all properties to
+	 * Assembler constructor. This constructor simply sets all properties to
 	 * the received parameters or empty objects.
 	 * @param InjectorInterface $injector Currently active injector instance.
-	 * @param CollectionInterface $shared Collection of shared objects.
 	 */
-	public function __construct(
-		InjectorInterface $injector,
-		CollectionInterface &$shared
-	) {
-		$this->injector = $injector;
-		$this->shared = &$shared;
-		$this->stack = new Stack;
-	}
-	
-	/**
-	 * Initializes a new building stack, discarding any remanescent object from
-	 * previous unsuccessful builds.
-	 * @return $this Builder for method chaining.
-	 */
-	public function init()
+	public function __construct(InjectorInterface $injector)
 	{
-		$this->stack->clear();
-		return $this;
+		$this->injector = $injector;
+		$this->stack = new Stack;
 	}
 	
 	/**
@@ -77,26 +54,25 @@ class Builder
 	 */
 	public function make(string $abstract, array $params = [])
 	{
-		$abstract = $this->injector->identify($abstract);
+		$bond = $this->stack->empty()
+			? $this->injector->resolve($abstract)
+			: $this->injector->when($this->stack->peek())->resolve($abstract);
 		
-		$context = !$this->stack->empty()
-			? $this->injector->when($this->stack->peek())->resolve($abstract)
-			: null;
-
-		if(!$context && $this->shared->has($abstract))
-			return $this->shared->get($abstract);
+		$concrete = $bond->concrete ?? $abstract;
+		$context = $bond->context ?? false;
+		$shared = $bond->shared ?? false;
 		
-		$info = $context ?? $this->injector->resolve($abstract);
-		$concrete = $info ? $info->concrete : $abstract;
+		if(!$context && $this->injector->has($concrete))
+			return $this->injector->get($concrete);
 		
 		$object = !is_callable($concrete)
 			? $abstract == $concrete
 				? $this->build($concrete, $params)
 				: $this->make($concrete, $params)
 			: $concrete($this->injector, ...$params);
-		
-		if(!$context && $info && $info->shared)
-			$this->shared->set($abstract, $object);
+	
+		if(!$context && $shared)
+			$this->injector->set($abstract, $object);
 		
 		return $object;
 	}
@@ -106,18 +82,29 @@ class Builder
 	 * @param callable $fn Function to be wrapped.
 	 * @param array $outer Parameters to be used when invoked.
 	 * @return \Closure Wrapped function.
+	 * @throws InjectorException The given method cannot be wrapped.
 	 */
 	public function wrap(callable $fn, array $outer = []): \Closure
 	{
-		$reflector = is_string($fn) && strpos($fn, '::') !== false
-			? new \ReflectionMethod(...explode('::', $fn))
+		$reflect = is_array($fn)
+			? new \ReflectionMethod(...$fn)
 			: new \ReflectionFunction($fn);
-
-		return function(array $inner = []) use($reflector, $outer) {
-			return $reflector->invokeArgs($this->resolve(
-				$reflector->getParameters(),
-				array_merge($outer, $inner)
-			));
+		
+		if($reflect instanceof \ReflectionMethod
+		   && !$reflect->isStatic() && !is_object($fn[0]))
+			throw InjectorException::requiredInstance(...$fn);
+			
+		$call = $reflect instanceof \ReflectionMethod
+			? [$reflect->isStatic() ? null : $fn[0]]
+			: [];
+		
+		return function(array $inner = []) use($reflect, $outer, $call) {
+			$this->stack->push($reflect->name);
+			$args = array_merge($inner, $outer);
+			$call[] = $this->resolve($reflect->getParameters(), $args);
+			$this->stack->pop();
+			
+			return $reflect->invokeArgs(...$call);
 		};
 	}
 	
@@ -126,24 +113,23 @@ class Builder
 	 * @param string $concrete Type to be instantiated.
 	 * @param array $params Parameters to be used when instantiating.
 	 * @return mixed Resolved and dependency injected object.
-	 * @throws NotInstantiableException Type is not instantiable.
-	 * @throws NotResolvableException The dependency cannot be resolved.
+	 * @throws InjectorException The object could not be assembled.
 	 */
 	protected function build(string $concrete, array $params = [])
 	{
-		$reflector = new \ReflectionClass($concrete);
+		$reflect = new \ReflectionClass($concrete);
 		
-		if(!$reflector->isInstantiable())
-			throw new NotInstantiableException($concrete);
+		if(!$reflect->isInstantiable())
+			throw InjectorException::notInstantiable($concrete);
 		
-		if(is_null($constructor = $reflector->getConstructor()))
-			return $reflector->newInstance();
+		if(is_null($constructor = $reflect->getConstructor()))
+			return $reflect->newInstance();
 		
 		$this->stack->push($concrete);
 		$argv = $this->resolve($constructor->getParameters(), $params);
 		$this->stack->pop();
 		
-		return $reflector->newInstanceArgs($argv);
+		return $reflect->newInstanceArgs($argv);
 	}
 	
 	/**
@@ -171,39 +157,41 @@ class Builder
 	 * Tries to resolve a primitive dependency.
 	 * @param \ReflectionParameter $param Parameter to be resolved.
 	 * @return mixed Resolved primitive.
-	 * @throws NotResolvableException Primitive value could not be resolved.
+	 * @throws InjectorException Parameter could not be resolved.
 	 */
 	private function buildPrimitive(\ReflectionParameter $param)
 	{
 		$context = $this->stack->peek();
 		$info = $this->injector->when($context)->resolve('$'.$param->name);
 		
-		if(!is_null($info))
-			return is_callable($info->concrete)
+		if(isset($info->concrete))
+			return $info->concrete instanceof \Closure
 				? ($info->concrete)($this->injector)
-				: $this->make($info->concrete);
+				: $info->concrete;
 		
 		if($param->isDefaultValueAvailable())
 			return $param->getDefaultValue();
 			
-		throw new NotResolvableException($param);
+		$this->stack->pop();
+		throw InjectorException::notResolvable($context, $param->name);
 	}
 	
 	/**
 	 * Tries to resolve an object dependency.
 	 * @param \ReflectionParameter $param Parameter to be resolved.
 	 * @return mixed Resolved object.
-	 * @throws NotResolvableException Dependency could not be resolved.
+	 * @throws InjectorException Exception thrown resolving parameter.
 	 */
 	private function buildObject(\ReflectionParameter $param)
 	{
 		try {
 			return $this->make($param->getClass()->getName());
-		} catch(\Exception $e) {
+		} catch(InjectorException $e) {
 			if($param->isOptional())
 				return $param->getDefaultValue();
 			
-			throw new NotResolvableException($param, $e);
+			$this->stack->pop();
+			throw $e;
 		}
 	}
 	

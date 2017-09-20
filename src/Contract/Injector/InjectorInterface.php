@@ -1,33 +1,22 @@
 <?php
 /**
- * Zettacast\Injector\InjectorInterface interface file.
+ * Zettacast\Contract\Injector\InjectorInterface interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Injector;
+namespace Zettacast\Contract\Injector;
+
+use Zettacast\Contract\StorageInterface;
 
 /**
  * This interface declares all needed methods for a properly working injector.
  * @package Zettacast\Injector
  * @version 1.0
  */
-interface InjectorInterface extends BinderInterface
+interface InjectorInterface extends StorageInterface, BinderInterface
 {
-	/**
-	 * Creates a new object alias.
-	 * @param string $alias Alias to be used for abstraction.
-	 * @param string $abstract Abstraction to be aliased.
-	 */
-	public function alias(string $alias, string $abstract);
-	
-	/**
-	 * Drops all data related to an abstraction.
-	 * @param string $abstract Abstraction to be forgotten.
-	 */
-	public function drop(string $abstract);
-	
 	/**
 	 * Creates a factory for the given abstraction.
 	 * @param string $abstract Abstraction to be wrapped.
@@ -35,13 +24,6 @@ interface InjectorInterface extends BinderInterface
 	 * @return \Closure Factory for abstraction.
 	 */
 	public function factory(string $abstract, array $outer = []): \Closure;
-	
-	/**
-	 * Reverses a chain of alias and returns real name.
-	 * @param string $alias Alias to be reversed.
-	 * @return mixed Unaliased abstraction name.
-	 */
-	public function identify(string $alias);
 	
 	/**
 	 * Resolve the given abstraction and inject dependencies if needed.
@@ -52,17 +34,11 @@ interface InjectorInterface extends BinderInterface
 	public function make(string $abstract, array $params = []);
 	
 	/**
-	 * Shares an existing instance to injector.
-	 * @param string $abstract Abstraction to be resolved.
-	 * @param mixed $instance Shared instance to registered.
+	 * Informs the building context to which binding operations are related to.
+	 * @param string $scope Creation scope to which binding is applied.
+	 * @return BinderInterface Binder responsible for the given context.
 	 */
-	public function share(string $abstract, $instance);
-	
-	/**
-	 * Unregisters an alias.
-	 * @param string $alias Alias name to be unregistered.
-	 */
-	public function unalias(string $alias);
+	public function when(string $scope): BinderInterface;
 	
 	/**
 	 * Wraps a function and solves all of its dependencies.

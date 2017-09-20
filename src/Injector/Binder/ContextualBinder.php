@@ -1,12 +1,14 @@
 <?php
 /**
- * Zettacast\Injector\ContextBinder class file.
+ * Zettacast\Injector\Binder\ContextualBinder class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Injector;
+namespace Zettacast\Injector\Binder;
+
+use Zettacast\Contract\Injector\BinderInterface;
 
 /**
  * The Context binder class is responsible for linking abstractions to
@@ -16,8 +18,14 @@ namespace Zettacast\Injector;
  * @package Zettacast\Injector
  * @version 1.0
  */
-class ContextBinder implements BinderInterface
+class ContextualBinder implements BinderInterface
 {
+	/**
+	 * Creation scope to which abstractions will be bound to.
+	 * @var string Target binding creation scope.
+	 */
+	protected $scope;
+	
 	/**
 	 * Abstraction binder. This binder will be manipulated so all scoped
 	 * bindings are stored in the same place as normal bindings, just in a
@@ -25,12 +33,6 @@ class ContextBinder implements BinderInterface
 	 * @var BinderInterface Abstraction binder object.
 	 */
 	protected $binder;
-	
-	/**
-	 * Creation scope to which abstractions will be bound to.
-	 * @var string Target binding creation scope.
-	 */
-	protected $scope;
 	
 	/**
 	 * Scoped binder constructor. This constructor receives a real binder
@@ -45,16 +47,19 @@ class ContextBinder implements BinderInterface
 	}
 	
 	/**
-	 * Creates a new abstraction binding, allowing for them to be instantiated.
-	 * @param string $abstract Abstraction to be bound.
-	 * @param string|\Closure $concrete Concrete object to abstraction.
-	 * @param bool $shared Should abstraction become a singleton?
-	 * @return $this Binder for method chaining.
+	 * Gets the concrete type for a given abstraction.
+	 * @param string $abstract Abstraction to be concretized.
+	 * @return object Object containing concrete and sharing info.
 	 */
-	public function bind(string $abstract, $concrete, bool $shared = false)
+	public function resolve(string $abstract)
 	{
-		$this->binder->bind($abstract.'@'.$this->scope, $concrete, $shared);
-		return $this;
+		while(is_scalar($abstract) && $this->knows($abstract)) {
+			$result = $this->binder->resolve($abstract.'@'.$this->scope)
+				?? $this->binder->resolve($abstract);
+			$abstract = $result->concrete;
+		}
+		
+		return $result ?? null;
 	}
 	
 	/**
@@ -62,19 +67,23 @@ class ContextBinder implements BinderInterface
 	 * @param string $abstract Abstraction to be checked.
 	 * @return bool Is abstract bound?
 	 */
-	public function isBound(string $abstract): bool
+	public function knows(string $abstract): bool
 	{
-		return $this->binder->isBound($abstract.'@'.$this->scope);
+		return $this->binder->knows($abstract.'@'.$this->scope)
+			|| $this->binder->knows($abstract);
 	}
 	
 	/**
-	 * Gets the concrete type for a given abstraction.
-	 * @param string $abstract Abstraction to be concretized.
-	 * @return mixed Object containing concrete and sharing info.
+	 * Creates a new abstraction binding, allowing for them to be instantiated.
+	 * @param string $abstract Abstraction to be bound.
+	 * @param string|\Closure $concrete Concrete object to abstraction.
+	 * @param bool $shared Not used by contextual binding. Always false.
+	 * @return $this Binder for method chaining.
 	 */
-	public function resolve(string $abstract)
+	public function bind(string $abstract, $concrete, bool $shared = false)
 	{
-		return $this->binder->resolve($abstract.'@'.$this->scope);
+		$this->binder->bind($abstract.'@'.$this->scope, $concrete, false);
+		return $this;
 	}
 	
 	/**
