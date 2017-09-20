@@ -79,7 +79,8 @@ final class Autoload extends Facade
 	}
 	
 	/**
-	 * Allows aliased objects to be removed from loader.
+	 * Allows aliased objects to be removed from loader. The alias will only be
+	 * removed if no aliased instance has been created yet.
 	 * @param string|array $target Aliases to be removed from loader.
 	 */
 	public static function delAlias($target)
@@ -90,7 +91,8 @@ final class Autoload extends Facade
 	}
 	
 	/**
-	 * Allows object mappings to be removed from loader.
+	 * Allows object mappings to be removed from loader. The mapping will only
+	 * be removed if it has not been used yet.
 	 * @param string|array $target Mappings to be removed from loader.
 	 */
 	public static function delClass($target)
@@ -101,7 +103,8 @@ final class Autoload extends Facade
 	}
 	
 	/**
-	 * Allows namespace mappings to be removed from loader.
+	 * Allows namespace mappings to be removed from loader. The mapping will
+	 * only be removed for classes that have not been instantiated yet.
 	 * @param string|array $target Mappings to be removed from loader.
 	 */
 	public static function delNamespace($target)

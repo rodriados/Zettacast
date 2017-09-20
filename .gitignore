@@ -1,8 +1,10 @@
 *~
 *.bak
 Thumbs.db
-.DS_Store
-.idea
-.ini
+.DS_Store/
+.idea/
+*.ini
+*.phar
 resource/
+build/
 tmp/

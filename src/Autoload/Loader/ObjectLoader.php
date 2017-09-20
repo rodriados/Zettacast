@@ -55,16 +55,6 @@ class ObjectLoader implements LoaderInterface
 	}
 	
 	/**
-	 * Resets the loader to its initial state.
-	 * @return $this Object loader for method chaining.
-	 */
-	public function reset()
-	{
-		$this->data->clear();
-		return $this;
-	}
-	
-	/**
 	 * Registers a new object file.
 	 * @param string $obj Object name to be registered.
 	 * @param string $file File in which object can be found.

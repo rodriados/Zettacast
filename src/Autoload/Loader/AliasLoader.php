@@ -50,16 +50,6 @@ class AliasLoader implements LoaderInterface
 	}
 	
 	/**
-	 * Resets the loader to its initial state.
-	 * @return $this Alias loader for method chaining.
-	 */
-	public function reset()
-	{
-		$this->data->clear();
-		return $this;
-	}
-	
-	/**
 	 * Registers a new alias.
 	 * @param string $alias Aliased name to be registered.
 	 * @param string $target Original name the alias refers to.

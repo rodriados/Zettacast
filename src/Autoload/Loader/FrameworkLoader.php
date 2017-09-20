@@ -69,15 +69,6 @@ final class FrameworkLoader implements LoaderInterface
 	}
 	
 	/**
-	 * Resets the loader to its initial state.
-	 * @return self Framework loader for method chaining.
-	 */
-	public function reset()
-	{
-		return $this;
-	}
-	
-	/**
 	 * Tries to load an invoked and not yet loaded class. This method will only
 	 * search for files on the framework source and application directories.
 	 * @param array $name Class to be loaded exploded to qualified names.

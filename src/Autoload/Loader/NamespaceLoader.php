@@ -68,16 +68,6 @@ class NamespaceLoader implements LoaderInterface
 	}
 	
 	/**
-	 * Resets the loader to its initial state.
-	 * @return $this Space loader for method chaining.
-	 */
-	public function reset()
-	{
-		$this->data->clear();
-		return $this;
-	}
-	
-	/**
 	 * Registers a new namespace folder.
 	 * @param string $space Namespace to be registered.
 	 * @param string $folder Folder containing namespace's objects.

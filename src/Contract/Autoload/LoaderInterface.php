@@ -22,9 +22,4 @@ interface LoaderInterface
 	 */
 	public function load(string $class): bool;
 	
-	/**
-	 * Resets the loader to its initial state.
-	 */
-	public function reset();
-	
 }
