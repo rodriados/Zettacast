@@ -71,9 +71,6 @@ final class InjectorTest extends \PHPUnit\Framework\TestCase
 		$this->assertInstanceOf(A::class, $r[0]);
 		$this->assertEquals($r[1], 57.48);
 		$this->assertEquals($f([null,100.18])[1], 100.18);
-		
-		$this->expectException(InjectorException::class);
-		$f = zetta()->wrap([D::class, 'instanceF'], [null, 57.48]);
 	}
 	
 	public function testExceptionUninstantiable()
