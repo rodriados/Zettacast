@@ -110,7 +110,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 */
 	public function all(): array
 	{
-		return $this->data;
+		return toArray($this->data);
 	}
 	
 	/**

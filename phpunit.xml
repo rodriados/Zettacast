@@ -1,14 +1,14 @@
 <phpunit colors="true" strict="true">
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src/Helper</directory>
+            <directory suffix=".php">./src/Exception</directory>
+            <directory suffix=".php">./src/Contract</directory>
             <directory suffix=".php">./src/Autoload</directory>
             <directory suffix=".php">./src/Collection</directory>
-            <directory suffix=".php">./src/Contract</directory>
-            <directory suffix=".php">./src/Exception</directory>
-            <directory suffix=".php">./src/Helper</directory>
             <directory suffix=".php">./src/Injector</directory>
             <file>./src/Facade/Autoload.php</file>
-            <file>./src/Zettacast.php</file>
+            <file>./src/Zettacast.php</file>-->
         </whitelist>
     </filter>
     <logging>
