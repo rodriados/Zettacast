@@ -63,7 +63,7 @@ final class FrameworkLoader implements LoaderInterface
 	{
 		$name = explode('\\', ltrim($class, '\\'));
 		
-		return $name[0] == ZETTACAST || $name == 'App'
+		return $name[0] == ZETTACAST || $name[0] == 'App'
 			? $this->loadInternal($name)
 			: $this->loadResource($name);
 	}
