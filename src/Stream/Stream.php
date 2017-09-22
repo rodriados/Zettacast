@@ -335,7 +335,7 @@ class Stream implements FilterableInterface
 	 * @param string $contents Initial stream contents.
 	 * @return StreamInterface The virtual stream instance.
 	 */
-	public function virtual(string $contents = null): StreamInterface
+	public static function virtual(string $contents = null): StreamInterface
 	{
 		$stream = new static('php://temp', 'r+');
 		
