@@ -13,14 +13,8 @@ namespace Zettacast\Contract;
  * the creation of a listable object.
  * @package Zettacast\Contract
  */
-interface ListableInterface extends \Countable, \Iterator
+interface ListableInterface extends ExtractableInterface, \Countable, \Iterator
 {
-	/**
-	 * Informs the object contents as a built-in array.
-	 * @return array List of object's contents.
-	 */
-	public function all(): array;
-	
 	/**
 	 * Clears the object and returns its old contents.
 	 * @return array Old object's contents before clearing.

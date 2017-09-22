@@ -138,7 +138,7 @@ class RecursiveCollection extends Collection
 	 */
 	public function reduce(callable $fn, $initial = null)
 	{
-		return array_reduce($this->flatten()->all(), $fn, $initial);
+		return array_reduce($this->flatten()->raw(), $fn, $initial);
 	}
 	
 	/**
