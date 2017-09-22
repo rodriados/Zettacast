@@ -1,19 +1,23 @@
 <?php
 /**
- * Zettacast\Filesystem\Stream\Filter class file.
+ * Zettacast\Stream\Filter class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Filesystem\Stream;
+namespace Zettacast\Stream;
+
+use Zettacast\Stream\Filter\ClosureFilter;
+use Zettacast\Contract\Stream\FilterInterface;
+use Zettacast\Exception\Stream\FilterException;
 
 /**
  * This class manages filters to be applied to streams.
- * @package Zettacast\Filesystem\Stream
+ * @package Zettacast\Stream
  * @version 1.0
  */
-class Filter
+class Filter implements FilterInterface
 {
 	/**
 	 * Parameter to be passed to filter object.
@@ -34,30 +38,43 @@ class Filter
 	private $instances;
 	
 	/**
-	 * Filter constructor.
-	 * @param string $filtername Filter name to applied to stream.
+	 * Filter constructor. If the given filtername is not yet registered, this
+	 * object will try to automatically register it. Closures are also accepted
+	 * by this filter manager.
+	 * @param string|\Closure $filter Filter to applied to stream.
 	 * @param mixed $param Parameter to be passed to filter.
+	 * @throws FilterException The given filter name is not known.
+	 * @see ClosureFilter
 	 */
-	public function __construct(string $filtername, $param = null)
+	public function __construct($filter, $param = null)
 	{
-		$this->param = $param;
-		$this->filtername = $filtername;
+		if($filter instanceof \Closure) {
+			$param = $filter;
+			$filter = ClosureFilter::class;
+		}
+		
+		if(!in_array($filter, self::list())) {
+			if(!class_exists($filter, true))
+				throw FilterException::isNotKnown($filter);
+			
+			self::register($filter, $filter);
+		}
+		
+		$this->filtername = $filter;
 		$this->instances = [];
+		$this->param = $param;
 	}
 	
 	/**
 	 * Appends filter to a stream.
 	 * @param resource $stream Stream to be filtered.
 	 * @param int $channel Stream channel to be filtered.
-	 * @return static Filter for method chaining.
+	 * @return $this Filter for method chaining.
 	 */
-	public function append($stream, int $channel = Stream::ALL)
+	public function append($stream, int $channel = self::ALL)
 	{
 		$this->instances[] = stream_filter_append(
-			$stream,
-			$this->filtername,
-			$channel,
-			$this->param
+			$stream, $this->filtername, $channel, $this->param
 		);
 		
 		return $this;
@@ -67,23 +84,20 @@ class Filter
 	 * Prepends filter to a stream.
 	 * @param resource $stream Stream to be filtered.
 	 * @param int $channel Stream channel to be filtered.
-	 * @return static Filter for method chaining.
+	 * @return $this Filter for method chaining.
 	 */
-	public function prepend($stream, int $channel = Stream::ALL)
+	public function prepend($stream, int $channel = self::ALL)
 	{
 		$this->instances[] = stream_filter_prepend(
-			$stream,
-			$this->filtername,
-			$channel,
-			$this->param
+			$stream, $this->filtername, $channel, $this->param
 		);
 		
 		return $this;
 	}
 	
 	/**
-	 * Removes all filter instances tracked by this object.
-	 * @return static Filter for method chaining.
+	 * Removes the filter from all streams it was applied to.
+	 * @return $this Filter for method chaining.
 	 */
 	public function remove()
 	{
@@ -97,7 +111,7 @@ class Filter
 	 * Retrieves a list of all currently available filters.
 	 * @return array List of registered filters.
 	 */
-	public static function list() : array
+	final public static function list(): array
 	{
 		return stream_get_filters();
 	}
@@ -108,7 +122,7 @@ class Filter
 	 * @param string $class Class responsible for responding to filter calls.
 	 * @return bool Was the filter successfully registered?
 	 */
-	public static function register(string $filter, string $class) : bool
+	final public static function register(string $filter, string $class): bool
 	{
 		return stream_filter_register($filter, $class);
 	}
