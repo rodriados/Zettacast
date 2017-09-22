@@ -16,7 +16,7 @@ final class CollectionTest extends \PHPUnit\Framework\TestCase
 		
 		$this->assertInstanceOf(Collection::class, $c1);
 		$this->assertInstanceOf(Collection::class, $c2);
-		$this->assertEquals($c2->all(), ['a' => 1, 'b' => 2]);
+		$this->assertEquals($c2->raw(), ['a' => 1, 'b' => 2]);
 		$this->assertEquals($c2['b'], 2);
 		$this->assertTrue(isset($c2['a']));
 		$this->assertFalse(isset($c2['c']));
@@ -29,7 +29,7 @@ final class CollectionTest extends \PHPUnit\Framework\TestCase
 		$this->assertInstanceOf(RecursiveCollection::class, $rec);
 		$this->assertFalse($rec->empty());
 		
-		$this->assertEquals($rec->collapse()->all(), [1,2,3,4,5,6,7,8,9]);
+		$this->assertEquals($rec->collapse()->raw(), [1,2,3,4,5,6,7,8,9]);
 	}
 	
 	public function testDotCollection()
@@ -60,15 +60,15 @@ final class CollectionTest extends \PHPUnit\Framework\TestCase
         ]);
 		
 		$plucked = $dot->pluck('name');
-		$this->assertEquals($plucked->all(), ['Catarina', 'Katrina', 'Irma']);
+		$this->assertEquals($plucked->raw(), ['Catarina', 'Katrina', 'Irma']);
 		
 		$plucked = $dot->pluck('name', 'year');
-		$this->assertEquals($plucked->all(), [2004 => 'Catarina', 2006 => 'Katrina', 2017 => 'Irma']);
+		$this->assertEquals($plucked->raw(), [2004 => 'Catarina', 2006 => 'Katrina', 2017 => 'Irma']);
 		
 		$filtered = $dot->filter(function($value): bool {
 			return is_string($value) && strpos($value, 't') !== false || is_array($value);
 		});
-		$this->assertEquals($filtered[0]->all(), ['name' => 'Catarina']);
+		$this->assertEquals($filtered[0]->raw(), ['name' => 'Catarina']);
 	}
 	
 	public function testQueue()
@@ -124,7 +124,7 @@ final class CollectionTest extends \PHPUnit\Framework\TestCase
 			return 2 * $value;
 		});
 		
-		$this->assertEquals($seq->all(), [0,2,4,6,8,10,12]);
+		$this->assertEquals($seq->raw(), [0,2,4,6,8,10,12]);
 		$this->assertEquals($seq->first(), 0);
 		$this->assertEquals($seq->last(), 12);
 		

@@ -47,7 +47,7 @@ if(!function_exists('toArray')) {
 	function toArray($data): array
 	{
 		if($data instanceof ListableInterface)
-			return $data->all();
+			return $data->raw();
 		
 		if($data instanceof Traversable)
 			return iterator_to_array($data);

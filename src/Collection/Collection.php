@@ -108,7 +108,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 * Returns all data stored in collection.
 	 * @return array All data stored in collection.
 	 */
-	public function all(): array
+	public function raw(): array
 	{
 		return toArray($this->data);
 	}

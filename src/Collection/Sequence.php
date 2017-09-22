@@ -107,7 +107,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	 * Returns all data stored in sequence.
 	 * @return array All data stored in sequence.
 	 */
-	public function all(): array
+	public function raw(): array
 	{
 		return toArray($this->data);
 	}
@@ -138,7 +138,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 		if($size <= 0)
 			return [];
 		
-		foreach(array_chunk($this->all(), $size) as $sequence)
+		foreach(array_chunk($this->raw(), $size) as $sequence)
 			$chunk[] = $this->new($sequence);
 		
 		return $chunk ?? [];
@@ -150,7 +150,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	 */
 	public function clear(): array
 	{
-		$ref = $this->all();
+		$ref = $this->raw();
 		$this->data = new \SplDoublyLinkedList;
 		
 		return $ref;
@@ -216,7 +216,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	public function except($keys)
 	{
 		return $this->new(
-			array_diff_key($this->all(), array_flip(toArray($keys)))
+			array_diff_key($this->raw(), array_flip(toArray($keys)))
 		);
 	}
 	
@@ -229,8 +229,8 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	public function filter(callable $fn = null)
 	{
 		return $this->new(is_null($fn)
-			? array_filter($this->all())
-			: array_filter($this->all(), $fn, ARRAY_FILTER_USE_BOTH)
+			? array_filter($this->raw())
+			: array_filter($this->raw(), $fn, ARRAY_FILTER_USE_BOTH)
 		);
 	}
 	
@@ -251,7 +251,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	public function intersect($items)
 	{
 		return $this->new(
-			array_intersect($this->all(), toArray($items))
+			array_intersect($this->raw(), toArray($items))
 		);
 	}
 	
@@ -291,7 +291,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	 */
 	public function map(callable $fn)
 	{
-		$target = $this->all();
+		$target = $this->raw();
 		
 		return $this->new(
 			array_map($fn, $target, array_keys($target))
@@ -306,7 +306,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	public function merge($items)
 	{
 		return $this->new(
-			array_merge($this->all(), array_values($items))
+			array_merge($this->raw(), array_values($items))
 		);
 	}
 	
@@ -328,7 +328,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	public function only($keys)
 	{
 		return $this->new(
-			array_intersect_key($this->all(), array_flip(toArray($keys)))
+			array_intersect_key($this->raw(), array_flip(toArray($keys)))
 		);
 	}
 	
@@ -398,7 +398,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 		if($sample >= $this->count())
 			return $this->shuffle();
 		
-		$keys = array_rand($this->all(), $sample);
+		$keys = array_rand($this->raw(), $sample);
 		return $this->only($keys);
 	}
 	
@@ -410,7 +410,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	 */
 	public function reduce(callable $fn, $initial = null)
 	{
-		return array_reduce($this->all(), $fn, $initial);
+		return array_reduce($this->raw(), $fn, $initial);
 	}
 	
 	/**
@@ -419,7 +419,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	 */
 	public function reverse()
 	{
-		return $this->new(array_reverse($this->all()));
+		return $this->new(array_reverse($this->raw()));
 	}
 	
 	/**
@@ -444,7 +444,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	{
 		$btt = $rotations > 0;
 		$rot = (abs($rotations) % $this->count()) * ($btt ? -1 : 1);
-		$arr = $this->all();
+		$arr = $this->raw();
 		
 		return $this->new(
 			array_merge(array_slice($arr, $rot), array_slice($arr, 0, $rot))
@@ -459,7 +459,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	 */
 	public function search($needle, bool $strict = false)
 	{
-		return array_search($needle, $this->all(), $strict);
+		return array_search($needle, $this->raw(), $strict);
 	}
 	
 	/**
@@ -477,7 +477,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	 */
 	public function shuffle()
 	{
-		$data = $this->all();
+		$data = $this->raw();
 		shuffle($data);
 
 		return $this->new($data);
@@ -491,7 +491,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	 */
 	public function slice(int $index, int $length = null)
 	{
-		return $this->new(array_slice($this->all(), $index, $length));
+		return $this->new(array_slice($this->raw(), $index, $length));
 	}
 	
 	/**
@@ -501,7 +501,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	 */
 	public function sort(callable $fn = null)
 	{
-		$data = $this->all();
+		$data = $this->raw();
 		is_null($fn) ? sort($data) : usort($data, $fn);
 		
 		return $this->new($data);

@@ -47,7 +47,7 @@ class Queue implements QueueInterface
 	 * Returns all data stored in queue.
 	 * @return array All data stored in queue.
 	 */
-	public function all(): array
+	public function raw(): array
 	{
 		return toArray($this->data);
 	}
@@ -58,7 +58,7 @@ class Queue implements QueueInterface
 	 */
 	public function clear(): array
 	{
-		$old = $this->all();
+		$old = $this->raw();
 		$this->data = new \SplDoublyLinkedList;
 		
 		return $old;
