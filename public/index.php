@@ -12,7 +12,7 @@
  * Sets error reporting level and display errors settings. It is recommended to
  * change these values when in production use.
  */
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
 error_reporting(~0);
 
 /*

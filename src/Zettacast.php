@@ -68,9 +68,9 @@ final class Zettacast
 		$this->share(self::class, $this);
 		$this->share(Injector::class, $this);
 		
-		set_error_handler([Handler::class, 'error']);
-		set_exception_handler([Handler::class, 'exception']);
-		register_shutdown_function([Handler::class, 'shutdown']);
+		set_error_handler([Handler::class, 'handleError']);
+		set_exception_handler([Handler::class, 'handleException']);
+		register_shutdown_function([Handler::class, 'handleShutdown']);
 		
 	}
 	

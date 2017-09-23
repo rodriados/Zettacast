@@ -8,33 +8,29 @@
  */
 namespace Zettacast\Exception;
 
-use Throwable;
-use Exception as BuiltinException;
-
-class Exception
-	extends BuiltinException
+/**
+ * This class is the base for all exceptions thrown by the framework. All of
+ * the application exceptions should inherit from this one, but that cannot be
+ * enforced by the framework.
+ * @package Zettacast\Exception
+ * @version 1.0
+ */
+class Exception extends \Exception
 {
-	private static $properties = [
-		'code'    => 'getCode',
-		'file'    => 'getFile',
-		'line'    => 'getLine',
-		'trace'   => 'getTrace',
-		'message' => 'getMessage',
-	];
-	
+	/**
+	 * Constructs a new Exception instance. Although public, the inherited
+	 * exceptions should all have static methods responsible for initializing
+	 * the messages carried by them, instead of directly constructing them.
+	 * @param string $msg The message carried by the exception.
+	 * @param int $code Exception code to be carried.
+	 * @param \Throwable $previous The previously thrown parent exception.
+	 */
 	final public function __construct(
 		string $msg = null,
 		int $code = null,
-		Throwable $previous = null
+		\Throwable $previous = null
 	) {
 		parent::__construct($msg, $code, $previous);
-	}
-	
-	public function __get(string $name)
-	{
-		return array_key_exists($name, self::$properties)
-			? $this->{self::$properties[$name]}()
-			: null;
 	}
 	
 }
