@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Filesystem\Driver\Local class file.
+ * Zettacast\Filesystem\Driver\LocalDriver class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -11,34 +11,19 @@ namespace Zettacast\Filesystem\Driver;
 use Zettacast\Filesystem\File;
 use Zettacast\Filesystem\Info;
 use Zettacast\Collection\Sequence;
-use Zettacast\Filesystem\Exception\MissingDirectory;
-use Zettacast\Contract\Filesystem\Stream as StreamContract;
-use Zettacast\Contract\Filesystem\Driver as DriverContract;
+use Zettacast\Contract\Stream\StreamInterface;
+use Zettacast\Contract\Filesystem\DriverInterface;
+use Zettacast\Contract\Collection\SequenceInterface;
+use Zettacast\Exception\Filesystem\FilesystemException;
 
 /**
  * Driver for local files. This driver handles all operations to the local
  * filesystem, where the framework is installed. It cannot handle files out of
  * the document root, though.
- * @method string basename(string $path = null)
- * @method string dirname(string $path = null)
- * @method bool executable(string $path = null)
- * @method string extension(string $path = null)
- * @method bool islink(string $path = null)
- * @method string mime(string $path = null)
- * @method Info parent(string $path = null)
- * @method string path(string $path = null)
- * @method int permissions(string $path = null)
- * @method bool readable(string $path = null)
- * @method string realpath(string $path = null)
- * @method int size(string $path = null)
- * @method int timestamp(string $path = null)
- * @method string type(string $path = null)
- * @method bool writable(string $path = null)
  * @package Zettacast\Filesystem
  * @version 1.0
  */
-class Local
-	implements DriverContract
+class LocalDriver implements DriverInterface
 {
 	/**
 	 * Driver root. All operations will use this directory as base, that is
@@ -50,7 +35,7 @@ class Local
 	/**
 	 * Local driver constructor.
 	 * @param string $root Root directory for all operations done in driver.
-	 * @throws MissingDirectory The path does not exist or can not be read.
+	 * @throws FilesystemException The path does not exist or cannot be read.
 	 */
 	public function __construct(string $root = DOCROOT)
 	{
@@ -58,18 +43,42 @@ class Local
 		$this->prefix = rtrim($root, '\\/');
 		
 		if(!$this->ensure($root))
-			throw new MissingDirectory($root);
+			throw FilesystemException::missingDirectory($root);
 	}
 	
 	/**
-	 * Retrieves metadata about a file or directory from driver.
-	 * @param string $name Name of metadata being retrieved.
-	 * @param array $args File path to be informed about.
-	 * @return mixed Retrieved metadata about path, or default return value.
+	 * Checks whether a path exists in the driver.
+	 * @param string $path Path to be checked.
+	 * @return bool Was the path found?
 	 */
-	public function __call(string $name, array $args)
+	public function has(string $path): bool
 	{
-		return $this->info($args[0] ?? null, $name);
+		$src = $this->prefix($path);
+		return file_exists($src);
+	}
+	
+	/**
+	 * Removes a file from driver.
+	 * @param string $path Path to file to be removed from driver.
+	 * @return bool Was file or directory successfully removed?
+	 */
+	public function remove(string $path): bool
+	{
+		$tgt = $this->prefix($path);
+		return @unlink($tgt);
+	}
+	
+	/**
+	 * Edits the permission information of the given path.
+	 * @param string $path Path to be editted.
+	 * @param int $perms Permission to be set to given path.
+	 * @return bool Was permission successfully executed?
+	 */
+	public function chmod(string $path, int $perms = 0777): bool
+	{
+		return $this->has($path)
+			? chmod($this->prefix($path), $perms)
+			: false;
 	}
 	
 	/**
@@ -78,7 +87,7 @@ class Local
 	 * @param string $target Path to which copy is created.
 	 * @return bool Was it possible to copy such a file?
 	 */
-	public function copy(string $path, string $target) : bool
+	public function copy(string $path, string $target): bool
 	{
 		if(!$this->has($path))
 			return false;
@@ -86,17 +95,6 @@ class Local
 		$src = $this->prefix($path);
 		$tgt = $this->prefix($target);
 		return $this->ensure(dirname($tgt)) && copy($src, $tgt);
-	}
-	
-	/**
-	 * Checks whether a path exists in the driver.
-	 * @param string $path Path to be checked.
-	 * @return bool Was the path found?
-	 */
-	public function has(string $path) : bool
-	{
-		$src = $this->prefix($path);
-		return file_exists($src);
 	}
 	
 	/**
@@ -108,6 +106,7 @@ class Local
 	public function info(string $path = null, string $data = null)
 	{
 		$src = $this->prefix($path ?? '.');
+		$data = !is_null($data) ? 'get'.$data : null;
 		
 		return !is_null($data)
 			? method_exists(Info::class, $data)
@@ -121,7 +120,7 @@ class Local
 	 * @param string $path Path to be checked.
 	 * @return bool Is path a directory?
 	 */
-	public function isdir(string $path) : bool
+	public function isDir(string $path): bool
 	{
 		$src = $this->prefix($path);
 		return is_dir($src);
@@ -132,7 +131,7 @@ class Local
 	 * @param string $path Path to be checked.
 	 * @return bool Is path a file?
 	 */
-	public function isfile(string $path) : bool
+	public function isFile(string $path): bool
 	{
 		$src = $this->prefix($path);
 		return is_file($src);
@@ -141,9 +140,9 @@ class Local
 	/**
 	 * Lists all files and directories contained in the given path.
 	 * @param string $dir Path to be listed.
-	 * @return Sequence All directory contents in the path.
+	 * @return SequenceInterface All directory contents in the path.
 	 */
-	public function list(string $dir = null) : Sequence
+	public function list(string $dir = null): SequenceInterface
 	{
 		if(!is_dir($src = $this->prefix($dir ?? '')))
 			return new Sequence;
@@ -157,7 +156,7 @@ class Local
 	 * @param int $perms Permission to be given to the new directory.
 	 * @return bool Was the directory successfully created?
 	 */
-	public function mkdir(string $path, int $perms = 0777) : bool
+	public function mkdir(string $path, int $perms = 0777): bool
 	{
 		$tgt = $this->prefix($path);
 		return !is_dir($tgt) && mkdir($tgt, $perms, true);
@@ -169,7 +168,7 @@ class Local
 	 * @param string $newpath The new name for target file or directory.
 	 * @return bool Was the file or directory successfully moved?
 	 */
-	public function move(string $path, string $newpath) : bool
+	public function move(string $path, string $newpath): bool
 	{
 		if(!$this->has($path))
 			return false;
@@ -183,27 +182,12 @@ class Local
 	 * Opens a file as a directly editable stream.
 	 * @param string $filename File to be opened.
 	 * @param string $mode Reading/writing mode the file should be opened in.
-	 * @return StreamContract The directly editable file handler.
+	 * @return StreamInterface The directly editable file handler.
 	 */
-	public function open(string $filename, string $mode = 'r') : StreamContract
+	public function open(string $filename, string $mode = 'r'): StreamInterface
 	{
 		$tgt = $this->prefix($filename);
 		return is_file($tgt) ? new File($tgt, $mode) : null;
-	}
-	
-	/**
-	 * Edits the permission information of the given path.
-	 * @param string $path Path to be editted.
-	 * @param int $perms Permission to be set to given path.
-	 * @return bool Was permission successfully executed?
-	 */
-	public function permission(string $path, int $perms = 0777) : bool
-	{
-		if(!$this->has($path))
-			return false;
-		
-		$tgt = $this->prefix($path);
-		return chmod($tgt, $perms);
 	}
 	
 	/**
@@ -211,7 +195,7 @@ class Local
 	 * @param string $filename File to be read.
 	 * @return string All file contents.
 	 */
-	public function read(string $filename) : string
+	public function read(string $filename): string
 	{
 		if(!$this->has($filename))
 			return (string)null;
@@ -223,28 +207,17 @@ class Local
 	/**
 	 * Retrieves contents from a file and puts it into a stream.
 	 * @param string $file Source file to be read.
-	 * @param resource|StreamContract $stream Target stream to put content on.
+	 * @param resource|StreamInterface $stream Target stream to put content on.
 	 * @param int $length Maximum number of bytes to be written to stream.
 	 * @return int Length of data read from file.
 	 */
-	public function readTo(string $file, $stream, int $length = null) : int
+	public function readTo(string $file, $stream, int $length = null): int
 	{
 		$fcontent = $this->read($file);
 
-		return $stream instanceof StreamContract
+		return $stream instanceof StreamInterface
 			? $stream->write($fcontent, $length)
 			: fwrite($stream, $fcontent, $length ?? strlen($fcontent));
-	}
-	
-	/**
-	 * Removes a file from driver.
-	 * @param string $path Path to file to be removed from driver.
-	 * @return bool Was file or directory successfully removed?
-	 */
-	public function remove(string $path) : bool
-	{
-		$tgt = $this->prefix($path);
-		return @unlink($tgt);
 	}
 	
 	/**
@@ -252,7 +225,7 @@ class Local
 	 * @param string $path Path to directory to be removed from driver.
 	 * @return bool Was directory successfully removed?
 	 */
-	public function rmdir(string $path) : bool
+	public function rmdir(string $path): bool
 	{
 		if(!$this->isdir($path))
 			return false;
@@ -274,7 +247,7 @@ class Local
 	 * @param mixed $content Content to be written to path.
 	 * @return int Number of written characters.
 	 */
-	public function update(string $filename, $content) : int
+	public function update(string $filename, $content): int
 	{
 		$tgt = $this->prefix($filename);
 		
@@ -285,14 +258,14 @@ class Local
 	
 	/**
 	 * Retrieves content from stream and appends it to a file.
-	 * @param resource|StreamContract $stream Source content is retrieved from.
+	 * @param resource|StreamInterface $stream Source content is retrieved from.
 	 * @param string $file Target file to be written to.
 	 * @param int $length Maximum number of bytes to be written to file.
 	 * @return int Total length of data written to file.
 	 */
-	public function updateFrom($stream, string $file, int $length = null) : int
+	public function updateFrom($stream, string $file, int $length = null): int
 	{
-		return $stream instanceof StreamContract
+		return $stream instanceof StreamInterface
 			? $this->update($file, $stream->read($length))
 			: $this->update($file, stream_get_contents($stream, $length));
 	}
@@ -303,7 +276,7 @@ class Local
 	 * @param mixed $content Content to be written to path.
 	 * @return int Number of written characters.
 	 */
-	public function write(string $filename, $content) : int
+	public function write(string $filename, $content): int
 	{
 		$tgt = $this->prefix($filename);
 		
@@ -314,14 +287,14 @@ class Local
 	
 	/**
 	 * Retrieves content from stream and writes it to a file.
-	 * @param resource|StreamContract $stream Stream content is retrieved from.
+	 * @param resource|StreamInterface $stream Stream content is retrieved from.
 	 * @param string $file Target file to be written to.
 	 * @param int $length Maximum number of bytes to be written to file.
 	 * @return int Total length of data written to file.
 	 */
-	public function writeFrom($stream, string $file, int $length = null) : int
+	public function writeFrom($stream, string $file, int $length = null): int
 	{
-		return $stream instanceof StreamContract
+		return $stream instanceof StreamInterface
 			? $this->write($file, $stream->read($length))
 			: $this->write($file, stream_get_contents($stream, $length));
 	}
@@ -331,7 +304,7 @@ class Local
 	 * @param string $path Path to be ensured it exists.
 	 * @return bool Does directory exist or was successfully created?
 	 */
-	protected function ensure(string $path)
+	protected function ensure(string $path): bool
 	{
 		if(!is_dir($path)) {
 			$umask = umask(0);
@@ -347,7 +320,7 @@ class Local
 	 * @param string $path Path to be prefixed.
 	 * @return string Prefixed path.
 	 */
-	protected function prefix(string $path)
+	protected function prefix(string $path): string
 	{
 		return $this->prefix.'/'.ltrim($path, '\\/');
 	}
@@ -357,7 +330,7 @@ class Local
 	 * @param string $path Path to be unprefixed.
 	 * @return string Unprefixed path.
 	 */
-	protected function unprefix(string $path)
+	protected function unprefix(string $path): string
 	{
 		return substr($path, strlen($this->prefix.'/'));
 	}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Filesystem\Driver\Zip class file.
+ * Zettacast\Filesystem\Driver\ZipDriver class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -8,13 +8,13 @@
  */
 namespace Zettacast\Filesystem\Driver;
 
-use ZipArchive;
+use Zettacast\Stream\Stream;
 use Zettacast\Collection\Sequence;
 use Zettacast\Collection\Collection;
-use Zettacast\Filesystem\Stream\Stream;
-use Zettacast\Filesystem\Exception\FileDoesNotExist;
-use Zettacast\Contract\Filesystem\Driver as DriverContract;
-use Zettacast\Contract\Filesystem\Stream as StreamContract;
+use Zettacast\Contract\Stream\StreamInterface;
+use Zettacast\Contract\Filesystem\DriverInterface;
+use Zettacast\Contract\Collection\SequenceInterface;
+use Zettacast\Exception\Filesystem\FilesystemException;
 
 /**
  * Driver for accessing a zip file. This driver allows the stored zip files
@@ -22,23 +22,65 @@ use Zettacast\Contract\Filesystem\Stream as StreamContract;
  * @package Zettacast\Filesystem
  * @version 1.0
  */
-class Zip
-	implements DriverContract
+class ZipDriver implements DriverInterface
 {
+	/**
+	 * The internal zip file handler resource.
+	 * @var \ZipArchive The object responsible for actually accessing the file.
+	 */
 	protected $archive;
 	
-	public function __construct(string $location)
+	protected $password;
+	
+	/**
+	 * This constructor is responsible for opening or creating the zip file.
+	 * @param string $location The location of the zip file to be opened.
+	 * @param string $password Password needed to decompress the file.
+	 * @throws FilesystemException The zip file could not be found or created.
+	 */
+	public function __construct(string $location, string $password = null)
 	{
-		$this->archive = new ZipArchive;
-		$success = $this->archive->open($location, ZipArchive::CREATE);
+		$this->archive = new \ZipArchive;
+		$success = $this->archive->open($location, \ZipArchive::CREATE);
+		
+		if(!is_null($this->password = $password))
+			$this->archive->setPassword($this->password);
 		
 		if($success !== true)
-			throw new FileDoesNotExist($location);
+			throw FilesystemException::missingFile($location);
 	}
 	
+	/**
+	 * Closes the zip file and commits all changes made to it. This constructor
+	 * is explicitly needed as the zip archive will come back to its original
+	 * form if not previously closed.
+	 */
 	public function __destruct()
 	{
 		$this->archive->close();
+	}
+	
+	/**
+	 * Checks whether a path exists in the driver.
+	 * @param string $path Path to be checked.
+	 * @return bool Was the path found?
+	 */
+	public function has(string $path): bool
+	{
+		$tgt = $this->treat($path);
+		
+		return (bool)$this->archive->statName($tgt)
+		       or (bool)$this->archive->statName($tgt.'/');
+	}
+	
+	/**
+	 * Removes a file from driver.
+	 * @param string $path Path to file to be removed from driver.
+	 * @return bool Was file or directory successfully removed?
+	 */
+	public function remove(string $path): bool
+	{
+		return $this->archive->deleteName($path);
 	}
 	
 	/**
@@ -47,25 +89,12 @@ class Zip
 	 * @param string $target Path to which copy is created.
 	 * @return bool Was it possible to copy such the file?
 	 */
-	public function copy(string $path, string $target) : bool
+	public function copy(string $path, string $target): bool
 	{
 		$src = $this->treat($path);
 		$tgt = $this->treat($target);
 		
 		return $this->write($src, $this->read($tgt));
-	}
-	
-	/**
-	 * Checks whether a path exists in the driver.
-	 * @param string $path Path to be checked.
-	 * @return bool Was the path found?
-	 */
-	public function has(string $path) : bool
-	{
-		$tgt = $this->treat($path);
-		
-		return (bool)$this->archive->statName($tgt)
-			or (bool)$this->archive->statName($tgt.'/');
 	}
 	
 	/**
@@ -79,9 +108,13 @@ class Zip
 		if(!$this->has($path))
 			return null;
 		
-		return new Collection(
-			$this->archive->statName($this->isfile($path) ? $path : $path.'/')
+		$stat = $this->archive->statName(
+			$this->isFile($path) ? $path : $path.'/'
 		);
+		
+		return is_null($data)
+			? new Collection($stat)
+			: ($stat[$data] ?? null);
 	}
 	
 	/**
@@ -89,7 +122,7 @@ class Zip
 	 * @param string $path Path to be checked.
 	 * @return bool Is path a directory?
 	 */
-	public function isdir(string $path) : bool
+	public function isDir(string $path): bool
 	{
 		$tgt = $this->treat($path);
 		return (bool)$this->archive->statName($tgt.'/');
@@ -100,7 +133,7 @@ class Zip
 	 * @param string $path Path to be checked.
 	 * @return bool Is path a file?
 	 */
-	public function isfile(string $path) : bool
+	public function isFile(string $path): bool
 	{
 		$tgt = $this->treat($path);
 		return (bool)$this->archive->statName($tgt);
@@ -111,7 +144,7 @@ class Zip
 	 * @param string $path Path of the directory to be created.
 	 * @return bool Was the directory successfully created?
 	 */
-	public function mkdir(string $path) : bool
+	public function mkdir(string $path): bool
 	{
 		$tgt = $this->treat($path);
 		return $this->isdir($tgt) or $this->archive->addEmptyDir($tgt);
@@ -123,7 +156,7 @@ class Zip
 	 * @param string $newpath The new name for target file or directory.
 	 * @return bool Was the file or directory successfully moved?
 	 */
-	public function move(string $path, string $newpath) : bool
+	public function move(string $path, string $newpath): bool
 	{
 		$src = $this->treat($path);
 		$tgt = $this->treat($newpath);
@@ -134,9 +167,9 @@ class Zip
 	/**
 	 * Lists all files and directories contained in the given path.
 	 * @param string $dir Path to be listed.
-	 * @return Sequence All directory contents in the path.
+	 * @return SequenceInterface All directory contents in the path.
 	 */
-	public function list(string $dir = null) : Sequence
+	public function list(string $dir = null): SequenceInterface
 	{
 		$result = new Sequence;
 		$dir = $this->treat($dir ?: '');
@@ -157,9 +190,9 @@ class Zip
 	 * Opens a file as a directly readable stream.
 	 * @param string $filename File to be opened.
 	 * @param string $mode Only reading is allowed for this driver.
-	 * @return StreamContract The directly readable file handler.
+	 * @return StreamInterface The directly readable file handler.
 	 */
-	public function open(string $filename, string $mode = 'r') : StreamContract
+	public function open(string $filename, string $mode = 'r'): StreamInterface
 	{
 		$this->reopen();
 		
@@ -173,7 +206,7 @@ class Zip
 	 * @param string $filename File to be read.
 	 * @return string All file contents.
 	 */
-	public function read(string $filename) : string
+	public function read(string $filename): string
 	{
 		$this->reopen();
 		return $this->archive->getFromName($filename) ?: (string)null;
@@ -186,23 +219,13 @@ class Zip
 	 * @param int $length Maximum number of bytes to be written to stream.
 	 * @return int Length of data read from file.
 	 */
-	public function readTo(string $file, $stream, int $length = null) : int
+	public function readTo(string $file, $stream, int $length = null): int
 	{
 		$fcontent = $this->read($file);
 		
-		return $stream instanceof StreamContract
+		return $stream instanceof StreamInterface
 			? $stream->write($fcontent, $length)
 			: fwrite($stream, $fcontent, $length ?? strlen($fcontent));
-	}
-	
-	/**
-	 * Removes a file from driver.
-	 * @param string $path Path to file to be removed from driver.
-	 * @return bool Was file or directory successfully removed?
-	 */
-	public function remove(string $path) : bool
-	{
-		return $this->archive->deleteName($path);
 	}
 	
 	/**
@@ -210,7 +233,7 @@ class Zip
 	 * @param string $path Path to directory to be removed from driver.
 	 * @return bool Was directory successfully removed?
 	 */
-	public function rmdir(string $path) : bool
+	public function rmdir(string $path): bool
 	{
 		$this->reopen();
 		$tgt = $this->treat($path).'/';
@@ -230,7 +253,7 @@ class Zip
 	 * @param mixed $content Content to be written to path.
 	 * @return int Number of written characters.
 	 */
-	public function update(string $filename, $content) : int
+	public function update(string $filename, $content): int
 	{
 		$previous = $this->has($filename) ? $this->read($filename) : '';
 		$this->remove($filename);
@@ -245,9 +268,9 @@ class Zip
 	 * @param int $length Maximum number of bytes to be written to file.
 	 * @return int Total length of data written to file.
 	 */
-	public function updateFrom($stream, string $file, int $length = null) : int
+	public function updateFrom($stream, string $file, int $length = null): int
 	{
-		return $stream instanceof StreamContract
+		return $stream instanceof StreamInterface
 			? $this->update($file, $stream->read($length))
 			: $this->update($file, stream_get_contents($stream, $length));
 	}
@@ -258,7 +281,7 @@ class Zip
 	 * @param mixed $content Content to be written to path.
 	 * @return int Number of written characters.
 	 */
-	public function write(string $filename, $content) : int
+	public function write(string $filename, $content): int
 	{
 		$tgt = $this->treat($filename);
 		$dirname = self::dirname($tgt);
@@ -277,28 +300,46 @@ class Zip
 	 * @param int $length Maximum number of bytes to be written to file.
 	 * @return int Total length of data written to file.
 	 */
-	public function writeFrom($stream, string $file, int $length = null) : int
+	public function writeFrom($stream, string $file, int $length = null): int
 	{
-		return $stream instanceof StreamContract
+		return $stream instanceof StreamInterface
 			? $this->write($file, $stream->read($length))
 			: $this->write($file, stream_get_contents($stream, $length));
 	}
 	
+	/**
+	 * Reopens the zip file. This is needed whenever we want to commit changes
+	 * to the file. If the changes are not committed, the number of files, for
+	 * instance, can be wrongly calculated.
+	 */
 	protected function reopen()
 	{
 		$path = $this->archive->filename;
 		$this->archive->close();
 		$this->archive->open($path);
+		
+		if(!is_null($this->password))
+			$this->archive->setPassword($this->password);
 	}
 	
-	protected function treat(string $path)
+	/**
+	 * Ensures that no file is treated like a directory.
+	 * @param string $path File to have its path treated.
+	 * @return string The treated file path.
+	 */
+	protected function treat(string $path): string
 	{
 		return rtrim($path, '/');
 	}
 	
-	protected static function dirname(string $filename)
+	/**
+	 * Returns the directory name of the given path.
+	 * @param string $path The path to be analyzed.
+	 * @return string The directory name of given path.
+	 */
+	protected static function dirname(string $path): string
 	{
-		$dirname = dirname($filename);
+		$dirname = dirname($path);
 		return $dirname === '.' ? '' : $dirname;
 	}
 	

@@ -8,16 +8,15 @@
  */
 namespace Zettacast\Filesystem;
 
-use Zettacast\Filesystem\Driver\Local as LocalDriver;
-use Zettacast\Filesystem\Driver\Virtual as VirtualDriver;
+use Zettacast\Filesystem\Driver\LocalDriver;
+use Zettacast\Filesystem\Driver\VirtualDriver;
 
 /**
  * This class acts as wrapper to a local driver.
  * @package Zettacast\Filesystem
  * @version 1.0
  */
-class Filesystem
-	extends LocalDriver
+class Filesystem extends LocalDriver
 {
 	/**
 	 * Local driver constructor.

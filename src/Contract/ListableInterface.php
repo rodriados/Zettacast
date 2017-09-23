@@ -16,6 +16,13 @@ namespace Zettacast\Contract;
 interface ListableInterface extends ExtractableInterface, \Countable, \Iterator
 {
 	/**
+	 * Gives access to the object's raw contents. That is, it exposes the
+	 * internal content that is wrapped by the object.
+	 * @return array The raw sequence contents as array.
+	 */
+	public function raw(): array;
+	
+	/**
 	 * Clears the object and returns its old contents.
 	 * @return array Old object's contents before clearing.
 	 */

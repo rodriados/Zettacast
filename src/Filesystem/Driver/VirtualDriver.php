@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Filesystem\Driver\Virtual class file.
+ * Zettacast\Filesystem\Driver\VirtualDriver class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -8,12 +8,12 @@
  */
 namespace Zettacast\Filesystem\Driver;
 
+use Zettacast\Filesystem\File;
 use Zettacast\Collection\Sequence;
-use Zettacast\Filesystem\Stream\Stream;
-use Zettacast\Collection\Recursive as Collection;
-use Zettacast\Filesystem\Stream\Virtual as VirtualStream;
-use Zettacast\Contract\Filesystem\Stream as StreamContract;
-use Zettacast\Contract\Filesystem\Driver as DriverContract;
+use Zettacast\Collection\RecursiveCollection;
+use Zettacast\Contract\Stream\StreamInterface;
+use Zettacast\Contract\Filesystem\DriverInterface;
+use Zettacast\Contract\Collection\SequenceInterface;
 
 /**
  * Emulates a driver for virtual files. All of the contents saved in this
@@ -21,12 +21,11 @@ use Zettacast\Contract\Filesystem\Driver as DriverContract;
  * @package Zettacast\Filesystem
  * @version 1.0
  */
-class Virtual
-	implements DriverContract
+class VirtualDriver implements DriverInterface
 {
 	/**
-	 * This Collection is our disk. All content will be stored in here.
-	 * @var Collection Driver disk. Holds all driver data.
+	 * This collection is our disk. All content will be stored in here.
+	 * @var RecursiveCollection Driver disk. Holds all driver data.
 	 */
 	protected $storage;
 	
@@ -36,7 +35,7 @@ class Virtual
 	 */
 	public function __construct()
 	{
-		$this->storage = new Collection([
+		$this->storage = new RecursiveCollection([
 			'.' => [
 				'timestamp' => time(),
 				'type' => 'dir'
@@ -45,23 +44,12 @@ class Virtual
 	}
 	
 	/**
-	 * Retrieves metadata about a file or directory from driver.
-	 * @param string $name Name of metadata being retrieved.
-	 * @param array $args File path to be informed about.
-	 * @return mixed Retrieved metadata about path, or default return value.
-	 */
-	public function __call(string $name, array $args)
-	{
-		return $this->info($args[0] ?? '.', $name);
-	}
-	
-	/**
 	 * Creates a copy of a file in the given destiny path.
 	 * @param string $path File to be copied.
 	 * @param string $target Path to which copy is created.
 	 * @return bool Was it possible to copy such a file?
 	 */
-	public function copy(string $path, string $target) : bool
+	public function copy(string $path, string $target): bool
 	{
 		$src = $this->treat($path);
 		$tgt = $this->treat($target);
@@ -78,7 +66,7 @@ class Virtual
 	 * @param string $path Path to be checked.
 	 * @return bool Was the path found?
 	 */
-	public function has(string $path) : bool
+	public function has(string $path): bool
 	{
 		$tgt = $this->treat($path);
 		return $this->storage->has($tgt);
@@ -106,7 +94,7 @@ class Virtual
 	 * @param string $path Path to be checked.
 	 * @return bool Is path a directory?
 	 */
-	public function isdir(string $path) : bool
+	public function isDir(string $path): bool
 	{
 		$tgt = $this->treat($path);
 		
@@ -119,7 +107,7 @@ class Virtual
 	 * @param string $path Path to be checked.
 	 * @return bool Is path a file?
 	 */
-	public function isfile(string $path) : bool
+	public function isFile(string $path): bool
 	{
 		$tgt = $this->treat($path);
 		
@@ -130,9 +118,9 @@ class Virtual
 	/**
 	 * Lists all files and directories contained in the given path.
 	 * @param string $dir Path to be listed.
-	 * @return Sequence All directory contents in the path.
+	 * @return SequenceInterface All directory contents in the path.
 	 */
-	public function list(string $dir = null) : Sequence
+	public function list(string $dir = null): SequenceInterface
 	{
 		$tgt = $this->treat($dir);
 		
@@ -145,10 +133,9 @@ class Virtual
 	/**
 	 * Creates a new directory into the driver.
 	 * @param string $path Path of the directory to be created.
-	 * @param int $perms Permission to be given to the new directory.
 	 * @return bool Was the directory successfully created?
 	 */
-	public function mkdir(string $path, int $perms = 0777) : bool
+	public function mkdir(string $path): bool
 	{
 		$tgt = $this->treat($path);
 		
@@ -172,7 +159,7 @@ class Virtual
 	 * @param string $newpath The new name for target file or directory.
 	 * @return bool Was the file or directory successfully moved?
 	 */
-	public function move(string $path, string $newpath) : bool
+	public function move(string $path, string $newpath): bool
 	{
 		$src = $this->treat($path);
 		$tgt = $this->treat($newpath);
@@ -181,7 +168,7 @@ class Virtual
 			return false;
 		
 		$this->storage->set($tgt, $this->storage->get($src)->all());
-		$this->storage->remove($src);
+		$this->storage->del($src);
 		return true;
 	}
 	
@@ -189,9 +176,9 @@ class Virtual
 	 * Opens a file as a directly editable stream.
 	 * @param string $filename File to be opened.
 	 * @param string $mode Reading/writing mode the file should be opened in.
-	 * @return StreamContract The directly editable file handler.
+	 * @return StreamInterface The directly editable file handler.
 	 */
-	public function open(string $filename, string $mode = 'r') : StreamContract
+	public function open(string $filename, string $mode = 'r'): StreamInterface
 	{
 		$src = $this->treat($filename);
 
@@ -205,14 +192,14 @@ class Virtual
 	 * @param string $filename File to be read.
 	 * @return string All file contents.
 	 */
-	public function read(string $filename) : string
+	public function read(string $filename): string
 	{
 		$src = $this->treat($filename);
 
 		if(!$this->isfile($src))
 			return (string)null;
 		
-		/* @var Stream $stream */
+		/* @var StreamInterface $stream */
 		$stream = $this->storage->get($src)->stream;
 		$offset = $stream->tell();
 
@@ -226,15 +213,15 @@ class Virtual
 	/**
 	 * Retrieves contents from a file and puts it into a stream.
 	 * @param string $file Source file to be read.
-	 * @param resource|StreamContract $stream Target stream to put content on.
+	 * @param resource|StreamInterface $stream Target stream to put content on.
 	 * @param int $length Maximum number of bytes to be written to stream.
 	 * @return int Length of data read from file.
 	 */
-	public function readTo(string $file, $stream, int $length = null) : int
+	public function readTo(string $file, $stream, int $length = null): int
 	{
 		$fcontent = $this->read($file);
 		
-		return $stream instanceof StreamContract
+		return $stream instanceof StreamInterface
 			? $stream->write($fcontent, $length)
 			: fwrite($stream, $fcontent, $length ?? strlen($fcontent));
 	}
@@ -244,14 +231,14 @@ class Virtual
 	 * @param string $path Path to file to be removed from driver.
 	 * @return bool Was file or directory successfully removed?
 	 */
-	public function remove(string $path) : bool
+	public function remove(string $path): bool
 	{
 		$tgt = $this->treat($path);
 
 		if(!$this->isfile($tgt))
 			return false;
 		
-		$this->storage->remove($tgt);
+		$this->storage->del($tgt);
 		return true;
 	}
 	
@@ -260,7 +247,7 @@ class Virtual
 	 * @param string $path Path to directory to be removed from driver.
 	 * @return bool Was directory successfully removed?
 	 */
-	public function rmdir(string $path) : bool
+	public function rmdir(string $path): bool
 	{
 		$tgt = $this->treat($path);
 		
@@ -272,7 +259,7 @@ class Virtual
 				? $this->rmdir($target)
 				: $this->remove($target);
 		
-		$this->storage->remove($tgt);
+		$this->storage->del($tgt);
 		return true;
 	}
 	
@@ -282,14 +269,14 @@ class Virtual
 	 * @param mixed $content Content to be written to path.
 	 * @return int Number of written characters.
 	 */
-	public function update(string $filename, $content) : int
+	public function update(string $filename, $content): int
 	{
 		$tgt = $this->treat($filename);
 		
 		if(!$this->storage->has($tgt))
 			return $this->write($tgt, $content);
 		
-		/* @var Stream $stream */
+		/* @var StreamInterface $stream */
 		$stream = $this->storage->get($tgt)->stream;
 		$offset = $stream->tell();
 		
@@ -302,14 +289,14 @@ class Virtual
 	
 	/**
 	 * Retrieves content from stream and appends it to a file.
-	 * @param resource|StreamContract $stream Source content is retrieved from.
+	 * @param resource|StreamInterface $stream Source content is retrieved from.
 	 * @param string $file Target file to be written to.
 	 * @param int $length Maximum number of bytes to be written to file.
 	 * @return int Total length of data written to file.
 	 */
-	public function updateFrom($stream, string $file, int $length = null) : int
+	public function updateFrom($stream, string $file, int $length = null): int
 	{
-		return $stream instanceof StreamContract
+		return $stream instanceof StreamInterface
 			? $this->update($file, $stream->read($length))
 			: $this->update($file, stream_get_contents($stream, $length));
 	}
@@ -320,7 +307,7 @@ class Virtual
 	 * @param mixed $content Content to be written to path.
 	 * @return int Number of written characters.
 	 */
-	public function write(string $filename, $content) : int
+	public function write(string $filename, $content): int
 	{
 		$tgt = $this->treat($filename);
 		
@@ -329,7 +316,7 @@ class Virtual
 		
 		$this->storage->set($tgt, [
 			'timestamp' => time(),
-		    'stream' => $file = new VirtualStream($content),
+		    'stream' => $file = File::virtual($content),
 		    'mime' => with(new \finfo(FILEINFO_MIME_TYPE))->buffer($content),
 		    'type' => 'file',
 		]);
@@ -339,14 +326,14 @@ class Virtual
 	
 	/**
 	 * Retrieves content from stream and writes it to a file.
-	 * @param resource|StreamContract $stream Stream content is retrieved from.
+	 * @param resource|StreamInterface $stream Stream content is retrieved from.
 	 * @param string $file Target file to be written to.
 	 * @param int $length Maximum number of bytes to be written to file.
 	 * @return int Total length of data written to file.
 	 */
-	public function writeFrom($stream, string $file, int $length = null) : int
+	public function writeFrom($stream, string $file, int $length = null): int
 	{
-		return $stream instanceof StreamContract
+		return $stream instanceof StreamInterface
 			? $this->write($file, $stream->read($length))
 			: $this->write($file, stream_get_contents($stream, $length));
 	}
@@ -356,7 +343,7 @@ class Virtual
 	 * @param string $path Path to be treated.
 	 * @return string Trated path.
 	 */
-	protected function treat(string $path = null)
+	protected function treat(string $path = null): string
 	{
 		$path = explode('/', $path);
 		$true = [];
