@@ -62,14 +62,14 @@ class Assembler
 		$context = $bond->context ?? false;
 		$shared = $bond->shared ?? false;
 		
-		if(!$context && $this->injector->has($concrete))
+		if(!$context && is_scalar($concrete) && $this->injector->has($concrete))
 			return $this->injector->get($concrete);
 		
 		$object = !is_callable($concrete)
 			? $abstract == $concrete
 				? $this->build($concrete, $params)
 				: $this->make($concrete, $params)
-			: $concrete($this->injector, ...$params);
+			: $concrete(...$params);
 	
 		if(!$context && $shared)
 			$this->injector->set($abstract, $object);
@@ -117,6 +117,9 @@ class Assembler
 	 */
 	protected function build(string $concrete, array $params = [])
 	{
+		if(!class_exists($concrete))
+			throw InjectorException::doesNotExist($concrete);
+		
 		$reflect = new \ReflectionClass($concrete);
 		
 		if(!$reflect->isInstantiable())

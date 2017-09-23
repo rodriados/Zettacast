@@ -54,10 +54,12 @@ class Filter implements FilterInterface
 		}
 		
 		if(!in_array($filter, self::list())) {
-			if(!class_exists($filter, true))
+			$class = zetta()->resolve($filter)->concrete ?? $filter;
+			
+			if(!class_exists($class, true))
 				throw FilterException::isNotKnown($filter);
 			
-			self::register($filter, $filter);
+			self::register($filter, $class);
 		}
 		
 		$this->filtername = $filter;

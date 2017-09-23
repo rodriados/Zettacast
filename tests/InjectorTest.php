@@ -34,6 +34,10 @@ final class InjectorTest extends \PHPUnit\Framework\TestCase
 		zetta()->when(D::class)->unbind(BInterface::class);
 		$this->assertInstanceOf(D::class, $d = zetta()->make('testD'));
 		$this->assertInstanceOf(B::class, $d->b);
+		$this->assertTrue(zetta()->knows('testA'));
+		
+		zetta()->del(AInterface::class);
+		$this->assertFalse(zetta()->has(AInterface::class));
 	}
 	
 	public function testCanWrap()

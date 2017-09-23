@@ -131,7 +131,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	/**
 	 * Chunks the sequence into pieces of the given size.
 	 * @param int $size Size of the chunks.
-	 * @return array Array of sequence chunks.
+	 * @return static[] Array of sequence chunks.
 	 */
 	public function chunk(int $size): array
 	{
@@ -517,10 +517,10 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	public function splice(int $offset, int $length = null, $replace = [])
 	{
 		return $this->new(array_splice(
-			                  toArray($this->data),
-			                  $offset,
-			                  $length ?: $this->count(),
-			                  $replace
+			toArray($this->data),
+			$offset,
+			$length ?: $this->count(),
+			$replace
 		));
 	}
 	

@@ -132,7 +132,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	/**
 	 * Chunks the collection into pieces of the given size.
 	 * @param int $size Size of the chunks.
-	 * @return array Array of collection of chunks.
+	 * @return static[] Array of collection of chunks.
 	 */
 	public function chunk(int $size): array
 	{

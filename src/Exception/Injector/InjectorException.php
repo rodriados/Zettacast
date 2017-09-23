@@ -12,6 +12,14 @@ use Zettacast\Exception\Exception;
 
 class InjectorException extends Exception
 {
+	public static function doesNotExist(string $abstract)
+	{
+		return new static(sprintf(
+			'The class "%s" does not exist.',
+			$abstract
+		));
+	}
+	
 	public static function notInstantiable(string $abstract)
 	{
 		return new static(sprintf(

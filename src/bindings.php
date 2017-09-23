@@ -7,31 +7,43 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-zetta()
+$zetta = zetta();
 
-# Injector module
-->bind('injector', 'Zettacast\Injector\Injector')
-->bind('Zettacast\Injector\InjectorInterface', 'Zettacast\Injector\Injector')
+$bindings = [
+	# Injector module
+	'injector' => 'Zettacast\Contract\Injector\InjectorInterface',
+	'Zettacast\Injector\InjectorInterface' => 'Zettacast\Injector\Injector',
 
-# Autoload module
-->bind('autoload', 'Zettacast\Autoload\Autoload')
+	# Autoload module
+	'autoload' => 'Zettacast\Autoload\Autoload',
 
-# Collection module
-->bind('queue', 'Zettacast\Collection\Queue')
-->bind('stack', 'Zettacast\Collection\Stack')
-->bind('dot', 'Zettacast\Collection\DotCollection')
-->bind('sequence', 'Zettacast\Collection\Sequence')
-->bind('collection', 'Zettacast\Collection\Collection')
+	# Collection module
+	'stack' => 'Zettacast\Collection\Stack',
+	'queue' => 'Zettacast\Contract\Collection\QueueInterface',
+	'sequence' => 'Zettacast\Contract\Collection\SequenceInterface',
+	'collection' => 'Zettacast\Contract\Collection\CollectionInterface',
+	'collection.dot' => 'Zettacast\Collection\DotCollection',
+	'Zettacast\Contract\Collection\QueueInterface' => 'Zettacast\Collection\Queue',
+	'Zettacast\Contract\Collection\SequenceInterface' => 'Zettacast\Collection\Sequence',
+	'Zettacast\Contract\Collection\CollectionInterface' => 'Zettacast\Collection\Collection',
 
-# Config module
-->bind('config', 'Zettacast\Config\Warehouse')
+	# Config module
+	'config' => 'Zettacast\Config\Warehouse',
 
-# Filesystem module
-->bind('file', 'Zettacast\Filesystem\File')
-->bind('info', 'Zettacast\Filesystem\Info')
-->bind('stream', 'Zettacast\Filesystem\Stream\Stream')
-->bind('filesystem', 'Zettacast\Filesystem\Filesystem')
-->bind('Zettacast\Contract\Filesystem\Driver', 'Zettacast\Filesystem\Driver\Local')
-->bind('Zettacast\Contract\Filesystem\Stream', 'Zettacast\Filesystem\Stream\Stream')
+	# Filesystem module
+	'file' => 'Zettacast\Filesystem\File',
+	'info' => 'Zettacast\Filesystem\Info',
+	'filesystem' => 'Zettacast\Filesystem\Filesystem',
+	'Zettacast\Contract\Filesystem\Driver' => 'Zettacast\Filesystem\Driver\Local',
 
-;
+	# Stream module
+	'filter' => 'Zettacast\Stream\Filter',
+	'stream' => 'Zettacast\Contract\Stream\StreamInterface',
+	'stream.context' => 'Zettacast\Stream\StreamContext',
+	'stream.virtual' => ['Zettacast\Stream\Stream', 'virtual'],
+	'filter.closure' => 'Zettacast\Stream\Filter\ClosureFilter',
+	'Zettacast\Contract\Stream\StreamInterface' => 'Zettacast\Stream\Stream',
+];
+
+foreach($bindings as $abstract => $concrete)
+	$zetta->bind($abstract, $concrete);

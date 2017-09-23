@@ -23,6 +23,22 @@ final class CollectionTest extends \PHPUnit\Framework\TestCase
 		$this->assertTrue($c1->empty());
 	}
 	
+	public function testCollection()
+	{
+		$col = new Collection([.5,1,1.5,2,2.5,3,3.5,4,4.5,5]);
+		$this->assertEquals($col->raw(), with(clone $col)->raw());
+		$this->assertEquals($col->raw(), $col->copy()->raw());
+		$this->assertEquals($col->count(), 10);
+		$this->assertEquals($col->apply(function($value): int {
+			return (int)($value * 2);
+		})->raw(), [1,2,3,4,5,6,7,8,9,10]);
+		
+		$col->add([10 => 11, 11 => 12]);
+		$chunk = $col->chunk(3);
+		$this->assertEquals([], $col->chunk(0));
+		$this->assertEquals([9=>10,10=>11,11=>12], $chunk[3]->raw());
+	}
+	
 	public function testRecursiveCollection()
 	{
 		$rec = new RecursiveCollection([[1,2,3],[4,5,6],[7,8,9]]);
