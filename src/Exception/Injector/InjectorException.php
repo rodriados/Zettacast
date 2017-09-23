@@ -8,7 +8,9 @@
  */
 namespace Zettacast\Exception\Injector;
 
-class InjectorException extends \Exception
+use Zettacast\Exception\Exception;
+
+class InjectorException extends Exception
 {
 	public static function notInstantiable(string $abstract)
 	{

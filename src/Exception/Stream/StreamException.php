@@ -8,7 +8,9 @@
  */
 namespace Zettacast\Exception\Stream;
 
-class StreamException extends \Exception
+use Zettacast\Exception\Exception;
+
+class StreamException extends Exception
 {
 	public static function couldNotBeOpened(string $uri)
 	{
