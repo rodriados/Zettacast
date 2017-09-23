@@ -8,6 +8,7 @@
  */
 namespace Zettacast;
 
+use Zettacast\Exception\Handler;
 use Zettacast\Injector\Injector;
 use Zettacast\Contract\SingletonTrait;
 
@@ -65,6 +66,10 @@ final class Zettacast extends Injector
 		
 		$this->set(self::class, $this);
 		$this->set(Injector::class, $this);
+		
+		set_error_handler([Handler::class, 'handleError']);
+		set_exception_handler([Handler::class, 'handleException']);
+		register_shutdown_function([Handler::class, 'handleShutdown']);
 	}
 	
 	/**
@@ -77,10 +82,6 @@ final class Zettacast extends Injector
 		setlocale(LC_ALL, config('app.locale', 'en_US'));
 		mb_internal_encoding(config('app.charset', 'UTF-8'));
 		date_default_timezone_set(config('app.timezone', 'UTC'));
-		
-		#set_error_handler([Handler::class, 'error']);
-		#set_exception_handler([Handler::class, 'exception']);
-		#register_shutdown_function([Handler::class, 'shutdown']);
 		
 		$this->set('mode', isset($_SERVER['argv']) ? self::CLI : self::APP);
 	}
