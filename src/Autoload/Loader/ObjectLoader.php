@@ -42,16 +42,15 @@ class ObjectLoader implements LoaderInterface
 	 */
 	public function load(string $obj): bool
 	{
-		$obj = ltrim($obj, '\\');
-		
-		if(
-			!$this->data->has($obj) ||
-		    !file_exists($filename = $this->data->get($obj))
-		)
+		if($this->data->empty())
 			return false;
 		
-		require $filename;
-		return true;
+		$obj = ltrim($obj, '\\');
+		
+		if(($fname = $this->data[$obj]) && ($loaded = file_exists($fname)))
+			require $fname;
+		
+		return $loaded ?? false;
 	}
 	
 	/**

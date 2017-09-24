@@ -45,26 +45,19 @@ class NamespaceLoader implements LoaderInterface
 		if($this->data->empty())
 			return false;
 		
-		$obj = ltrim($obj, '\\');
-		$nspname = explode('\\', $obj);
-		$objname = array_pop($nspname);
+		$name = explode('\\', ltrim($obj, '\\'));
+		$objfile = array_pop($name).'.php';
 		
-		while($nspname) {
-			$space = implode('\\', $nspname);
-			
-			if($this->data->has($space)) {
-				$filename = $this->data->get($space) . '/' . $objname . '.php';
-				break;
-			}
-			
-			$objname = array_pop($nspname) . '/' . $objname;
-		}
+		while($name && !$this->data->has($space = implode('\\', $name)))
+			$objfile = array_pop($name).'/'.$objfile;
 		
-		if(!isset($filename) || !file_exists($filename))
-			return false;
+		if($name && isset($space))
+			$fname = $this->data->get($space).'/'.$objfile;
 		
-		require $filename;
-		return true;
+		if(isset($fname) && $loaded = file_exists($fname))
+			require $fname;
+		
+		return $loaded ?? false;
 	}
 	
 	/**
