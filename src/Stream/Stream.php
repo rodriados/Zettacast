@@ -332,14 +332,14 @@ class Stream implements FilterableInterface
 	 * Creates an instance of a virtual stream. Virtual streams are stored in
 	 * memory and may be transfered to a temporary file if a given size
 	 * threshold is reached.
-	 * @param string $contents Initial stream contents.
-	 * @return StreamInterface The virtual stream instance.
+	 * @param string $content Initial stream contents.
+	 * @return FilterableInterface The virtual stream instance.
 	 */
-	public static function virtual(string $contents = null): StreamInterface
+	public static function virtual(string $content = null): FilterableInterface
 	{
 		$stream = new static('php://temp', 'r+');
 		
-		if(!is_null($contents) && $stream->write($contents))
+		if(!is_null($content) && $stream->write($content))
 			$stream->rewind();
 		
 		return $stream;

@@ -43,6 +43,7 @@ $bindings = [
 	'stream.context' => 'Zettacast\Stream\StreamContext',
 	'stream.virtual' => ['Zettacast\Stream\Stream', 'virtual'],
 	'filter.closure' => 'Zettacast\Stream\Filter\ClosureFilter',
+	'filter.callable' => 'Zettacast\Stream\Filter\CallableFilter',
 	'Zettacast\Contract\Stream\StreamInterface' => 'Zettacast\Stream\Stream',
 	'Zettacast\Contract\Stream\FilterInterface' => 'Zettacast\Stream\Filter',
 ];
