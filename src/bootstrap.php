@@ -28,10 +28,11 @@ define('ZBOOTMEMO', memory_get_usage(true));
  */
 define('DOCROOT',       realpath(dirname(__DIR__)));
 define('APPPATH',       DOCROOT.'/app');
-define('RSRCPATH',      DOCROOT.'/resource');
-define('CONFIGPATH',    DOCROOT.'/config');
 define('FWORKPATH',     DOCROOT.'/src');
+define('CONFIGPATH',    DOCROOT.'/config');
 define('PUBLICPATH',    DOCROOT.'/public');
+define('RSRCPATH',      DOCROOT.'/resource');
+define('TMPPATH',       DOCROOT.'/tmp');
 /**#@-*/
 
 /*

@@ -27,10 +27,7 @@ $bindings = [
 	'Zettacast\Contract\Collection\QueueInterface' => 'Zettacast\Collection\Queue',
 	'Zettacast\Contract\Collection\SequenceInterface' => 'Zettacast\Collection\Sequence',
 	'Zettacast\Contract\Collection\CollectionInterface' => 'Zettacast\Collection\Collection',
-
-	# Config module
-	'config' => 'Zettacast\Config\Warehouse',
-
+	
 	# Filesystem module
 	'info' => 'Zettacast\Filesystem\Info',
 	'file' => 'Zettacast\Filesystem\File',

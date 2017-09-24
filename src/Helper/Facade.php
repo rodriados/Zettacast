@@ -21,7 +21,7 @@ abstract class Facade
 	 * façaded method.
 	 * @var mixed Façaded object instance.
 	 */
-	protected static $instance;
+	private static $instance;
 	
 	/**
 	 * Retrieves the instance of the object being façaded.

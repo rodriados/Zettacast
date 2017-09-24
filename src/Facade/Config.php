@@ -9,20 +9,89 @@
 namespace Zettacast\Facade;
 
 use Zettacast\Helper\Facade;
-use Zettacast\Config\Warehouse as baseclass;
+use Zettacast\Filesystem\Filesystem;
+use Zettacast\Contract\SingletonTrait;
+use Zettacast\Collection\DotCollection;
 
 /**
  * Zettacast's Config façade class.
- * This class exposes package:config\Repository methods to external usage.
- * @method static mixed get(string $key, $default = null)
- * @method static bool load(string $file)
- * @method static baseclass remove(string $key)
- * @method static baseclass set(string $key, $default)
+ * This façade is responsible for accessing the application and framework's
+ * configuration files.
  * @version 1.0
  */
-final class Config
+final class Config extends Facade
 {
-	use Facade;
+	use SingletonTrait;
+	
+	/**
+	 * Holds all data contained in the warehouse.
+	 * @var DotCollection Repository data.
+	 */
+	protected $data;
+	
+	/**
+	 * Configuration folder, that holds all files.
+	 * @var Filesystem Manages all files in configuration folder.
+	 */
+	protected $folder;
+
+	/**
+	 * Config constructor.
+	 * This constructor simply initializes all instance properties.
+	 */
+	protected function __construct()
+	{
+		$this->data = new DotCollection;
+		$this->folder = new Filesystem(CONFIGPATH);
+	}
+	
+	/**
+	 * Retrieves a configuration value from the directory. If no correspondent
+	 * value can be found, the default one is returned.
+	 * @param string $key Configuration value to be retrieved.
+	 * @param mixed $default Default value to be returned if key is not found.
+	 * @return mixed The retrieved value.
+	 */
+	public static function get(string $key, $default = null)
+	{
+		$file = explode('.', $key, 2)[0];
+		
+		return self::i()->data->has($file) || self::load($file)
+			? self::i()->data->get($key, $default)
+			: $default;
+	}
+	
+	/**
+	 * Checks whether a value key exists within the directory.
+	 * @param string $key Key to be searched for.
+	 * @return bool Is value key present in the directory?
+	 */
+	public static function has(string $key): bool
+	{
+		$file = explode('.', $key, 2)[0];
+		
+		return self::i()->data->has($file) || self::load($file)
+			? self::i()->data->has($key)
+			: false;
+	}
+	
+	/**
+	 * Loads configuration file to memory.
+	 * @param string $file File to be loaded.
+	 * @return bool Did the file load correctly?
+	 */
+	public static function load(string $file): bool
+	{
+		static $loaded;
+		
+		if(isset($loaded[$file]))
+			return $loaded[$file];
+		
+		if($fname = self::i()->folder->info($file.'.php', 'realpath'))
+			self::i()->data->set($file, require $fname);
+			
+		return $loaded[$file] = (bool)$fname;
+	}
 	
 	/**
 	 * Informs what the façaded object accessor is, allowing it to be further
@@ -31,8 +100,7 @@ final class Config
 	 */
 	protected static function accessor()
 	{
-		zetta()->share(baseclass::class, new baseclass(APPPATH.'/config'));
-		return baseclass::class;
+		return self::i();
 	}
 	
 }

@@ -82,7 +82,7 @@ if(!function_exists('zetta')) {
 	function zetta(string $abstract = null, ...$args)
 	{
 		return is_null($abstract)
-			? Zettacast::instance()
-			: Zettacast::instance()->make($abstract, $args);
+			? Zettacast::i()
+			: Zettacast::i()->make($abstract, $args);
 	}
 }
