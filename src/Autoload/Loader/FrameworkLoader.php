@@ -76,18 +76,17 @@ final class FrameworkLoader implements LoaderInterface
 	 */
 	protected function loadInternal(array $name): bool
 	{
-		$name[0] = ($name[0] == ZETTACAST)
-			? $this->fwork
-			: $this->app;
-		
+		$nspace = array_shift($name);
 		$cpath = implode('/', $name);
-		$fname = $cpath . '.php';
 		
-		if(!file_exists($fname))
-			return false;
+		$fname = $nspace == ZETTACAST
+			? $this->fwork.'/'.$cpath.'.php'
+			: $this->app.'/'.strtolower($cpath).'.php';
 		
-		require $fname;
-		return true;
+		if($loaded = file_exists($fname))
+			require $fname;
+		
+		return $loaded;
 	}
 	
 	/**
@@ -99,15 +98,14 @@ final class FrameworkLoader implements LoaderInterface
 	 */
 	protected function loadResource(array $name): bool
 	{
-		array_unshift($name, $this->rsrc);
+		$pkg = array_shift($name);
 		$cpath = implode('/', $name);
-		$fname = $cpath . '.php';
+		$fname = $this->rsrc."/{$pkg}/src/{$cpath}.php";
 		
-		if(!file_exists($fname))
-			return false;
+		if($loaded = file_exists($fname))
+			require $fname;
 		
-		require $fname;
-		return true;
+		return $loaded;
 	}
 	
 }
