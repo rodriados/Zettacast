@@ -8,17 +8,16 @@
  */
 namespace Zettacast\Stream;
 
-use Zettacast\Exception\Stream\StreamException;
-use Zettacast\Contract\Stream\FilterableInterface;
 use Zettacast\Contract\Stream\FilterInterface;
 use Zettacast\Contract\Stream\StreamInterface;
+use Zettacast\Exception\Stream\StreamException;
 
 /**
  * This class handles all interactions to a stream.
  * @package Zettacast\Filesystem\Stream
  * @version 1.0
  */
-class Stream implements FilterableInterface
+class Stream implements StreamInterface
 {
 	/**
 	 * Internal stream handler, responsible for keeping it open for
@@ -107,24 +106,6 @@ class Stream implements FilterableInterface
 	}
 	
 	/**
-	 * Informs whether the stream is in blocking IO mode.
-	 * @return bool Is stream in blocking mode?
-	 */
-	public function isBlocked(): bool
-	{
-		return stream_get_meta_data($this->handler)['blocked'];
-	}
-	
-	/**
-	 * Gets any header information held by stream wrapper.
-	 * @return mixed Header information or null if none.
-	 */
-	public function header()
-	{
-		return stream_get_meta_data($this->handler)['wrapper_data'] ?? null;
-	}
-	
-	/**
 	 * Allows the creation of a simple reader and writer model by supporting a
 	 * portable way of locking complete streams in an advisory way.
 	 * @param bool $share Should the lock be a shared one, for reading?
@@ -138,6 +119,27 @@ class Stream implements FilterableInterface
 
 		return stream_supports_lock($this->handler)
 		    && flock($this->handler, $lock);
+	}
+	
+	/**
+	 * Retrieves some metadata about the stream. This class exposes the
+	 * following metadata: wrapper, header, timeout, type, blocked, seekable.
+	 * @param string $data Data name to be retrieved.
+	 * @return mixed The metadata value.
+	 */
+	public function metadata(string $data)
+	{
+		static $metadata = [
+			'wrapper' => 'wrapper_type',
+			'header' => 'wrapper_data',
+			'seekable' => 'seekable',
+			'timeout' => 'timed_out',
+			'type' => 'stream_type',
+			'blocked' => 'blocked',
+		];
+		
+		$data = $metadata[$data] ?? null;
+		return stream_get_meta_data($this->handler)[$data] ?? null;
 	}
 	
 	/**
@@ -263,15 +265,6 @@ class Stream implements FilterableInterface
 	}
 	
 	/**
-	 * Informs whether the stream has timed out while waiting for data.
-	 * @return bool Has the stream timed out?
-	 */
-	public function timedOut(): bool
-	{
-		return stream_get_meta_data($this->handler)['time_out'];
-	}
-	
-	/**
 	 * Truncates the stream to the given length. If the given length is larger
 	 * than the stream, it is extended with null bytes.
 	 * @param int $size The size to truncate to.
@@ -333,9 +326,9 @@ class Stream implements FilterableInterface
 	 * memory and may be transfered to a temporary file if a given size
 	 * threshold is reached.
 	 * @param string $content Initial stream contents.
-	 * @return FilterableInterface The virtual stream instance.
+	 * @return StreamInterface The virtual stream instance.
 	 */
-	public static function virtual(string $content = null): FilterableInterface
+	public static function virtual(string $content = null): StreamInterface
 	{
 		$stream = new static('php://temp', 'r+');
 		
