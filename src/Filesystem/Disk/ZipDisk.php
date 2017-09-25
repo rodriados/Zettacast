@@ -1,28 +1,28 @@
 <?php
 /**
- * Zettacast\Filesystem\Driver\ZipDriver class file.
+ * Zettacast\Filesystem\Disk\ZipDisk class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Filesystem\Driver;
+namespace Zettacast\Filesystem\Disk;
 
 use Zettacast\Stream\Stream;
 use Zettacast\Collection\Sequence;
 use Zettacast\Collection\Collection;
 use Zettacast\Contract\Stream\StreamInterface;
-use Zettacast\Contract\Filesystem\DriverInterface;
+use Zettacast\Contract\Filesystem\DiskInterface;
 use Zettacast\Contract\Collection\SequenceInterface;
 use Zettacast\Exception\Filesystem\FilesystemException;
 
 /**
- * Driver for accessing a zip file. This driver allows the stored zip files
- * to be treated as if the were local.
+ * Disk for accessing a zip file. This driver allows the stored zip files to be
+ * treated as if they were local uncompressed files.
  * @package Zettacast\Filesystem
  * @version 1.0
  */
-class ZipDriver implements DriverInterface
+class ZipDisk implements DiskInterface
 {
 	/**
 	 * The internal zip file handler resource.
@@ -61,7 +61,7 @@ class ZipDriver implements DriverInterface
 	}
 	
 	/**
-	 * Checks whether a path exists in the driver.
+	 * Checks whether a path exists in the disk.
 	 * @param string $path Path to be checked.
 	 * @return bool Was the path found?
 	 */
@@ -74,8 +74,8 @@ class ZipDriver implements DriverInterface
 	}
 	
 	/**
-	 * Removes a file from driver.
-	 * @param string $path Path to file to be removed from driver.
+	 * Removes a file from disk.
+	 * @param string $path Path to file to be removed from disk.
 	 * @return bool Was file or directory successfully removed?
 	 */
 	public function remove(string $path): bool
@@ -140,7 +140,7 @@ class ZipDriver implements DriverInterface
 	}
 	
 	/**
-	 * Creates a new directory into the driver.
+	 * Creates a new directory into the disk.
 	 * @param string $path Path of the directory to be created.
 	 * @return bool Was the directory successfully created?
 	 */
@@ -189,7 +189,7 @@ class ZipDriver implements DriverInterface
 	/**
 	 * Opens a file as a directly readable stream.
 	 * @param string $filename File to be opened.
-	 * @param string $mode Only reading is allowed for this driver.
+	 * @param string $mode Only reading is allowed for this disk.
 	 * @return StreamInterface The directly readable file handler.
 	 */
 	public function open(string $filename, string $mode = 'r'): StreamInterface
@@ -206,10 +206,10 @@ class ZipDriver implements DriverInterface
 	 * @param string $filename File to be read.
 	 * @return string All file contents.
 	 */
-	public function read(string $filename): string
+	public function read(string $filename)
 	{
 		$this->reopen();
-		return $this->archive->getFromName($filename) ?: (string)null;
+		return $this->archive->getFromName($filename) ?: null;
 	}
 	
 	/**
@@ -229,8 +229,8 @@ class ZipDriver implements DriverInterface
 	}
 	
 	/**
-	 * Removes a directory from driver.
-	 * @param string $path Path to directory to be removed from driver.
+	 * Removes a directory from disk.
+	 * @param string $path Path to directory to be removed from disk.
 	 * @return bool Was directory successfully removed?
 	 */
 	public function rmdir(string $path): bool

@@ -1,27 +1,27 @@
 <?php
 /**
- * Zettacast\Filesystem\Driver\VirtualDriver class file.
+ * Zettacast\Filesystem\Disk\VirtualDisk class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Filesystem\Driver;
+namespace Zettacast\Filesystem\Disk;
 
 use Zettacast\Filesystem\File;
 use Zettacast\Collection\Sequence;
 use Zettacast\Collection\RecursiveCollection;
 use Zettacast\Contract\Stream\StreamInterface;
-use Zettacast\Contract\Filesystem\DriverInterface;
+use Zettacast\Contract\Filesystem\DiskInterface;
 use Zettacast\Contract\Collection\SequenceInterface;
 
 /**
- * Emulates a driver for virtual files. All of the contents saved in this
- * driver will be erased as soon as this object is destructed.
+ * Emulates a disk for virtual files. All of the contents saved in this disk
+ * will be erased as soon as this object is destructed.
  * @package Zettacast\Filesystem
  * @version 1.0
  */
-class VirtualDriver implements DriverInterface
+class VirtualDisk implements DiskInterface
 {
 	/**
 	 * This collection is our disk. All content will be stored in here.
@@ -30,7 +30,7 @@ class VirtualDriver implements DriverInterface
 	protected $storage;
 	
 	/**
-	 * Virtual driver constructor. This constructor simply creates our root
+	 * Virtual disk constructor. This constructor simply creates our root
 	 * directory so we have a base where we can put our files on.
 	 */
 	public function __construct()
@@ -192,12 +192,12 @@ class VirtualDriver implements DriverInterface
 	 * @param string $filename File to be read.
 	 * @return string All file contents.
 	 */
-	public function read(string $filename): string
+	public function read(string $filename)
 	{
 		$src = $this->treat($filename);
 
 		if(!$this->isfile($src))
-			return (string)null;
+			return null;
 		
 		/* @var StreamInterface $stream */
 		$stream = $this->storage->get($src)->stream;

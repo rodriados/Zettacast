@@ -1,29 +1,29 @@
 <?php
 /**
- * Zettacast\Filesystem\Driver\LocalDriver class file.
+ * Zettacast\Filesystem\Disk\LocalDisk class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Filesystem\Driver;
+namespace Zettacast\Filesystem\Disk;
 
 use Zettacast\Filesystem\File;
 use Zettacast\Filesystem\Info;
 use Zettacast\Collection\Sequence;
 use Zettacast\Contract\Stream\StreamInterface;
-use Zettacast\Contract\Filesystem\DriverInterface;
+use Zettacast\Contract\Filesystem\DiskInterface;
 use Zettacast\Contract\Collection\SequenceInterface;
 use Zettacast\Exception\Filesystem\FilesystemException;
 
 /**
- * Driver for local files. This driver handles all operations to the local
+ * Dsik for local files. This disk handles all operations to the local
  * filesystem, where the framework is installed. It cannot handle files out of
  * the document root, though.
  * @package Zettacast\Filesystem
  * @version 1.0
  */
-class LocalDriver implements DriverInterface
+class LocalDisk implements DiskInterface
 {
 	/**
 	 * Driver root. All operations will use this directory as base, that is
@@ -33,8 +33,8 @@ class LocalDriver implements DriverInterface
 	protected $prefix;
 	
 	/**
-	 * Local driver constructor.
-	 * @param string $root Root directory for all operations done in driver.
+	 * Local disk constructor.
+	 * @param string $root Root directory for all operations done in disk.
 	 * @throws FilesystemException The path does not exist or cannot be read.
 	 */
 	public function __construct(string $root = DOCROOT)
@@ -47,7 +47,7 @@ class LocalDriver implements DriverInterface
 	}
 	
 	/**
-	 * Checks whether a path exists in the driver.
+	 * Checks whether a path exists in the disk.
 	 * @param string $path Path to be checked.
 	 * @return bool Was the path found?
 	 */
@@ -58,8 +58,8 @@ class LocalDriver implements DriverInterface
 	}
 	
 	/**
-	 * Removes a file from driver.
-	 * @param string $path Path to file to be removed from driver.
+	 * Removes a file from disk.
+	 * @param string $path Path to file to be removed from disk.
 	 * @return bool Was file or directory successfully removed?
 	 */
 	public function remove(string $path): bool
@@ -151,7 +151,7 @@ class LocalDriver implements DriverInterface
 	}
 	
 	/**
-	 * Creates a new directory into the driver.
+	 * Creates a new directory into the disk.
 	 * @param string $path Path of the directory to be created.
 	 * @param int $perms Permission to be given to the new directory.
 	 * @return bool Was the directory successfully created?
@@ -195,10 +195,10 @@ class LocalDriver implements DriverInterface
 	 * @param string $filename File to be read.
 	 * @return string All file contents.
 	 */
-	public function read(string $filename): string
+	public function read(string $filename)
 	{
 		if(!$this->has($filename))
-			return (string)null;
+			return null;
 		
 		$src = $this->prefix($filename);
 		return file_get_contents($src);
@@ -221,8 +221,8 @@ class LocalDriver implements DriverInterface
 	}
 	
 	/**
-	 * Removes a directory from driver.
-	 * @param string $path Path to directory to be removed from driver.
+	 * Removes a directory from disk.
+	 * @param string $path Path to directory to be removed from disk.
 	 * @return bool Was directory successfully removed?
 	 */
 	public function rmdir(string $path): bool

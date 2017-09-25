@@ -13,10 +13,10 @@ $bindings = [
 	# Injector module
 	'injector' => 'Zettacast\Contract\Injector\InjectorInterface',
 	'Zettacast\Injector\InjectorInterface' => 'Zettacast\Injector\Injector',
-
+	
 	# Autoload module
 	'autoload' => 'Zettacast\Autoload\Autoload',
-
+	
 	# Collection module
 	'stack' => 'Zettacast\Collection\Stack',
 	'queue' => 'Zettacast\Contract\Collection\QueueInterface',
@@ -33,9 +33,9 @@ $bindings = [
 	'file' => 'Zettacast\Filesystem\File',
 	'filesystem' => 'Zettacast\Filesystem\Filesystem',
 	'file.virtual' => ['Zettacast\Filesystem\File', 'virtual'],
-	'filesystem.zip' => 'Zettacast\Filesystem\Driver\ZipDriver',
-	'filesystem.virtual' => 'Zettacast\Filesystem\Driver\VirtualDriver',
-	'Zettacast\Contract\Filesystem\DriverInterface' => 'Zettacast\Filesystem\Driver\LocalDriver',
+	'filesystem.zip' => 'Zettacast\Filesystem\Driver\ZipDisk',
+	'filesystem.virtual' => 'Zettacast\Filesystem\Driver\VirtualDisk',
+	'Zettacast\Contract\Filesystem\DiskInterface' => 'Zettacast\Filesystem\Driver\LocalDisk',
 	
 	# Stream module
 	'filter' => 'Zettacast\Contract\Stream\FilterInterface',

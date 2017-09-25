@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Contract\Filesystem\DriverInterface interface file.
+ * Zettacast\Contract\Filesystem\DiskInterface interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -12,22 +12,22 @@ use Zettacast\Contract\Stream\StreamInterface;
 use Zettacast\Contract\Collection\SequenceInterface;
 
 /**
- * The Driver interface is responsible for exposing mandatory methods a
- * Filesystem driver must have.
+ * The disk interface is responsible for exposing mandatory methods a
+ * Filesystem disk must have.
  * @package Zettacast\Filesystem
  */
-interface DriverInterface
+interface DiskInterface
 {
 	/**
-	 * Checks whether a path exists in the driver.
+	 * Checks whether a path exists in the disk.
 	 * @param string $path Path to be checked.
 	 * @return bool Was the path found?
 	 */
 	public function has(string $path): bool;
 	
 	/**
-	 * Removes a file from driver.
-	 * @param string $path Path to file to be removed from driver.
+	 * Removes a file from disk.
+	 * @param string $path Path to file to be removed from disk.
 	 * @return bool Was file or directory successfully removed?
 	 */
 	public function remove(string $path): bool;
@@ -63,7 +63,7 @@ interface DriverInterface
 	public function isFile(string $path): bool;
 	
 	/**
-	 * Creates a new directory into the driver.
+	 * Creates a new directory into the disk.
 	 * @param string $path Path of the directory to be created.
 	 * @return bool Was the directory successfully created?
 	 */
@@ -97,7 +97,7 @@ interface DriverInterface
 	 * @param string $filename File to be read.
 	 * @return string All file contents.
 	 */
-	public function read(string $filename): string;
+	public function read(string $filename);
 	
 	/**
 	 * Retrieves contents from a file and puts it into a stream.
@@ -109,8 +109,8 @@ interface DriverInterface
 	public function readTo(string $file, $stream, int $length = null): int;
 	
 	/**
-	 * Removes a directory from driver.
-	 * @param string $path Path to directory to be removed from driver.
+	 * Removes a directory from disk.
+	 * @param string $path Path to directory to be removed from disk.
 	 * @return bool Was directory successfully removed?
 	 */
 	public function rmdir(string $path): bool;
