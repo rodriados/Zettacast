@@ -125,7 +125,9 @@ class Queue implements QueueInterface
 	 */
 	public function peek()
 	{
-		return $this->data->bottom();
+		return !$this->empty()
+			? $this->data->bottom()
+			: null;
 	}
 	
 	/**

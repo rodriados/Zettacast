@@ -44,7 +44,9 @@ class Stack extends Queue
 	 */
 	public function peek()
 	{
-		return $this->data->top();
+		return !$this->empty()
+			? $this->data->top()
+			: null;
 	}
 	
 	/**
