@@ -5,6 +5,7 @@ Thumbs.db
 .idea/
 *.ini
 *.phar
-resource/
+vendor/
 build/
 tmp/
+/.phpstorm.meta.php

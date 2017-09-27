@@ -33,23 +33,23 @@ final class FrameworkLoader implements LoaderInterface
 	protected $fwork;
 	
 	/**
-	 * Resources' directory path.
-	 * @var string Path to resources' files.
+	 * Vendors' directory path.
+	 * @var string Path to vendors' files.
 	 */
-	protected $rsrc;
+	protected $vendor;
 	
 	/**
 	 * Autoload constructor.
 	 * Initializes the class and set values to instance properties.
 	 * @param string $fwork Framework files' path.
 	 * @param string $app Application files' path.
-	 * @param string $rsrc Resource files' path.
+	 * @param string $vendor Vendors' files' path.
 	 */
-	public function __construct(string $fwork, string $app, string $rsrc)
+	public function __construct(string $fwork, string $app, string $vendor)
 	{
-		$this->fwork = $fwork;
-		$this->rsrc = $rsrc;
 		$this->app = $app;
+		$this->fwork = $fwork;
+		$this->vendor = $vendor;
 	}
 	
 	/**
@@ -65,7 +65,7 @@ final class FrameworkLoader implements LoaderInterface
 		
 		return $name[0] == ZETTACAST || $name[0] == 'App'
 			? $this->loadInternal($name)
-			: $this->loadResource($name);
+			: $this->loadVendor($name);
 	}
 	
 	/**
@@ -90,17 +90,17 @@ final class FrameworkLoader implements LoaderInterface
 	}
 	
 	/**
-	 * Tries to load an invoked and not yet loaded resource class. This method
+	 * Tries to load an invoked and not yet loaded vendor class. This method
 	 * is a fallback for classes not located within framework's directories, so
-	 * it searches in resources' directory.
+	 * it searches for vendors' classes.
 	 * @param array $name Class to be loaded exploded to qualified names.
 	 * @return bool Was the class successfully loaded?
 	 */
-	protected function loadResource(array $name): bool
+	protected function loadVendor(array $name): bool
 	{
 		$pkg = array_shift($name);
 		$cpath = implode('/', $name);
-		$fname = $this->rsrc."/{$pkg}/src/{$cpath}.php";
+		$fname = $this->vendor."/{$pkg}/src/{$cpath}.php";
 		
 		if($loaded = file_exists($fname))
 			require $fname;

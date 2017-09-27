@@ -47,7 +47,7 @@ final class Autoload
 	public function __construct(
 		string $fwork = FWORKPATH,
 		string $app = APPPATH,
-		string $rsrc = RSRCPATH
+		string $rsrc = VENDORPATH
 	) {
 		$this->loaders = [];
 		$this->framework = new FrameworkLoader($fwork, $app, $rsrc);

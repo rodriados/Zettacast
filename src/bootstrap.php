@@ -31,7 +31,7 @@ define('APPPATH',       DOCROOT.'/app');
 define('FWORKPATH',     DOCROOT.'/src');
 define('CONFIGPATH',    DOCROOT.'/config');
 define('PUBLICPATH',    DOCROOT.'/public');
-define('RSRCPATH',      DOCROOT.'/resource');
+define('VENDORPATH',    DOCROOT.'/vendor');
 define('TMPPATH',       DOCROOT.'/tmp');
 define('LOGPATH',       TMPPATH.'/log');
 define('CACHEPATH',     TMPPATH.'/cache');
