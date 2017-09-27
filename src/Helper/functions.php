@@ -8,21 +8,7 @@
  */
 
 use Zettacast\Zettacast;
-use Zettacast\Facade\Config;
 use Zettacast\Contract\ListableInterface;
-
-if(!function_exists('config')) {
-	/**
-	 * Retrieves a configuration value from repository.
-	 * @param string $key Key to be retrieved from repository.
-	 * @param mixed $default Value to be returned if key cannot be retrieved.
-	 * @return mixed The retrieved value, or default if not found.
-	 */
-	function config(string $key, $default = null)
-	{
-		return Config::get($key, $default);
-	}
-}
 
 if(!function_exists('isListable')) {
 	/**

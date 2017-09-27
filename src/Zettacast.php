@@ -8,8 +8,11 @@
  */
 namespace Zettacast;
 
+use Zettacast\Facade\Config;
 use Zettacast\Exception\Handler;
 use Zettacast\Injector\Injector;
+use Zettacast\Injector\Binder\DefaultBinder;
+use Zettacast\Contract\Injector\BinderInterface;
 use Zettacast\Contract\SingletonTrait;
 
 /**
@@ -57,7 +60,8 @@ final class Zettacast extends Injector
 	 */
 	public function __construct(string $root = DOCROOT)
 	{
-		parent::__construct();
+		$binder = $this->bindInternal();
+		parent::__construct($binder);
 		
 		$this->set('path', $root.'/app');
 		$this->set('path.base', $root);
@@ -79,11 +83,32 @@ final class Zettacast extends Injector
 	 */
 	public function bootstrap()
 	{
-		setlocale(LC_ALL, config('app.locale', 'en_US'));
-		mb_internal_encoding(config('app.charset', 'UTF-8'));
-		date_default_timezone_set(config('app.timezone', 'UTC'));
+		setlocale(LC_ALL, Config::get('app.locale', 'en_US'));
+		mb_internal_encoding(Config::get('app.charset', 'UTF-8'));
+		date_default_timezone_set(Config::get('app.timezone', 'UTC'));
 		
 		$this->set('mode', isset($_SERVER['argv']) ? self::CLI : self::APP);
+	}
+	
+	/**
+	 * Tries to load the framework bindings from the cache. If not possible,
+	 * the bindings are loaded from the PHP file.
+	 * @return BinderInterface The injector binder ready for usage.
+	 */
+	private function bindInternal(): BinderInterface
+	{
+		if(file_exists($cache = CACHEPATH.'/bindings.cache'))
+			if(filemtime($cache) > filemtime(FWORKPATH.'/bindings.php'))
+				return unserialize(file_get_contents($cache));
+		
+		$binder = new DefaultBinder;
+		$data = require FWORKPATH.'/bindings.php';
+		
+		foreach($data as $binding)
+			$binder->bind(...$binding);
+		
+		file_put_contents($cache, serialize($binder));
+		return $binder;
 	}
 	
 }

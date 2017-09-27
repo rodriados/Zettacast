@@ -33,6 +33,8 @@ define('CONFIGPATH',    DOCROOT.'/config');
 define('PUBLICPATH',    DOCROOT.'/public');
 define('RSRCPATH',      DOCROOT.'/resource');
 define('TMPPATH',       DOCROOT.'/tmp');
+define('LOGPATH',       TMPPATH.'/log');
+define('CACHEPATH',     TMPPATH.'/cache');
 /**#@-*/
 
 /*
@@ -49,9 +51,3 @@ $loader = new Zettacast\Autoload\Autoload;
  * to be worried with instantiating complex objects: we can do it for you.
  */
 zetta()->set(Zettacast\Autoload\Autoload::class, $loader);
-
-/*
- * Creates all needed bindings for framework's dependency injector. This will
- * make the modules loosely coupled, and easily testable.
- */
-require FWORKPATH.'/bindings.php';
