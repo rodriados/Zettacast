@@ -16,10 +16,8 @@ use Zettacast\Contract\Http\Request as baseclass;
  * This class exposes package:http\Request methods to external usage.
  * @version 1.0
  */
-final class Request
+final class Request extends Facade
 {
-	use Facade;
-	
 	/**
 	 * Informs what the façaded object accessor is, allowing it to be further
 	 * used when calling façaded methods.
