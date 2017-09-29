@@ -157,15 +157,6 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Copies all the content present in this object.
-	 * @return static A new sequence with copied data.
-	 */
-	public function copy()
-	{
-		return clone $this;
-	}
-	
-	/**
 	 * Counts the number of elements currently in sequence.
 	 * @return int Number of elements stored in the sequence.
 	 */
@@ -555,7 +546,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	 */
 	public function tap(callable $fn)
 	{
-		$fn($copy = $this->copy());
+		$fn($copy = clone $this);
 		return $copy;
 	}
 	

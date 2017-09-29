@@ -157,15 +157,6 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Copies all the content present in this object.
-	 * @return static A new collection with copied data.
-	 */
-	public function copy()
-	{
-		return clone $this;
-	}
-	
-	/**
 	 * Counts the number of elements currently in collection.
 	 * @return int Number of elements stored in the collection.
 	 */
@@ -470,7 +461,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 */
 	public function tap(callable $fn)
 	{
-		$fn($copy = $this->copy());
+		$fn($copy = clone $this);
 		return $copy;
 	}
 	

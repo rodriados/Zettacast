@@ -27,7 +27,6 @@ final class CollectionTest extends \PHPUnit\Framework\TestCase
 	{
 		$col = new Collection([.5,1,1.5,2,2.5,3,3.5,4,4.5,5]);
 		$this->assertEquals($col->raw(), with(clone $col)->raw());
-		$this->assertEquals($col->raw(), $col->copy()->raw());
 		$this->assertEquals($col->count(), 10);
 		$this->assertEquals($col->apply(function($value): int {
 			return (int)($value * 2);
@@ -103,7 +102,6 @@ final class CollectionTest extends \PHPUnit\Framework\TestCase
 		foreach($queue as $key => $value)
 			$this->assertEquals($key + 1, $value);
 		
-		$this->assertInstanceOf(Queue::class, $queue->copy());
 		$this->assertEquals($queue->clear(), [1,2,3,4,5]);
 		$this->assertTrue($queue->empty());
 	}
@@ -121,7 +119,6 @@ final class CollectionTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals($queue->peek(), 1);
 		$this->assertEquals($queue->count(), 5);
 		
-		$this->assertInstanceOf(Stack::class, $queue->copy());
 		$this->assertEquals($queue->clear(), [5,4,3,2,1]);
 		$this->assertTrue($queue->empty());
 	}

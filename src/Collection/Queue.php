@@ -65,15 +65,6 @@ class Queue implements QueueInterface
 	}
 	
 	/**
-	 * Copies all the content present in this object.
-	 * @return static A new queue with copied data.
-	 */
-	public function copy()
-	{
-		return clone $this;
-	}
-	
-	/**
 	 * Counts the number of elements currently in queue.
 	 * @return int Number of queued elements.
 	 */

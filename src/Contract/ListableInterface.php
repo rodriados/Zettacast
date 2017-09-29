@@ -29,12 +29,6 @@ interface ListableInterface extends ExtractableInterface, \Countable, \Iterator
 	public function clear(): array;
 	
 	/**
-	 * Clones the object with all of its contents.
-	 * @return $this A new cloned object.
-	 */
-	public function copy();
-	
-	/**
 	 * Checks whether object is currently empty.
 	 * @return bool Is object empty?
 	 */
