@@ -8,20 +8,19 @@
  */
 namespace Zettacast\Filesystem;
 
-use Zettacast\Filesystem\Driver\Local as LocalDriver;
-use Zettacast\Filesystem\Driver\Virtual as VirtualDriver;
+use Zettacast\Filesystem\Disk\LocalDisk;
+use Zettacast\Filesystem\Disk\VirtualDisk;
 
 /**
- * This class acts as wrapper to a local driver.
+ * This class acts as wrapper to a local disk.
  * @package Zettacast\Filesystem
  * @version 1.0
  */
-class Filesystem
-	extends LocalDriver
+class Filesystem extends LocalDisk
 {
 	/**
-	 * Local driver constructor.
-	 * @param string $root Root directory for all operations done in driver.
+	 * Local disk constructor.
+	 * @param string $root Root directory for all operations done in disk.
 	 */
 	public function __construct(string $root = DOCROOT)
 	{
@@ -29,12 +28,12 @@ class Filesystem
 	}
 	
 	/**
-	 * Creates a new virtual driver, to be removed at this object destruction.
-	 * @return VirtualDriver New virtual filesystem.
+	 * Creates a new virtual disk, to be removed at this object destruction.
+	 * @return VirtualDisk New virtual filesystem.
 	 */
 	public static function virtual()
 	{
-		return new VirtualDriver;
+		return new VirtualDisk;
 	}
 	
 }

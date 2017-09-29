@@ -1,2 +1,4 @@
 README.md merge=ours
 LICENSE.md merge=ours
+.travis.yml merge=ours
+composer.json merge=ours

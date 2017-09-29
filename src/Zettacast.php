@@ -8,18 +8,21 @@
  */
 namespace Zettacast;
 
-use Zettacast\Helper\Singleton;
+use Zettacast\Facade\Config;
+use Zettacast\Exception\Handler;
 use Zettacast\Injector\Injector;
+use Zettacast\Injector\Binder\DefaultBinder;
+use Zettacast\Contract\Injector\BinderInterface;
+use Zettacast\Contract\SingletonTrait;
 
 /**
  * Boots framework and starts its main classes and modules, allowing its
  * correct usage and execution.
  * @version 1.0
  */
-final class Zettacast
-	extends Injector
+final class Zettacast extends Injector
 {
-	use Singleton;
+	use SingletonTrait;
 	
 	/**
 	 * Informs Zettacast current version.
@@ -57,15 +60,20 @@ final class Zettacast
 	 */
 	public function __construct(string $root = DOCROOT)
 	{
-		parent::__construct();
+		$binder = $this->bindInternal();
+		parent::__construct($binder);
 		
-		$this->share('path', $root.'/app');
-		$this->share('path.base', $root);
-		$this->share('path.public', $root.'/public');
-		$this->share('path.zetta', $root.'/src');
+		$this->set('path', $root.'/app');
+		$this->set('path.base', $root);
+		$this->set('path.public', $root.'/public');
+		$this->set('path.zetta', $root.'/src');
 		
-		$this->share(self::class, $this);
-		$this->share(Injector::class, $this);
+		$this->set(self::class, $this);
+		$this->set(Injector::class, $this);
+		
+		set_error_handler([Handler::class, 'handleError']);
+		set_exception_handler([Handler::class, 'handleException']);
+		register_shutdown_function([Handler::class, 'handleShutdown']);
 	}
 	
 	/**
@@ -75,15 +83,32 @@ final class Zettacast
 	 */
 	public function bootstrap()
 	{
-		setlocale(LC_ALL, config('app.locale', 'en_US'));
-		mb_internal_encoding(config('app.charset', 'UTF-8'));
-		date_default_timezone_set(config('app.timezone', 'UTC'));
+		setlocale(LC_ALL, Config::get('app.locale', 'en_US'));
+		mb_internal_encoding(Config::get('app.charset', 'UTF-8'));
+		date_default_timezone_set(Config::get('app.timezone', 'UTC'));
 		
-		#set_error_handler([Handler::class, 'error']);
-		#set_exception_handler([Handler::class, 'exception']);
-		#register_shutdown_function([Handler::class, 'shutdown']);
+		$this->set('mode', isset($_SERVER['argv']) ? self::CLI : self::APP);
+	}
+	
+	/**
+	 * Tries to load the framework bindings from the cache. If not possible,
+	 * the bindings are loaded from the PHP file.
+	 * @return BinderInterface The injector binder ready for usage.
+	 */
+	private function bindInternal(): BinderInterface
+	{
+		if(file_exists($cache = CACHEPATH.'/bindings.cache'))
+			if(filemtime($cache) > filemtime(FWORKPATH.'/bindings.php'))
+				return unserialize(file_get_contents($cache));
 		
-		$this->share('mode', isset($_SERVER['argv']) ? self::CLI : self::APP);
+		$binder = new DefaultBinder;
+		$data = require FWORKPATH.'/bindings.php';
+		
+		foreach($data as $binding)
+			$binder->bind(...$binding);
+		
+		file_put_contents($cache, serialize($binder));
+		return $binder;
 	}
 	
 }

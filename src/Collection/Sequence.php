@@ -8,18 +8,22 @@
  */
 namespace Zettacast\Collection;
 
-use SplDoublyLinkedList;
-use Zettacast\Collection\Concerns\ArrayAccess;
-use Zettacast\Contract\Collection\Sequence as SequenceContract;
+use Zettacast\Contract\ArrayAccessTrait;
+use Zettacast\Contract\Collection\SequenceInterface;
 
-class Sequence
-	implements SequenceContract
+/**
+ * Sequence class. This class has methods appliable for all kinds of sequences.
+ * Only integer and sequencial keys are acceptable.
+ * @package Zettacast\Collection
+ * @version 1.0
+ */
+class Sequence implements SequenceInterface, \ArrayAccess
 {
-	use ArrayAccess;
+	use ArrayAccessTrait;
 	
 	/**
 	 * Data to be stored.
-	 * @var SplDoublyLinkedList Data stored in collection.
+	 * @var \SplDoublyLinkedList Data stored in sequence.
 	 */
 	protected $data;
 	
@@ -31,10 +35,10 @@ class Sequence
 	public function __construct($data = null)
 	{
 		$data = !is_null($data)
-			? toarray($data)
+			? toArray($data)
 			: [];
 		
-		$this->data = new SplDoublyLinkedList;
+		$this->data = new \SplDoublyLinkedList;
 		
 		foreach($data as $value)
 			$this->data->push($value);
@@ -50,22 +54,74 @@ class Sequence
 	}
 	
 	/**
-	 * Returns all data stored in collection.
-	 * @return array All data stored in collection.
+	 * Accesses the element stored in the given index.
+	 * @param int $index Index to be accessed.
+	 * @param mixed $default Default value as fallback.
+	 * @return mixed Element stored in given index.
 	 */
-	public function all() : array
+	public function get($index, $default = null)
 	{
-		return toarray($this->data);
+		return $this->has($index)
+			? $this->data[$index]
+			: $default;
+	}
+	
+	/**
+	 * Checks whether the index exists.
+	 * @param int $index Index to be checked.
+	 * @return bool Does given index exist?
+	 */
+	public function has($index): bool
+	{
+		return isset($this->data[$index]);
+	}
+	
+	/**
+	 * Sets a value to the given index.
+	 * @param int $index Index to be updated.
+	 * @param mixed $value Value to be stored in index.
+	 * @return $this Sequence for method chaining.
+	 */
+	public function set($index, $value)
+	{
+		if($index <= $this->count())
+			$this->data->add($index, $value);
+		
+		return $this;
+	}
+	
+	/**
+	 * Removes an element from sequence.
+	 * @param mixed $index Index to be removed.
+	 * @return $this Sequence for method chaining.
+	 */
+	public function del($index)
+	{
+		if($this->has($index))
+			unset($this->data[$index]);
+		
+		return $this;
+	}
+	
+	/**
+	 * Returns all data stored in sequence.
+	 * @return array All data stored in sequence.
+	 */
+	public function raw(): array
+	{
+		return toArray($this->data);
 	}
 	
 	/**
 	 * Applies a callback to all values stored in sequence.
 	 * @param callable $fn Callback to be applied. Parameters: value, key.
-	 * @param mixed ...$userdata Optional extra parameters for function.
-	 * @return static Sequence for method chaining.
+	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
+	 * @return $this Sequence for method chaining.
 	 */
-	public function apply(callable $fn, ...$userdata)
+	public function apply(callable $fn, $userdata = null)
 	{
+		$userdata = toArray($userdata);
+		
 		foreach($this->iterate() as $key => $value)
 			$this->data[$key] = $fn($value, $key, ...$userdata);
 		
@@ -75,14 +131,14 @@ class Sequence
 	/**
 	 * Chunks the sequence into pieces of the given size.
 	 * @param int $size Size of the chunks.
-	 * @return array Array of sequence chunks.
+	 * @return static[] Array of sequence chunks.
 	 */
-	public function chunk(int $size) : array
+	public function chunk(int $size): array
 	{
 		if($size <= 0)
 			return [];
 		
-		foreach(array_chunk($this->all(), $size) as $sequence)
+		foreach(array_chunk($this->raw(), $size) as $sequence)
 			$chunk[] = $this->new($sequence);
 		
 		return $chunk ?? [];
@@ -90,29 +146,21 @@ class Sequence
 	
 	/**
 	 * Clears all data stored in object and returns it.
-	 * @return array All data stored in collection before clearing.
+	 * @return array All data stored in sequence before clearing.
 	 */
-	public function clear() : array
+	public function clear(): array
 	{
-		$ref = $this->all();
-		$this->data = new SplDoublyLinkedList;
+		$ref = $this->raw();
+		$this->data = new \SplDoublyLinkedList;
+		
 		return $ref;
 	}
 	
 	/**
-	 * Copies all the content present in this object.
-	 * @return static A new collection with copied data.
+	 * Counts the number of elements currently in sequence.
+	 * @return int Number of elements stored in the sequence.
 	 */
-	public function copy()
-	{
-		return clone $this;
-	}
-	
-	/**
-	 * Counts the number of elements currently in collection.
-	 * @return int Number of elements stored in the collection.
-	 */
-	public function count() : int
+	public function count(): int
 	{
 		return $this->data->count();
 	}
@@ -127,20 +175,20 @@ class Sequence
 	}
 	
 	/**
-	 * Checks whether collection is currently empty.
-	 * @return bool Is collection empty?
+	 * Checks whether sequence is currently empty.
+	 * @return bool Is sequence empty?
 	 */
-	public function empty() : bool
+	public function empty(): bool
 	{
 		return $this->data->isEmpty();
 	}
 	
 	/**
-	 * Checks whether all elements in collection pass given tests.
+	 * Checks whether all elements in sequence pass given test.
 	 * @param callable $fn Test function. Parameters: value, key.
 	 * @return bool Does every element pass the tests?
 	 */
-	public function every(callable $fn = null) : bool
+	public function every(callable $fn = null): bool
 	{
 		$fn = $fn ?: 'with';
 		
@@ -153,25 +201,27 @@ class Sequence
 	
 	/**
 	 * Creates a new sequence with all elements except the specified keys.
-	 * @param int[] $keys Keys to be forgotten in the new sequence.
+	 * @param int|int[] $keys Keys to be forgotten in the new sequence.
 	 * @return static New sequence instance.
 	 */
-	public function except(int ...$keys)
+	public function except($keys)
 	{
-		return $this->new(array_diff_key($this->all(), array_flip($keys)));
+		return $this->new(
+			array_diff_key($this->raw(), array_flip(toArray($keys)))
+		);
 	}
 	
 	/**
-	 * Filters elements according to the given tests. If no tests function is
+	 * Filters elements according to the given test. If no test function is
 	 * given, it fallbacks to removing all false equivalent values.
 	 * @param callable $fn Test function. Parameters: value, key.
-	 * @return static Collection of all filtered values.
+	 * @return static Sequence of all filtered values.
 	 */
 	public function filter(callable $fn = null)
 	{
 		return $this->new(is_null($fn)
-			? array_filter($this->all())
-			: array_filter($this->all(), $fn, ARRAY_FILTER_USE_BOTH)
+			? array_filter($this->raw())
+			: array_filter($this->raw(), $fn, ARRAY_FILTER_USE_BOTH)
 		);
 	}
 	
@@ -185,29 +235,6 @@ class Sequence
 	}
 	
 	/**
-	 * Accesses the element stored in the given index.
-	 * @param int $index Index to be accessed.
-	 * @param mixed $default Default value as fallback.
-	 * @return mixed Element stored in given index.
-	 */
-	public function get(int $index, $default = null)
-	{
-		return $this->has($index)
-			? $this->data[$index]
-			: $default;
-	}
-	
-	/**
-	 * Checks whether the index exists.
-	 * @param int $index Index to be checked.
-	 * @return bool Does given index exist?
-	 */
-	public function has(int $index) : bool
-	{
-		return isset($this->data[$index]);
-	}
-	
-	/**
 	 * Intersects given items with sequence's elements.
 	 * @param array|Sequence $items Items to intersect with sequence.
 	 * @return static Sequence of intersected elements.
@@ -215,7 +242,7 @@ class Sequence
 	public function intersect($items)
 	{
 		return $this->new(
-			array_intersect($this->all(), toarray($items))
+			array_intersect($this->raw(), toArray($items))
 		);
 	}
 	
@@ -223,16 +250,16 @@ class Sequence
 	 * Creates a generator that iterates over the sequence.
 	 * @yield mixed Sequence's stored values.
 	 */
-	public function iterate()
+	public function iterate(): \Generator
 	{
 		yield from $this->data;
 	}
 	
 	/**
 	 * Fetches the key the internal pointer currently points to.
-	 * @return mixed Current element's key in the collection.
+	 * @return int Current element's key in the sequence.
 	 */
-	public function key()
+	public function key(): int
 	{
 		return $this->data->key();
 	}
@@ -255,7 +282,7 @@ class Sequence
 	 */
 	public function map(callable $fn)
 	{
-		$target = $this->all();
+		$target = $this->raw();
 		
 		return $this->new(
 			array_map($fn, $target, array_keys($target))
@@ -270,7 +297,7 @@ class Sequence
 	public function merge($items)
 	{
 		return $this->new(
-			array_merge($this->all(), array_values($items))
+			array_merge($this->raw(), array_values($items))
 		);
 	}
 	
@@ -286,12 +313,14 @@ class Sequence
 	
 	/**
 	 * Creates a new sequence with a subset of elements.
-	 * @param int[] $keys Keys to be included in new sequence.
+	 * @param int|int[] $keys Keys to be included in new sequence.
 	 * @return static New sequence instance.
 	 */
-	public function only(int ...$keys)
+	public function only($keys)
 	{
-		return $this->new(array_intersect_key($this->all(), array_flip($keys)));
+		return $this->new(
+			array_intersect_key($this->raw(), array_flip(toArray($keys)))
+		);
 	}
 	
 	/**
@@ -332,14 +361,15 @@ class Sequence
 	public function pull(int $index, $default = null)
 	{
 		$value = $this->get($index, $default);
-		$this->remove($index);
+		$this->del($index);
+		
 		return $value;
 	}
 	
 	/**
-	 * Pushes an element to the top of the sequence.
-	 * @param mixed $value Element to be pushed to the top of the sequence.
-	 * @return static Sequence for method chaining.
+	 * Pushes an element onto the end of the sequence.
+	 * @param mixed $value Value to be appended onto the sequence.
+	 * @return $this Sequence for method chaining.
 	 */
 	public function push($value)
 	{
@@ -359,8 +389,8 @@ class Sequence
 		if($sample >= $this->count())
 			return $this->shuffle();
 		
-		$keys = toarray(array_rand($this->all(), $sample));
-		return $this->only(...$keys);
+		$keys = array_rand($this->raw(), $sample);
+		return $this->only($keys);
 	}
 	
 	/**
@@ -371,20 +401,7 @@ class Sequence
 	 */
 	public function reduce(callable $fn, $initial = null)
 	{
-		return array_reduce($this->all(), $fn, $initial);
-	}
-	
-	/**
-	 * Removes an element from sequence.
-	 * @param mixed $index Index to be removed.
-	 * @return static Sequence for method chaining.
-	 */
-	public function remove(int $index)
-	{
-		if($this->has($index))
-			unset($this->data[$index]);
-		
-		return $this;
+		return array_reduce($this->raw(), $fn, $initial);
 	}
 	
 	/**
@@ -393,7 +410,7 @@ class Sequence
 	 */
 	public function reverse()
 	{
-		return $this->new(array_reverse($this->all()));
+		return $this->new(array_reverse($this->raw()));
 	}
 	
 	/**
@@ -418,7 +435,7 @@ class Sequence
 	{
 		$btt = $rotations > 0;
 		$rot = (abs($rotations) % $this->count()) * ($btt ? -1 : 1);
-		$arr = $this->all();
+		$arr = $this->raw();
 		
 		return $this->new(
 			array_merge(array_slice($arr, $rot), array_slice($arr, 0, $rot))
@@ -433,21 +450,7 @@ class Sequence
 	 */
 	public function search($needle, bool $strict = false)
 	{
-		return array_search($needle, $this->all(), $strict);
-	}
-	
-	/**
-	 * Sets a value to the given index.
-	 * @param int $index Index to be updated.
-	 * @param mixed $value Value to be stored in index.
-	 * @return static Sequence for method chaining.
-	 */
-	public function set(int $index, $value)
-	{
-		if($index <= $this->count())
-			$this->data->add($index, $value);
-		
-		return $this;
+		return array_search($needle, $this->raw(), $strict);
 	}
 	
 	/**
@@ -465,7 +468,7 @@ class Sequence
 	 */
 	public function shuffle()
 	{
-		$data = $this->all();
+		$data = $this->raw();
 		shuffle($data);
 
 		return $this->new($data);
@@ -474,38 +477,38 @@ class Sequence
 	/**
 	 * Retrieves a slice of the sequence.
 	 * @param int $index Slice initial position.
-	 * @param int|null $length Length of the slice.
+	 * @param int $length Length of the slice.
 	 * @return static Sliced sequence.
 	 */
 	public function slice(int $index, int $length = null)
 	{
-		return $this->new(array_slice($this->all(), $index, $length));
+		return $this->new(array_slice($this->raw(), $index, $length));
 	}
 	
 	/**
-	 * Sorts the collection using a given function.
+	 * Sorts the sequence using a given function.
 	 * @param callable $fn Ordering function.
-	 * @return static Sorted collection.
+	 * @return static Sorted sequence.
 	 */
 	public function sort(callable $fn = null)
 	{
-		$data = $this->all();
+		$data = $this->raw();
 		is_null($fn) ? sort($data) : usort($data, $fn);
 		
 		return $this->new($data);
 	}
 	
 	/**
-	 * Removes part of the collection and replaces it.
+	 * Removes part of the sequence and replaces it.
 	 * @param int $offset Initial splice offset.
 	 * @param int $length Length of splice portion.
-	 * @param array $replace Replacement for removed slice.
-	 * @return static Spliced collection.
+	 * @param mixed $replace Replacement for removed slice.
+	 * @return static Spliced sequence.
 	 */
 	public function splice(int $offset, int $length = null, $replace = [])
 	{
 		return $this->new(array_splice(
-			toarray($this->data),
+			toArray($this->data),
 			$offset,
 			$length ?: $this->count(),
 			$replace
@@ -513,22 +516,21 @@ class Sequence
 	}
 	
 	/**
-	 * Splits the collection into the given number of groups.
-	 * @param int $count Number of groups to split the collection.
-	 * @return array Splitted collection.
+	 * Splits the sequence into the given number of groups.
+	 * @param int $count Number of groups to split the sequence.
+	 * @return array Splitted sequence.
 	 */
-	public function split(int $count) : array
+	public function split(int $count): array
 	{
-		if($this->empty())
-			return [];
-		
-		return $this->chunk(ceil($this->count() / $count));
+		return !$this->empty()
+			? $this->chunk(ceil($this->count() / $count))
+			: [];
 	}
 	
 	/**
 	 * Takes the first or last specified number of items.
 	 * @param int $limit Number of items to be taken.
-	 * @return static Collection of the taken items.
+	 * @return static Sequence of the taken items.
 	 */
 	public function take(int $limit)
 	{
@@ -544,7 +546,7 @@ class Sequence
 	 */
 	public function tap(callable $fn)
 	{
-		$fn($copy = $this->copy());
+		$fn($copy = clone $this);
 		return $copy;
 	}
 	
@@ -563,7 +565,7 @@ class Sequence
 	 * Checks whether the pointer is a valid position.
 	 * @return bool Is the pointer in a valid position?
 	 */
-	public function valid() : bool
+	public function valid(): bool
 	{
 		return $this->data->valid();
 	}
@@ -571,11 +573,13 @@ class Sequence
 	/**
 	 * Iterates over sequence and executes a function over every element.
 	 * @param callable $fn Iteration function. Parameters: value, key.
-	 * @param mixed ...$userdata Optional extra parameters for function.
+	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
 	 * @return static Sequence for method chaining.
 	 */
-	public function walk(callable $fn, ...$userdata)
+	public function walk(callable $fn, $userdata = null)
 	{
+		$userdata = toArray($userdata);
+		
 		foreach($this->iterate() as $key => $value)
 			$fn($value, $key, ...$userdata);
 		

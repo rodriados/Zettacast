@@ -1,3 +1,3 @@
 <?php
 
-	print "Zettacast Initial Page!";
+print "Zettacast Initial Page!";

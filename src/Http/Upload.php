@@ -10,15 +10,14 @@ namespace Zettacast\Http;
 
 use Zettacast\Facade\File;
 use Zettacast\Filesystem\Info;
-use Zettacast\Collection\Recursive as RecursiveCollection;
+use Zettacast\Collection\RecursiveCollection;
 
 /**
  * This class stores information about an uploaded file.
  * @package Zettacast\HTTP
  * @version 1.0
  */
-class Upload
-	extends Info
+class Upload extends Info
 {
 	/**
 	 * The error code related to the upload.
@@ -75,7 +74,7 @@ class Upload
 		if(!File::mkdir(dirname($target)))
 			return false;
 		
-		if(!@move_uploaded_file($this->path(), $target))
+		if(!@move_uploaded_file($this->getPath(), $target))
 			return false;
 		
 		@chmod($target, 0666 & ~umask());
@@ -98,7 +97,7 @@ class Upload
 	public function valid() : bool
 	{
 		$ok = $this->error == UPLOAD_ERR_OK;
-		return $ok && is_uploaded_file($this->path());
+		return $ok && is_uploaded_file($this->getPath());
 	}
 	
 	/**

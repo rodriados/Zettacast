@@ -8,8 +8,7 @@
  */
 namespace Zettacast\Collection;
 
-use SplDoublyLinkedList;
-use Zettacast\Contract\Collection\Queue as QueueContract;
+use Zettacast\Contract\Collection\QueueInterface;
 
 /**
  * Queue class. This class has methods appliable for all kinds of queues. Only
@@ -17,13 +16,12 @@ use Zettacast\Contract\Collection\Queue as QueueContract;
  * @package Zettacast\Collection
  * @version 1.0
  */
-class Queue
-	implements QueueContract
+class Queue implements QueueInterface
 {
 	
 	/**
 	 * Data to be stored.
-	 * @var SplDoublyLinkedList Data stored in queue.
+	 * @var \SplDoublyLinkedList Data stored in queue.
 	 */
 	protected $data;
 	
@@ -33,7 +31,7 @@ class Queue
 	 */
 	public function __construct()
 	{
-		$this->data = new SplDoublyLinkedList;
+		$this->data = new \SplDoublyLinkedList;
 	}
 	
 	/**
@@ -49,36 +47,28 @@ class Queue
 	 * Returns all data stored in queue.
 	 * @return array All data stored in queue.
 	 */
-	public function all() : array
+	public function raw(): array
 	{
-		return toarray($this->data);
+		return toArray($this->data);
 	}
 	
 	/**
 	 * Clears all data stored in object and returns it.
 	 * @return array All data stored in queue before clearing.
 	 */
-	public function clear() : array
+	public function clear(): array
 	{
-		$old = $this->all();
-		$this->data = new SplDoublyLinkedList;
+		$old = $this->raw();
+		$this->data = new \SplDoublyLinkedList;
+		
 		return $old;
-	}
-	
-	/**
-	 * Copies all the content present in this object.
-	 * @return static A new queue with copied data.
-	 */
-	public function copy()
-	{
-		return clone $this;
 	}
 	
 	/**
 	 * Counts the number of elements currently in queue.
 	 * @return int Number of queued elements.
 	 */
-	public function count() : int
+	public function count(): int
 	{
 		return $this->data->count();
 	}
@@ -96,16 +86,16 @@ class Queue
 	 * Checks whether queue is currently empty.
 	 * @return bool Is queue empty?
 	 */
-	public function empty() : bool
+	public function empty(): bool
 	{
 		return $this->data->isEmpty();
 	}
 	
 	/**
 	 * Fetches the key the internal pointer currently points to.
-	 * @return mixed Current element's key in the queue.
+	 * @return int Current element's key in the queue.
 	 */
-	public function key() : int
+	public function key(): int
 	{
 		return $this->data->key();
 	}
@@ -126,7 +116,9 @@ class Queue
 	 */
 	public function peek()
 	{
-		return $this->data->bottom();
+		return !$this->empty()
+			? $this->data->bottom()
+			: null;
 	}
 	
 	/**
@@ -153,7 +145,7 @@ class Queue
 	/**
 	 * Pushes a value and positions it on the top of the queue.
 	 * @param mixed $value Value to be pushed to queue.
-	 * @return static Queue for method chaining.
+	 * @return $this Queue for method chaining.
 	 */
 	public function push($value)
 	{
@@ -175,7 +167,7 @@ class Queue
 	 * Checks whether the pointer is a valid position.
 	 * @return bool Is the pointer in a valid position?
 	 */
-	public function valid() : bool
+	public function valid(): bool
 	{
 		return $this->data->valid();
 	}

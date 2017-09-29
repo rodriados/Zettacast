@@ -9,23 +9,23 @@
 namespace Zettacast\Facade;
 
 use Zettacast\Helper\Facade;
-use Zettacast\Collection\Sequence;
-use Zettacast\Filesystem\Stream\Virtual;
+use Zettacast\Contract\Stream\StreamInterface;
+use Zettacast\Contract\Collection\SequenceInterface;
 use Zettacast\Filesystem\Filesystem as baseclass;
-use Zettacast\Contract\Filesystem\Stream as StreamContract;
 
 /**
  * Zettacast's Filesystem façade class.
  * This class exposes package:filesystem\Filesystem methods to external usage.
+ * @method static bool chmod(string $path, int $perms = 0777)
  * @method static bool copy(string $path, string $target)
  * @method static bool has(string $path)
  * @method static mixed info(string $path = null, string $data = null)
- * @method static bool isdir(string $path)
- * @method static bool isfile(string $path)
- * @method static Sequence list(string $dir = null)
+ * @method static bool isDir(string $path)
+ * @method static bool isFile(string $path)
+ * @method static SequenceInterface list(string $dir = null)
  * @method static bool mkdir(string $path)
  * @method static bool move(string $path, string $newpath)
- * @method static StreamContract open(string $filename, string $mode = 'r')
+ * @method static StreamInterface open(string $filename, string $mode = 'r')
  * @method static string read(string $filename)
  * @method static int readTo(string $file, $stream, int $length = null)
  * @method static bool remove(string $path)
@@ -36,28 +36,16 @@ use Zettacast\Contract\Filesystem\Stream as StreamContract;
  * @method static int writeFrom($stream, string $file, int $length = null)
  * @version 1.0
  */
-final class File
+final class File extends Facade
 {
-	use Facade;
-	
 	/**
 	 * Checks whether a path exists in the filesystem.
 	 * @param string $path Path to be checked.
 	 * @return bool Was the path found?
 	 */
-	public static function exists(string $path) : bool
+	public static function exists(string $path): bool
 	{
 		return self::facaded()->has($path);
-	}
-	
-	/**
-	 * Creates a new temporary file, to be removed at this object destruction.
-	 * @param string $content Initial content of temporary file.
-	 * @return Virtual New temporary file.
-	 */
-	public static function virtual(string $content = null) : Virtual
-	{
-		return new Virtual($content);
 	}
 	
 	/**

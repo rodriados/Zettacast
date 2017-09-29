@@ -13,14 +13,13 @@ use Zettacast\Contract\Http\Kernel as KernelContract;
 use Zettacast\Contract\Http\Request as RequestContract;
 use Zettacast\Contract\Http\Response as ResponseContract;
 
-class Kernel
-	implements KernelContract
+class Kernel implements KernelContract
 {
 	public function __construct()
 	{
 		zetta()->bootstrap();
-		zetta()->share(self::class, $this);
-		zetta()->share(KernelContract::class, $this);
+		zetta()->set(self::class, $this);
+		zetta()->set(KernelContract::class, $this);
 	}
 	
 	public function commit(RequestContract $req, ResponseContract $resp)
@@ -30,8 +29,7 @@ class Kernel
 	
 	public function handle(RequestContract $req) : ResponseContract
 	{
-		zetta()->share(RequestContract::class, $req);
-		RequestFacade::unfacade();
+		zetta()->set(RequestContract::class, $req);
 		
 		require APPPATH.'/view/index.php';
 		$resp = new Response;

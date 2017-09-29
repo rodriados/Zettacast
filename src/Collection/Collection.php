@@ -8,10 +8,9 @@
  */
 namespace Zettacast\Collection;
 
-use ArrayAccess as ArrayAccessContract;
-use Zettacast\Collection\Concerns\ArrayAccess;
-use Zettacast\Collection\Concerns\ObjectAccess;
-use Zettacast\Contract\Collection\Collection as CollectionContract;
+use Zettacast\Contract\ArrayAccessTrait;
+use Zettacast\Contract\ObjectAccessTrait;
+use Zettacast\Contract\Collection\CollectionInterface;
 
 /**
  * Collection class. This class has methods appliable for all kinds of
@@ -19,11 +18,10 @@ use Zettacast\Contract\Collection\Collection as CollectionContract;
  * @package Zettacast\Collection
  * @version 1.0
  */
-class Collection
-	implements CollectionContract, ArrayAccessContract
+class Collection implements CollectionInterface, \ArrayAccess
 {
-	use ArrayAccess;
-	use ObjectAccess;
+	use ArrayAccessTrait;
+	use ObjectAccessTrait;
 	
 	/**
 	 * Data to be stored.
@@ -39,19 +37,68 @@ class Collection
 	public function __construct($data = null)
 	{
 		$this->data = !is_null($data)
-			? toarray($data)
+			? toArray($data)
 			: [];
 	}
 	
 	/**
-	 * Adds an element to the collection if it doesn't exist.
-	 * @param mixed $key Key name to be added.
-	 * @param mixed $value Value to be stored.
-	 * @return static Collection for method chaining.
+	 * Gets an element stored in collection.
+	 * @param mixed $key Key of requested element.
+	 * @param mixed $default Default value fallback.
+	 * @return mixed Requested element or default fallback.
 	 */
-	public function add($key, $value)
+	public function get($key, $default = null)
 	{
-		if(!$this->has($key))
+		return $this->has($key)
+			? $this->data[$key]
+			: $default;
+	}
+	
+	/**
+	 * Checks whether element key exists.
+	 * @param mixed $key Key to be checked if exists.
+	 * @return bool Does key exist?
+	 */
+	public function has($key): bool
+	{
+		return isset($this->data[$key]);
+	}
+	
+	/**
+	 * Sets a value to the given key.
+	 * @param mixed $key Key to be created or updated.
+	 * @param mixed $value Value to be stored in key.
+	 * @return $this Collection for method chaining.
+	 */
+	public function set($key, $value)
+	{
+		if(is_null($key)) $this->data[] = $value;
+		else $this->data[$key] = $value;
+
+		return $this;
+	}
+	
+	/**
+	 * Removes an element from collection.
+	 * @param mixed $key Key to be removed.
+	 * @return $this Collection for method chaining.
+	 */
+	public function del($key)
+	{
+		if($this->has($key))
+			unset($this->data[$key]);
+		
+		return $this;
+	}
+	
+	/**
+	 * Adds a group of elements to the collection.
+	 * @param array $values Values to be added to collection.
+	 * @return $this Collection for method chaining.
+	 */
+	public function add(array $values = [])
+	{
+		foreach($values as $key => $value)
 			$this->set($key, $value);
 		
 		return $this;
@@ -61,19 +108,21 @@ class Collection
 	 * Returns all data stored in collection.
 	 * @return array All data stored in collection.
 	 */
-	public function all() : array
+	public function raw(): array
 	{
-		return $this->data;
+		return toArray($this->data);
 	}
 	
 	/**
 	 * Applies a callback to all values stored in collection.
 	 * @param callable $fn Callback to be applied. Parameters: value, key.
-	 * @param mixed ...$userdata Optional extra parameters for function.
-	 * @return static Collection for method chaining.
+	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
+	 * @return $this Collection for method chaining.
 	 */
-	public function apply(callable $fn, ...$userdata)
+	public function apply(callable $fn, $userdata = null)
 	{
+		$userdata = toArray($userdata);
+		
 		foreach($this->iterate() as $key => $value)
 			$this->data[$key] = $fn($value, $key, ...$userdata);
 		
@@ -83,9 +132,9 @@ class Collection
 	/**
 	 * Chunks the collection into pieces of the given size.
 	 * @param int $size Size of the chunks.
-	 * @return array Array of collection of chunks.
+	 * @return static[] Array of collection of chunks.
 	 */
-	public function chunk(int $size) : array
+	public function chunk(int $size): array
 	{
 		if($size <= 0)
 			return [];
@@ -100,7 +149,7 @@ class Collection
 	 * Clears all data stored in object and returns it.
 	 * @return array All data stored in collection before clearing.
 	 */
-	public function clear() : array
+	public function clear(): array
 	{
 		$ref = $this->data;
 		$this->data = [];
@@ -108,19 +157,10 @@ class Collection
 	}
 	
 	/**
-	 * Copies all the content present in this object.
-	 * @return static A new collection with copied data.
-	 */
-	public function copy()
-	{
-		return clone $this;
-	}
-	
-	/**
 	 * Counts the number of elements currently in collection.
 	 * @return int Number of elements stored in the collection.
 	 */
-	public function count() : int
+	public function count(): int
 	{
 		return count($this->data);
 	}
@@ -143,14 +183,14 @@ class Collection
 	public function diff($items, bool $keys = false)
 	{
 		$fn = $keys ? 'array_diff_assoc' : 'array_diff';
-		return $this->new($fn($this->data, toarray($items)));
+		return $this->new($fn($this->data, toArray($items)));
 	}
 	
 	/**
 	 * Divide collection's keys and values into two collections.
 	 * @return array Array of collections of keys and values.
 	 */
-	public function divide() : array
+	public function divide(): array
 	{
 		return [
 			$this->keys(),
@@ -162,17 +202,17 @@ class Collection
 	 * Checks whether collection is currently empty.
 	 * @return bool Is collection empty?
 	 */
-	public function empty() : bool
+	public function empty(): bool
 	{
 		return empty($this->data);
 	}
 	
 	/**
-	 * Checks whether all elements in collection pass given tests.
+	 * Checks whether all elements in collection pass given test.
 	 * @param callable $fn Test function. Parameters: value, key.
 	 * @return bool Does every element pass the tests?
 	 */
-	public function every(callable $fn = null) : bool
+	public function every(callable $fn = null): bool
 	{
 		$fn = $fn ?: 'with';
 		
@@ -185,16 +225,18 @@ class Collection
 	
 	/**
 	 * Creates a new collection with all elements except the specified keys.
-	 * @param mixed ...$keys Keys to be forgotten in the new collection.
+	 * @param mixed|mixed[] $keys Keys to be forgotten in the new collection.
 	 * @return static New collection instance.
 	 */
-	public function except(...$keys)
+	public function except($keys)
 	{
-		return $this->new(array_diff_key($this->data, array_flip($keys)));
+		return $this->new(
+			array_diff_key($this->data, array_flip(toArray($keys)))
+		);
 	}
 	
 	/**
-	 * Filters elements according to the given tests. If no tests function is
+	 * Filters elements according to the given test. If no test function is
 	 * given, it fallbacks to removing all false equivalent values.
 	 * @param callable $fn Test function. Parameters: value, key.
 	 * @return static Collection of all filtered values.
@@ -208,29 +250,6 @@ class Collection
 	}
 	
 	/**
-	 * Gets an element stored in collection.
-	 * @param mixed $key Key of requested element.
-	 * @param mixed $default Default value fallback.
-	 * @return mixed Requested element or default fallback.
-	 */
-	public function get($key, $default = null)
-	{
-		return $this->has($key)
-			? $this->data[$key]
-			: $default;
-	}
-	
-	/**
-	 * Checks whether element key exists.
-	 * @param mixed $key Key to be check if exists.
-	 * @return bool Does key exist?
-	 */
-	public function has($key) : bool
-	{
-		return isset($this->data[$key]);
-	}
-	
-	/**
 	 * Intersects given items with collection's elements.
 	 * @param array|Collection $items Items to intersect with collection.
 	 * @param bool $keys Should keys also be compared?
@@ -239,14 +258,14 @@ class Collection
 	public function intersect($items, bool $keys = false)
 	{
 		$fn = $keys ? 'array_intersect_assoc' : 'array_intersect';
-		return $this->new($fn($this->data, toarray($items)));
+		return $this->new($fn($this->data, toArray($items)));
 	}
 	
 	/**
 	 * Creates a generator that iterates over the collection.
 	 * @yield mixed Collection's stored values.
 	 */
-	public function iterate()
+	public function iterate(): \Generator
 	{
 		yield from $this->data;
 	}
@@ -264,7 +283,7 @@ class Collection
 	 * Returns all element keys currently present in collection.
 	 * @return self Collection of this collection element's keys.
 	 */
-	public function keys() : self
+	public function keys(): self
 	{
 		return new self(array_keys($this->data));
 	}
@@ -284,13 +303,13 @@ class Collection
 	}
 	
 	/**
-	 * Merges given items into collection's elements.
-	 * @param mixed $items Items to be merged into collection.
+	 * Merges given items with this collection's elements.
+	 * @param mixed $items Items to be merged with collection.
 	 * @return static Collection of merged elements.
 	 */
 	public function merge($items)
 	{
-		return $this->new(array_merge($this->data, toarray($items)));
+		return $this->new(array_merge($this->data, toArray($items)));
 	}
 	
 	/**
@@ -304,12 +323,14 @@ class Collection
 	
 	/**
 	 * Creates a new collection with a subset of elements.
-	 * @param mixed ...$keys Keys to be included in new collection.
+	 * @param mixed|mixed[] $keys Keys to be included in new collection.
 	 * @return static New collection instance.
 	 */
-	public function only(...$keys)
+	public function only($keys)
 	{
-		return $this->new(array_intersect_key($this->data, array_flip($keys)));
+		return $this->new(
+			array_intersect_key($this->data, array_flip(toArray($keys)))
+		);
 	}
 	
 	/**
@@ -340,7 +361,8 @@ class Collection
 	public function pull($key, $default = null)
 	{
 		$value = $this->get($key, $default);
-		$this->remove($key);
+		$this->del($key);
+
 		return $value;
 	}
 	
@@ -356,8 +378,8 @@ class Collection
 		if($sample >= $this->count())
 			return $this->shuffle();
 		
-		$keys = toarray(array_rand($this->data, $sample));
-		return $this->new(array_intersect_key($this->data, array_flip($keys)));
+		$keys = array_rand($this->data, $sample);
+		return $this->only($keys);
 	}
 	
 	/**
@@ -372,26 +394,13 @@ class Collection
 	}
 	
 	/**
-	 * Removes an element from collection.
-	 * @param mixed $key Key to be removed.
-	 * @return static Collection for method chaining.
-	 */
-	public function remove($key)
-	{
-		if($this->has($key))
-			unset($this->data[$key]);
-		
-		return $this;
-	}
-	
-	/**
 	 * Replaces collection according to the given data.
 	 * @param mixed $items Items to be replaced in the collection.
 	 * @return static Collection with replaced data.
 	 */
 	public function replace($items)
 	{
-		return $this->new(array_replace($this->data, toarray($items)));
+		return $this->new(array_replace($this->data, toArray($items)));
 	}
 	
 	/**
@@ -422,19 +431,6 @@ class Collection
 	}
 	
 	/**
-	 * Sets a value to the given key.
-	 * @param mixed $key Key to created or updated.
-	 * @param mixed $value Value to be stored in key.
-	 * @return static Collection for method chaining.
-	 */
-	public function set($key, $value)
-	{
-		if(is_null($key))   $this->data[] = $value;
-		else                $this->data[$key] = $value;
-		return $this;
-	}
-	
-	/**
 	 * Shuffles the elements in the collection.
 	 * @return static Shuffled collection.
 	 */
@@ -451,12 +447,11 @@ class Collection
 	 * @param int $count Number of groups to split the collection.
 	 * @return array Splitted collection.
 	 */
-	public function split(int $count) : array
+	public function split(int $count): array
 	{
-		if($this->empty())
-			return [];
-		
-		return $this->chunk(ceil($this->count() / (float)$count));
+		return !$this->empty()
+			? $this->chunk(ceil($this->count() / (float)$count))
+			: [];
 	}
 	
 	/**
@@ -466,7 +461,7 @@ class Collection
 	 */
 	public function tap(callable $fn)
 	{
-		$fn($copy = $this->copy());
+		$fn($copy = clone $this);
 		return $copy;
 	}
 	
@@ -477,7 +472,7 @@ class Collection
 	 */
 	public function union($items)
 	{
-		return $this->new($this->data + toarray($items));
+		return $this->new($this->data + toArray($items));
 	}
 	
 	/**
@@ -493,7 +488,7 @@ class Collection
 	 * Checks whether the pointer is a valid position.
 	 * @return bool Is the pointer in a valid position?
 	 */
-	public function valid() : bool
+	public function valid(): bool
 	{
 		return key($this->data) !== null;
 	}
@@ -502,7 +497,7 @@ class Collection
 	 * Returns all element values currently present in collection.
 	 * @return self Collection of this collection element's values.
 	 */
-	public function values() : self
+	public function values(): self
 	{
 		return new self(array_values($this->data));
 	}
@@ -510,11 +505,13 @@ class Collection
 	/**
 	 * Iterates over collection and executes a function over every element.
 	 * @param callable $fn Iteration function. Parameters: value, key.
-	 * @param mixed ...$userdata Optional extra parameters for function.
-	 * @return static Collection for method chaining.
+	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
+	 * @return $this Collection for method chaining.
 	 */
-	public function walk(callable $fn, ...$userdata)
+	public function walk(callable $fn, $userdata = null)
 	{
+		$userdata = toArray($userdata);
+		
 		foreach($this->iterate() as $key => $value)
 			$fn($value, $key, ...$userdata);
 		
@@ -523,12 +520,12 @@ class Collection
 	
 	/**
 	 * Zips collection together with one or more arrays.
-	 * @param mixed ...$items Items to zip collection with.
+	 * @param mixed[] ...$items Items to zip collection with.
 	 * @return array Array of zipped collections.
 	 */
-	public function zip(...$items) : array
+	public function zip(...$items): array
 	{
-		$items = array_map('toarray', $items);
+		$items = array_map('toArray', $items);
 		
 		return array_map(function(...$params) {
 			return $this->new($params);
@@ -554,11 +551,12 @@ class Collection
 	 */
 	protected function ref(&$target)
 	{
-		if(!listable($target))
+		if(!isListable($target))
 			return $target;
 		
 		$obj = $this->new();
 		$obj->data = &$target;
+		
 		return $obj;
 	}
 	

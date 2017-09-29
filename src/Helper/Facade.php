@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Helper\Facade trait file.
+ * Zettacast\Helper\Facade abstract class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -9,19 +9,34 @@
 namespace Zettacast\Helper;
 
 /**
- * Implements methods that allow class to become a façade. This trait turns
- * the object it is used within into an another object instance, so this
- * instance can be accessed by the usage of static methods.
+ * Implements methods that allow class to become a façade. This abstraction
+ * turns the inherited object into an another class instance, so this instance
+ * can be accessed by the usage of static methods.
  * @package Zettacast\Helper
  */
-trait Facade
+abstract class Facade
 {
 	/**
 	 * Façaded object instance. This is the instance to be called when using a
 	 * façaded method.
 	 * @var mixed Façaded object instance.
 	 */
-	protected static $instance = null;
+	private static $instance;
+	
+	/**
+	 * Retrieves the instance of the object being façaded.
+	 * @return mixed Façaded object instance.
+	 */
+	protected static function facaded()
+	{
+		if(isset(self::$instance))
+			return self::$instance;
+		
+		$access = static::accessor();
+		
+		return self::$instance = is_object($access)
+			? $access : zetta($access);
+	}
 	
 	/**
 	 * Handles dynamic static calls to the façaded object.
@@ -31,32 +46,8 @@ trait Facade
 	 */
 	public static function __callStatic(string $method, array $args)
 	{
-		$instance = static::facade();
+		$instance = static::facaded();
 		return $instance->$method(...$args);
-	}
-	
-	/**
-	 * Clears the resolved object and allows it to be facaded again. This is
-	 * needed when the facaded instance must be changed.
-	 */
-	public static function unfacade()
-	{
-		self::$instance = null;
-	}
-	
-	/**
-	 * Retrieves the instance of the object being façaded.
-	 * @return mixed Façaded object instance.
-	 */
-	protected static function facade()
-	{
-		if(isset(self::$instance))
-			return self::$instance;
-		
-		$access = static::accessor();
-		
-		return self::$instance = is_object($access)
-			? $access : zetta($access);
 	}
 	
 	/**

@@ -7,38 +7,50 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-zetta()
+return [
 
-# Injector module
-->alias('injector', 'Zettacast\Injector\Injector')
-->bind('Zettacast\Contract\Injector\Injector', 'Zettacast\Injector\Injector')
-
-# Autoload module
-->alias('autoload', 'Zettacast\Autoload\Autoload')
-
-# Collection module
-->alias('dot', 'Zettacast\Collection\Dot')
-->alias('queue', 'Zettacast\Collection\Queue')
-->alias('stack', 'Zettacast\Collection\Stack')
-->alias('sequence', 'Zettacast\Collection\Sequence')
-->alias('collection', 'Zettacast\Collection\Collection')
-
-# Config module
-->alias('config', 'Zettacast\Config\Warehouse')
-
-# Filesystem module
-->alias('file', 'Zettacast\Filesystem\File')
-->alias('info', 'Zettacast\Filesystem\Info')
-->alias('stream', 'Zettacast\Filesystem\Stream\Stream')
-->alias('filesystem', 'Zettacast\Filesystem\Filesystem')
-->bind('Zettacast\Contract\Filesystem\Driver', 'Zettacast\Filesystem\Driver\Local')
-->bind('Zettacast\Contract\Filesystem\Stream', 'Zettacast\Filesystem\Stream\Stream')
-
-# HTTP module
-->alias('url', 'Zettacast\Http\Url')
-->alias('request', 'Zettacast\Contract\Http\Request')
-->alias('response', 'Zettacast\Contract\Http\Response')
-->bind('Zettacast\Contract\Http\Kernel', 'Zettacast\Http\Kernel')
-->bind('Zettacast\Contract\Http\Request', 'Zettacast\Http\Request')
-
-;
+	# Injector module
+	['injector', 'Zettacast\Contract\Injector\InjectorInterface'],
+	['Zettacast\Injector\InjectorInterface', 'Zettacast\Injector\Injector'],
+	
+	# Autoload module
+	['autoload', 'Zettacast\Autoload\Autoload'],
+	
+	# Collection module
+	['stack', 'Zettacast\Collection\Stack'],
+	['queue', 'Zettacast\Contract\Collection\QueueInterface'],
+	['sequence', 'Zettacast\Contract\Collection\SequenceInterface'],
+	['collection', 'Zettacast\Contract\Collection\CollectionInterface'],
+	['collection.dot', 'Zettacast\Collection\DotCollection'],
+	['collection.recursive', 'Zettacast\Collection\RecursiveCollection'],
+	['Zettacast\Contract\Collection\QueueInterface', 'Zettacast\Collection\Queue'],
+	['Zettacast\Contract\Collection\SequenceInterface', 'Zettacast\Collection\Sequence'],
+	['Zettacast\Contract\Collection\CollectionInterface', 'Zettacast\Collection\Collection'],
+	
+	# Filesystem module
+	['info', 'Zettacast\Filesystem\Info'],
+	['file', 'Zettacast\Filesystem\File'],
+	['filesystem', 'Zettacast\Filesystem\Filesystem'],
+	['file.virtual', ['Zettacast\Filesystem\File', 'virtual']],
+	['filesystem.zip', 'Zettacast\Filesystem\Driver\ZipDisk'],
+	['filesystem.virtual', 'Zettacast\Filesystem\Driver\VirtualDisk'],
+	['Zettacast\Contract\Filesystem\DiskInterface', 'Zettacast\Filesystem\Driver\LocalDisk'],
+	
+	# Stream module
+	['filter', 'Zettacast\Contract\Stream\FilterInterface'],
+	['stream', 'Zettacast\Contract\Stream\StreamInterface'],
+	['stream.context', 'Zettacast\Stream\StreamContext'],
+	['stream.virtual', ['Zettacast\Stream\Stream', 'virtual']],
+	['filter.closure', 'Zettacast\Stream\Filter\ClosureFilter'],
+	['filter.callable', 'Zettacast\Stream\Filter\CallableFilter'],
+	['Zettacast\Contract\Stream\StreamInterface', 'Zettacast\Stream\Stream'],
+	['Zettacast\Contract\Stream\FilterInterface', 'Zettacast\Stream\Filter'],
+	
+	# HTTP module
+	['url', 'Zettacast\Http\Url'],
+	['request', 'Zettacast\Contract\Http\Request'],
+	['response', 'Zettacast\Contract\Http\Response'],
+	['Zettacast\Contract\Http\Kernel', 'Zettacast\Http\Kernel'],
+	['Zettacast\Contract\Http\Request', 'Zettacast\Http\Request'],
+	
+];

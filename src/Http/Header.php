@@ -8,15 +8,14 @@
  */
 namespace Zettacast\Http;
 
-use Zettacast\Collection\Recursive;
+use Zettacast\Collection\RecursiveCollection;
 
 /**
  * This class is responsible for storing all request's headers.
  * @package Zettacast\HTTP
  * @version 1.0
  */
-class Header
-	extends Recursive
+class Header extends RecursiveCollection
 {
 	/**
 	 * Collection constructor. This constructor simply sets the data received
@@ -40,7 +39,7 @@ class Header
 		if($this->empty())
 			return (string)null;
 		
-		$headers = $this->all();
+		$headers = $this->raw();
 		$string = null;
 		ksort($headers);
 		
@@ -55,16 +54,16 @@ class Header
 	}
 	
 	/**
-	 * Adds a value to an already existing header, or creates it.
-	 * @param mixed $key Header key to be added or created.
-	 * @param mixed $value Value to be added to header.
-	 * @return static Collection for method chaining.
+	 * Adds a group of values to an already existing headers, or create them.
+	 * @param array $values Values to be added to collection.
+	 * @return $this Collection for method chaining.
 	 */
-	public function add($key, $value)
+	public function add(array $values = [])
 	{
-		$this->has($key)
-			? array_push($this->data[$key], $value)
-			: $this->set($key, $value);
+		foreach($values as $key => $value)
+			$this->has($key)
+				? array_push($this->data[$key], $value)
+				: $this->set($key, $value);
 		return $this;
 	}
 	
