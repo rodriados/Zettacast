@@ -6,9 +6,9 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\HTTP;
+namespace Zettacast\Http;
 
-use Zettacast\Contract\HTTP\Response as ResponseContract;
+use Zettacast\Contract\Http\Response as ResponseContract;
 
 class Response
 	implements ResponseContract

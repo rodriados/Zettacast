@@ -9,7 +9,7 @@
 namespace Zettacast\Facade;
 
 use Zettacast\Helper\Facade;
-use Zettacast\Contract\HTTP\Request as baseclass;
+use Zettacast\Contract\Http\Request as baseclass;
 
 /**
  * Zettacast's Request façade class.

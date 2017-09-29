@@ -6,12 +6,12 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\HTTP;
+namespace Zettacast\Http;
 
 use Zettacast\Facade\Request as RequestFacade;
-use Zettacast\Contract\HTTP\Kernel as KernelContract;
-use Zettacast\Contract\HTTP\Request as RequestContract;
-use Zettacast\Contract\HTTP\Response as ResponseContract;
+use Zettacast\Contract\Http\Kernel as KernelContract;
+use Zettacast\Contract\Http\Request as RequestContract;
+use Zettacast\Contract\Http\Response as ResponseContract;
 
 class Kernel
 	implements KernelContract

@@ -92,20 +92,85 @@ class Uri
 	}
 	
 	/**
+	 * Gives access to the URI's scheme component.
+	 * @return string The URI scheme component.
+	 */
+	public function getScheme()
+	{
+		return $this->scheme ?: null;
+	}
+	
+	/**
 	 * Rebuilds the authority component of the URI and returns it.
 	 * @return string The authority component.
 	 */
-	public function getAuthority(): string
+	public function getAuthority()
 	{
-		$full = $this->host;
+		$full = $this->getHost();
 		
-		if(isset($this->userinfo))
+		if($data = $this->getUserInfo())
 			$full = $this->userinfo.'@'.$full;
 		
-		if(isset($this->port))
-			$full .= ':'.$this->port;
+		if($data = $this->getPort())
+			$full .= ':'.$data;
 		
-		return $full;
+		return $full ?: null;
+	}
+	
+	/**
+	 * Gives access to the URI's authority's userinfo component.
+	 * @return int The current userinfo informed by the URI.
+	 */
+	public function getUserInfo()
+	{
+		return $this->userinfo ?: null;
+	}
+	
+	/**
+	 * Gives access to the URI's authority's host component.
+	 * @return int The current host informed by the URI.
+	 */
+	public function getHost()
+	{
+		return $this->host ?: null;
+	}
+	
+	/**
+	 * Gives access to the URI's authority's port component.
+	 * @return int The current port informed by the URI.
+	 */
+	public function getPort()
+	{
+		return $this->port ?: null;
+	}
+	
+	/**
+	 * Gives access to the URI's path component.
+	 * @return int The current path informed by the URI.
+	 */
+	public function getPath()
+	{
+		return $this->path ?: null;
+	}
+	
+	/**
+	 * Gives access to the URI's query component.
+	 * @return int The current query informed by the URI.
+	 */
+	public function getQuery()
+	{
+		return !$this->query->empty()
+			? http_build_query($this->query->all())
+			: null;
+	}
+	
+	/**
+	 * Gives access to the URI's fragment component.
+	 * @return int The current query informed by the URI.
+	 */
+	public function getFragment()
+	{
+		return $this->fragment ?: null;
 	}
 	
 	/**
@@ -116,17 +181,17 @@ class Uri
 	{
 		$full = $this->path;
 		
-		if(!is_null($auth = $this->getAuthority()))
-			$full = '//'.$auth.$full;
+		if($comp = $this->getAuthority())
+			$full = '//'.$comp.$full;
 		
-		if(isset($this->scheme))
-			$full = $this->scheme.':'.$full;
+		if($comp = $this->getScheme())
+			$full = $comp.':'.$full;
 		
-		if(!$this->query->empty())
-			$full .= '?'.http_build_query($this->query->all());
+		if($comp = $this->getQuery())
+			$full .= '?'.$comp;
 		
-		if(isset($this->fragment))
-			$full .= '#'.$this->fragment;
+		if($comp = $this->getFragment())
+			$full .= '#'.$comp;
 		
 		return $full;
 	}
@@ -138,7 +203,7 @@ class Uri
 	protected function initialize(array $data)
 	{
 		foreach($data as &$value)
-			$value = rawurldecode($value) ?: null;
+			$value = $value ?: null;
 		
 		$this->scheme   = $data['scheme'] ?? null;
 		$this->userinfo = $data['userinfo'] ?? null;

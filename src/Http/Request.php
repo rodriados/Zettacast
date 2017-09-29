@@ -6,10 +6,10 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\HTTP;
+namespace Zettacast\Http;
 
 use Zettacast\Collection\Collection;
-use Zettacast\Contract\HTTP\Request as RequestContract;
+use Zettacast\Contract\Http\Request as RequestContract;
 
 class Request
 	implements RequestContract
@@ -32,7 +32,7 @@ class Request
 	{
 		$this->method = $method;
 		$this->content = new Collection($content);
-		$this->url = !$url instanceof URL ? new URL($url) : $url;
+		$this->url = !$url instanceof Url ? new Url($url) : $url;
 		
 		$this->files = null;
 		$this->header = null;
@@ -56,7 +56,7 @@ class Request
 		   && in_array($method, ['PUT', 'DELETE', 'PATCH']))
 			parse_str(file_get_contents('php://input'), $data);
 		
-		$request = new static($method, URL::capture(), $data ?? $_POST);
+		$request = new static($method, Url::capture(), $data ?? $_POST);
 		$request->files = Upload::capture();
 		$request->cookie = new Collection($_COOKIE);
 		$request->header = $header;

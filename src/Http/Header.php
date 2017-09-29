@@ -6,7 +6,7 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\HTTP;
+namespace Zettacast\Http;
 
 use Zettacast\Collection\Recursive;
 

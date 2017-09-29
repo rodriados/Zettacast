@@ -35,10 +35,10 @@ zetta()
 ->bind('Zettacast\Contract\Filesystem\Stream', 'Zettacast\Filesystem\Stream\Stream')
 
 # HTTP module
-->alias('url', 'Zettacast\HTTP\URL')
-->alias('request', 'Zettacast\Contract\HTTP\Request')
-->alias('response', 'Zettacast\Contract\HTTP\Response')
-->bind('Zettacast\Contract\HTTP\Kernel', 'Zettacast\HTTP\Kernel')
-->bind('Zettacast\Contract\HTTP\Request', 'Zettacast\HTTP\Request')
+->alias('url', 'Zettacast\Http\Url')
+->alias('request', 'Zettacast\Contract\Http\Request')
+->alias('response', 'Zettacast\Contract\Http\Response')
+->bind('Zettacast\Contract\Http\Kernel', 'Zettacast\Http\Kernel')
+->bind('Zettacast\Contract\Http\Request', 'Zettacast\Http\Request')
 
 ;

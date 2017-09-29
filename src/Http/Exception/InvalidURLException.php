@@ -6,7 +6,7 @@
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\HTTP\Exception;
+namespace Zettacast\Http\Exception;
 
 class InvalidURLException
 	extends \Exception
