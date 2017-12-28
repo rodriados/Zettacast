@@ -1,0 +1,63 @@
+# Server options definition. Make sure no directory listing is visible. We
+# don't want anybody spying us and looking our files.
+Options -Indexes
+Options	-Multiviews
+Options +FollowSymLinks
+
+# Redirection definitions. This allows us use friendly URLs and let our
+# application's links be cleaner and as human-readable as possible.
+<IfModule mod_rewrite.c>
+
+    RewriteEngine On
+
+    # In case a 404 is seen when trying to get a page or a file, try
+    # uncommeting these lines below.
+    #AllowOverride All
+    #RewriteBase /wherever/you/put/zettacast
+
+    # Restrict your site to a single domain. Choose one of the presented
+    # options below. You are totally free to use one of them. Be sure to
+    # chose only one of the options!
+
+    # Option #1: Rewrite "www.domain.com" to "domain.com". This is our
+    # prefered one, however, if you want to use the other option, please
+    # comment the following lines out.
+    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    RewriteRule . http://%1%{REQUEST_URI} [R=301,L,QSA]
+
+    # Option #2: Rewrite "domain.com" to "www.domain.com". If you want to use
+    # this option, uncomment the following lines and don't forget to comment
+    # the lines of the first option.
+    #RewriteCond %{HTTP_HOST} !^www\..*$ [NC]
+    #RewriteRule .* http://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L,QSA]
+
+    # Drop final slash of request. We must force, or at least try to force, a
+    # page is accessible from one, and only one URL for SEO reasons.
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)/$ /$1 [R=301,L,QSA]
+
+    # Send all requests to a single entry-point located in index.php if
+    # the file or directory requested are not real.
+    RewriteCond %{REQUEST_URI} ^.*\.php$ [OR]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule . index.php [L]
+
+</IfModule>
+
+# Compression module definitions. This allows website's contents to be loaded
+# faster due to the use of compression algorithms.
+<IfModule mod_deflate.c>
+
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE application/html
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+
+</IfModule>
+
+# Index definition. Sets index files. These are the files accessed when there's
+# no path or file specified in the request.
+DirectoryIndex index.php index.html
