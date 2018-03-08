@@ -9,31 +9,15 @@
  * @copyright 2017 Rodrigo Siqueira
  */
 
-/**#@+
- * These constants hold the path of the framework's directories. You should
- * modify these constants every time you change the location or name of the
- * framework's folders.
- * @var string Framework's directories constants.
+/*
+ * Include files needed for the correct functioning of the framework. The
+ * global functions created by the framework are available from this point.
  */
-define('APPPATH', DOCROOT.'/app');
-define('BINPATH', DOCROOT.'/bin');
-define('SRCPATH', DOCROOT.'/src');
-define('TMPPATH', DOCROOT.'/tmp');
-define('TESTSPATH', DOCROOT.'/tests');
-define('PUBLICPATH', DOCROOT.'/public');
-define('ASSETSPATH', PUBLICPATH.'/assets');
-/**#@-*/
+require SRCPATH.'/functions.php';
+require SRCPATH.'/Autoload/Autoload.php';
 
-/**#@+
- * These constants hold the path of the application's directories. You should
- * modify these constants every time you change the location or name of the
- * application's folders.
- * @var string Application's directories constants.
+/*
+ * Create an autoloader object. This object will be responsible for loading all
+ * requested classes, interfaces or the like for the framework when needed.
  */
-define('APPBINPATH', APPPATH.'/bin');
-define('APPSRCPATH', APPPATH.'/src');
-define('APPTESTSPATH', APPPATH.'/tests');
-define('APPCONFIGPATH', APPPATH.'/config');
-define('APPTEMPLATESPATH', APPPATH.'/templates');
-define('APPRESOURCESPATH', APPPATH.'/resources');
-/**#@-*/
+$loader = new \Zettacast\Autoload\Autoload;
