@@ -11,7 +11,7 @@
 
 if(!function_exists('with')) {
 	/**
-	 * Returns given object. This is useful for method chaining.
+	 * Return given object. This is useful for method chaining.
 	 * @param mixed $object Object to be returned.
 	 * @return mixed Given object.
 	 */
@@ -20,5 +20,18 @@ if(!function_exists('with')) {
 		return $object instanceof Closure
 			? $object()
 			: $object;
+	}
+}
+
+if(!function_exists('zetta')) {
+	/**
+	 * Get the current framework instance.
+	 * @param string $abstract Abstraction to be made.
+	 * @param mixed ...$params Arguments to be passed to constructing object.
+	 * @return Zettacast|mixed Requested abstraction instance.
+	 */
+	function zetta(string $abstract = null, ...$params)
+	{
+		return $abstract;
 	}
 }
