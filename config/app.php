@@ -23,7 +23,7 @@ return [
 	 * through which your application's users will be able to reach it. The
 	 * framework will use it for generating correct application links.
 	 */
-	'url' => 'http://zettacast.localhost',
+	'url' => 'zettacast.localhost',
 
 	/*
 	 * Application language configuration.

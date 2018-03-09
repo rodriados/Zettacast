@@ -46,4 +46,11 @@ return [
 	['Zettacast\Contract\Stream\StreamInterface', 'Zettacast\Stream\Stream'],
 	['Zettacast\Contract\Stream\FilterInterface', 'Zettacast\Stream\Filter'],
 	
+	# HTTP module
+	['url', 'Zettacast\Http\Url'],
+	['request', 'Zettacast\Contract\Http\Request'],
+	['response', 'Zettacast\Contract\Http\Response'],
+	['Zettacast\Contract\Http\Kernel', 'Zettacast\Http\Kernel'],
+	['Zettacast\Contract\Http\Request', 'Zettacast\Http\Request'],
+	
 ];
