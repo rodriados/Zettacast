@@ -9,6 +9,40 @@
  * @copyright 2017 Rodrigo Siqueira
  */
 
+if(!function_exists('listable')) {
+	/**
+	 * Check whether the given variable is listable.
+	 * @param mixed $data Variable to check.
+	 * @return bool Is the variable listable?
+	 */
+	function listable($data): bool
+	{
+		return is_array($data)
+			or $data instanceof \Zettacast\Helper\ListableInterface
+		    or $data instanceof \Traversable;
+	}
+}
+
+if(!function_exists('toarray')) {
+	/**
+	 * Transform given data into array.
+	 * @param mixed $data Data to transform into array.
+	 * @return array Given data as array.
+	 */
+	function toarray($data): array
+	{
+		if($data instanceof \Zettacast\Helper\ListableInterface)
+			return $data->raw();
+		
+		if($data instanceof \Traversable)
+			return iterator_to_array($data);
+		
+		return is_array($data)
+			? $data
+			: [$data];
+	}
+}
+
 if(!function_exists('with')) {
 	/**
 	 * Return given object. This is useful for method chaining.
@@ -17,7 +51,7 @@ if(!function_exists('with')) {
 	 */
 	function with($object)
 	{
-		return $object instanceof Closure
+		return $object instanceof \Closure
 			? $object()
 			: $object;
 	}
@@ -28,7 +62,7 @@ if(!function_exists('zetta')) {
 	 * Get the current framework instance.
 	 * @param string $abstract Abstraction to be made.
 	 * @param mixed ...$params Arguments to be passed to constructing object.
-	 * @return Zettacast|mixed Requested abstraction instance.
+	 * @return \Zettacast|mixed Requested abstraction instance.
 	 */
 	function zetta(string $abstract = null, ...$params)
 	{
