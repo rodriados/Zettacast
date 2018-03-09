@@ -71,12 +71,11 @@ final class Autoload
 	 * Unregisters a class loader from the autoload stack.
 	 * @param LoaderInterface $loader A loader to be unregistered.
 	 */
-	public function unregister(LoaderInterface $loader)
+	public function unregister(LoaderInterface $loader): void
 	{
 		if($this->registered($loader)) {
 			unset($this->loaders[spl_object_hash($loader)]);
 			spl_autoload_unregister([$loader, 'load']);
 		}
-		
 	}
 }
