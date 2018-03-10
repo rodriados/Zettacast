@@ -21,3 +21,10 @@ require SRCPATH.'/Autoload/Autoload.php';
  * requested classes, interfaces or the like for the framework when needed.
  */
 $loader = new \Zettacast\Autoload\Autoload;
+
+/*
+ * Start a new Zettacast framework instance. From now on, all objects can have
+ * their instances built with dependency injection, that is, you will not need
+ * to be worried with instantiating complex objects: we can do it for you.
+ */
+zetta()->set(\Zettacast\Autoload\Autoload::class, $loader);

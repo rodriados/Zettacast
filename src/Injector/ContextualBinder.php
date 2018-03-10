@@ -45,7 +45,7 @@ class ContextualBinder implements BinderInterface
 		while(is_scalar($abstract) && $this->knows($abstract, $context)) {
 			if($context) {
 				$result = $this->binder->resolve($abstract.'@'.$this->scope);
-				$result['context'] = $this->scope;
+				$result->context = $this->scope;
 				break;
 			}
 			

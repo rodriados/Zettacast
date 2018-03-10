@@ -8,6 +8,7 @@
  * @license MIT License
  * @copyright 2017 Rodrigo Siqueira
  */
+use Zettacast\Zettacast;
 
 if(!function_exists('_')) {
 	/**
@@ -74,10 +75,12 @@ if(!function_exists('zetta')) {
 	 * Get the current framework instance.
 	 * @param string $abstract Abstraction to be made.
 	 * @param mixed ...$params Arguments to be passed to constructing object.
-	 * @return \Zettacast|mixed Requested abstraction instance.
+	 * @return Zettacast|mixed Requested abstraction instance.
 	 */
 	function zetta(string $abstract = null, ...$params)
 	{
-		return $abstract;
+		return !is_null($abstract)
+			? Zettacast::i()->make($abstract, $params)
+			: Zettacast::i();
 	}
 }
