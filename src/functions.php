@@ -9,6 +9,18 @@
  * @copyright 2017 Rodrigo Siqueira
  */
 
+if(!function_exists('_')) {
+	/**
+	 * Shortcut for the i18n translator.
+	 * @param string $str String to internationalized.
+	 * @return string The internationalized string.
+	 */
+	function _(string $str): string
+	{
+		return $str;
+	}
+}
+
 if(!function_exists('listable')) {
 	/**
 	 * Check whether the given variable is listable.
