@@ -34,10 +34,13 @@ class Binder implements BinderInterface
 	 */
 	public function resolve(string $abstract)
 	{
+		var_dump($this->bindings);
+		
 		while(is_scalar($abstract) && $this->knows($abstract)) {
 			$result = $this->bindings->get($abstract);
 			$abstract = $result->concrete;
 		}
+		
 		return $result ?? null;
 	}
 	
@@ -54,7 +57,7 @@ class Binder implements BinderInterface
 	 */
 	public function bind(string $abstract, $target, bool $share = false): void
 	{
-		$this->bindings->set($abstract, (object)[
+		$this->bindings->set($abstract, $s = (object)[
 			'concrete' => $target,
 			'shared'   => $share,
 		]);

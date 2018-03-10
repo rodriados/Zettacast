@@ -46,9 +46,13 @@ class Assembler
 	 */
 	public function make(string $abstract, array $params = [])
 	{
+		var_dump($abstract);
+		
 		$bond = $this->stack->empty()
 			? $this->injector->resolve($abstract)
 			: $this->injector->when($this->stack->peek())->resolve($abstract);
+		
+		var_dump($bond);
 		
 		$concrete = $bond->concrete ?? $abstract;
 		$context = $bond->context ?? false;

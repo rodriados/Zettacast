@@ -90,6 +90,24 @@ final class Zettacast extends Injector
 	private function helpers(): Binder
 	{
 		$binder = new Binder;
+		$helpers = [
+			['autoload', 'Zettacast\Autoload\Autoload'],
+			['injector', 'Zettacast\Injector\InjectorInterface'],
+			['Zettacast\Injector\InjectorInterface', 'Zettacast\Injector\Injector'],
+			['stack', 'Zettacast\Collection\Stack'],
+			['queue', 'Zettacast\Collection\QueueInterface'],
+			['sequence', 'Zettacast\Collection\SequenceInterface'],
+			['collection', 'Zettacast\Collection\CollectionInterface'],
+			['collection.dot', 'Zettacast\Collection\DotCollection'],
+			['collection.recursive', 'Zettacast\Collection\RecursiveCollection'],
+			['Zettacast\Collection\QueueInterface', 'Zettacast\Collection\Queue'],
+			['Zettacast\Collection\SequenceInterface', 'Zettacast\Collection\Sequence'],
+			['Zettacast\Collection\CollectionInterface', 'Zettacast\Collection\Collection'],
+		];
+		
+		foreach($helpers as $abstract => $concrete)
+			$binder->bind($abstract, $concrete);
+		
 		return $binder;
 	}
 }
