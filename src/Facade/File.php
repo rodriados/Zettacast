@@ -8,7 +8,7 @@
  */
 namespace Zettacast\Facade;
 
-use Zettacast\Helper\FacadeAbstract;
+use Zettacast\Support\Facade;
 use Zettacast\Stream\StreamInterface;
 use Zettacast\Collection\SequenceInterface;
 use Zettacast\Filesystem\Filesystem as baseclass;
@@ -36,7 +36,7 @@ use Zettacast\Filesystem\Filesystem as baseclass;
  * @method static int writefrom($stream, string $file, int $length = null)
  * @version 1.0
  */
-final class File extends FacadeAbstract
+final class File extends Facade
 {
 	/**
 	 * Checks whether a path exists in the filesystem.

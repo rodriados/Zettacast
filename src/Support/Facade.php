@@ -1,14 +1,14 @@
 <?php
 /**
- * Zettacast\Helper\FacadeAbstract class file.
+ * Zettacast\Support\Facade class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2018 Rodrigo Siqueira
  */
-namespace Zettacast\Helper;
+namespace Zettacast\Support;
 
-abstract class FacadeAbstract
+abstract class Facade
 {
 	/**
 	 * Façaded object instance. This is the instance called when calling for a

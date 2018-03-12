@@ -1,6 +1,6 @@
 <?php
 /**
- * Zettacast\Support\Uri class file.
+ * Zettacast\Support\Url class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
@@ -11,65 +11,65 @@ namespace Zettacast\Support;
 use Zettacast\Collection\Collection;
 
 /**
- * Uri class. This class is responsible for identifying external or internally
- * known resources. This object simply holds the URI and is not responsible for
- * making sense out of it.
+ * The universal resource locator class. This class is responsible for
+ * identifying external or internally known resources. This object simply holds
+ * the URL and is not responsible for making sense out of it.
  * @package Zettacast\Support
  * @version 1.0
  */
-class Uri
+class Url
 {
 	/**
-	 * The protocol scheme used in the URI.
+	 * The protocol scheme used in the URL.
 	 * @var string Protocol scheme.
 	 */
 	protected $scheme;
 	
 	/**
-	 * The user credentials information, sent via URI. Although supported,
+	 * The user credentials information, sent via URL. Although supported,
 	 * this component should not contain password information.
 	 * @var string The user credentials.
 	 */
 	protected $userinfo;
 	
 	/**
-	 * Target host to which the URI is related.
-	 * @var string Host related to URI.
+	 * Target host to which the URL is related.
+	 * @var string Host related to URL.
 	 */
 	protected $host;
 	
 	/**
 	 * The port used in host server.
-	 * @var int URI connection port.
+	 * @var int URL connection port.
 	 */
 	protected $port;
 	
 	/**
-	 * The URI's path component.
-	 * @var string URI path segment.
+	 * The URL's path component.
+	 * @var string URL path segment.
 	 */
 	protected $path;
 	
 	/**
-	 * Query variables related to this URI.
-	 * @var Collection Variables to be sent via URI.
+	 * Query variables related to this URL.
+	 * @var Collection Variables to be sent via URL.
 	 */
 	protected $query;
 	
 	/**
-	 * The URI's fragment component.
-	 * @var string URI fragment component.
+	 * The URL's fragment component.
+	 * @var string URL fragment component.
 	 */
 	protected $fragment;
 	
 	/**
-	 * URI Constructor.
-	 * @param string|array $uri URI data to be stored in this object.
-	 * @param array $query Query variables to be related to given URI.
+	 * URL Constructor.
+	 * @param string|array $url URL data to be stored in this object.
+	 * @param array $query Query variables to be related to given URL.
 	 */
-	public function __construct($uri, $query = [])
+	public function __construct($url, $query = [])
 	{
-		is_array($uri) ? $this->initialize($uri) : $this->parse($uri);
+		is_array($url) ? $this->initialize($url) : $this->parse($url);
 		$this->query = with(new Collection($this->query))->merge($query);
 	}
 	
@@ -92,8 +92,8 @@ class Uri
 	}
 	
 	/**
-	 * Gives access to the URI's scheme component.
-	 * @return string The URI scheme component.
+	 * Gives access to the URL's scheme component.
+	 * @return string The URL scheme component.
 	 */
 	public function getScheme()
 	{
@@ -101,7 +101,7 @@ class Uri
 	}
 	
 	/**
-	 * Rebuilds the authority component of the URI and returns it.
+	 * Rebuilds the authority component of the URL and returns it.
 	 * @return string The authority component.
 	 */
 	public function getAuthority()
@@ -118,8 +118,8 @@ class Uri
 	}
 	
 	/**
-	 * Gives access to the URI's authority's userinfo component.
-	 * @return int The current userinfo informed by the URI.
+	 * Gives access to the URL's authority's userinfo component.
+	 * @return int The current userinfo informed by the URL.
 	 */
 	public function getUserInfo()
 	{
@@ -127,8 +127,8 @@ class Uri
 	}
 	
 	/**
-	 * Gives access to the URI's authority's host component.
-	 * @return int The current host informed by the URI.
+	 * Gives access to the URL's authority's host component.
+	 * @return int The current host informed by the URL.
 	 */
 	public function getHost()
 	{
@@ -136,8 +136,8 @@ class Uri
 	}
 	
 	/**
-	 * Gives access to the URI's authority's port component.
-	 * @return int The current port informed by the URI.
+	 * Gives access to the URL's authority's port component.
+	 * @return int The current port informed by the URL.
 	 */
 	public function getPort()
 	{
@@ -145,8 +145,8 @@ class Uri
 	}
 	
 	/**
-	 * Gives access to the URI's path component.
-	 * @return int The current path informed by the URI.
+	 * Gives access to the URL's path component.
+	 * @return int The current path informed by the URL.
 	 */
 	public function getPath()
 	{
@@ -154,8 +154,8 @@ class Uri
 	}
 	
 	/**
-	 * Gives access to the URI's query component.
-	 * @return int The current query informed by the URI.
+	 * Gives access to the URL's query component.
+	 * @return int The current query informed by the URL.
 	 */
 	public function getQuery()
 	{
@@ -165,8 +165,8 @@ class Uri
 	}
 	
 	/**
-	 * Gives access to the URI's fragment component.
-	 * @return int The current query informed by the URI.
+	 * Gives access to the URL's fragment component.
+	 * @return int The current query informed by the URL.
 	 */
 	public function getFragment()
 	{
@@ -174,8 +174,8 @@ class Uri
 	}
 	
 	/**
-	 * Rebuilds the full URI.
-	 * @return string The full URI with all of its known components.
+	 * Rebuilds the full URL.
+	 * @return string The full URL with all of its known components.
 	 */
 	public function getFull(): string
 	{
@@ -215,11 +215,11 @@ class Uri
 	}
 	
 	/**
-	 * Parses the URI passed as a string and builds the object's properties.
-	 * @param string $uri URI to be parsed.
-	 * @throws \Exception The given string is not a valid URI.
+	 * Parses the URL passed as a string and builds the object's properties.
+	 * @param string $url URL to be parsed.
+	 * @throws \Exception The given string is not a valid URL.
 	 */
-	protected function parse(string $uri)
+	protected function parse(string $url)
 	{
 		$valid = preg_match('!^'.
 			'(?>(?<scheme>[a-z][^:/?#]*):)?'.
@@ -231,11 +231,11 @@ class Uri
 			'(?<path>(?(2)/)[^?#]*)?'.
 			'(?:\?(?<query>[^#]*))?'.
 			'(?:#(?<fragment>.*))?'.
-			'$!i', $uri, $match
+			'$!i', $url, $match
 		);
 		
 		if(!$valid)
-			throw new \Exception('The URI \''.$uri.'\' is invalid!');
+			throw new \Exception('The URL \''.$url.'\' is invalid!');
 			
 		$this->initialize($match);
 	}

@@ -8,7 +8,7 @@
  */
 namespace Zettacast\Facade;
 
-use Zettacast\Helper\FacadeAbstract;
+use Zettacast\Support\Facade;
 use Zettacast\Autoload\LoaderInterface;
 use Zettacast\Autoload\Loader\ObjectLoader;
 use Zettacast\Autoload\Loader\NamespaceLoader;
@@ -23,7 +23,7 @@ use Zettacast\Autoload\Autoload as baseclass;
  * @method static unalias(string $name): void
  * @version 1.0
  */
-class Autoload extends FacadeAbstract
+class Autoload extends Facade
 {
 	/**
 	 * Registers a loader in autoload stack. The autoload function will be
