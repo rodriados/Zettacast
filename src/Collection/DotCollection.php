@@ -4,13 +4,13 @@
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
- * @copyright 2015-2017 Rodrigo Siqueira
+ * @copyright 2015-2018 Rodrigo Siqueira
  */
 namespace Zettacast\Collection;
 
 /**
- * DotCollection class. This collection implements dot access methods, that is
- * it's possible to access its recursive data via dot notation.
+ * The dot collection class. This collection implements dot access methods,
+ * that is it's possible to access its recursive data via dot notation.
  * @package Zettacast\Collection
  * @version 1.0
  */
@@ -24,9 +24,10 @@ class DotCollection extends RecursiveCollection
 	protected $dot;
 	
 	/**
-	 * Dot constructor. This constructor simply sets the data received as the
-	 * data stored in collection.
-	 * @param array|\Traversable $data Data to be stored.
+	 * Dot constructor.
+	 * This constructor simply sets the data received as the data stored in
+	 * collection, and defines the depth-separator.
+	 * @param array|\Traversable $data Data to store.
 	 * @param string $dot Depth-separator.
 	 */
 	public function __construct($data = null, string $dot = '.')
@@ -47,7 +48,7 @@ class DotCollection extends RecursiveCollection
 		$node = &$this->data;
 		
 		foreach($dot as $segment) {
-			if(!isListable($node) || !isset($node[$segment]))
+			if(!listable($node) || !isset($node[$segment]))
 				return $default;
 			
 			$node instanceof Collection
@@ -60,7 +61,7 @@ class DotCollection extends RecursiveCollection
 	
 	/**
 	 * Checks whether element key exists.
-	 * @param mixed $key Key to be check if exists.
+	 * @param mixed $key Key to check existance.
 	 * @return bool Does key exist?
 	 */
 	public function has($key): bool
@@ -69,7 +70,7 @@ class DotCollection extends RecursiveCollection
 		$node = &$this->data;
 		
 		foreach($dot as $segment) {
-			if(!isListable($node) || !isset($node[$segment]))
+			if(!listable($node) || !isset($node[$segment]))
 				return false;
 			
 			$node instanceof Collection
@@ -81,19 +82,18 @@ class DotCollection extends RecursiveCollection
 	}
 	
 	/**
-	 * Sets a value to the given key.
-	 * @param mixed $key Key to created or updated.
-	 * @param mixed $value Value to be stored in key.
-	 * @return $this Collection for method chaining.
+	 * Sets a value to given key.
+	 * @param mixed $key Key to create or update.
+	 * @param mixed $value Value to store in key.
 	 */
-	public function set($key, $value)
+	public function set($key, $value): void
 	{
 		$dot = $this->undot($key);
 		$last = array_pop($dot);
 		$node = &$this->data;
 		
 		foreach($dot as $segment) {
-			if(!isset($node[$segment]) || !isListable($node[$segment]))
+			if(!isset($node[$segment]) || !listable($node[$segment]))
 				$node[$segment] = [];
 			
 			$node instanceof Collection
@@ -102,23 +102,21 @@ class DotCollection extends RecursiveCollection
 		}
 		
 		$node[$last] = $value;
-		return $this;
 	}
 	
 	/**
 	 * Removes an element from collection.
-	 * @param mixed $key Key to be removed.
-	 * @return $this Collection for method chaining.
+	 * @param mixed $key Key to remove.
 	 */
-	public function del($key)
+	public function del($key): void
 	{
 		$dot = $this->undot($key);
 		$last = array_pop($dot);
 		$node = &$this->data;
 		
 		foreach($dot as $segment) {
-			if(!isListable($node) or !isset($node[$segment]))
-				return $this;
+			if(!listable($node) or !isset($node[$segment]))
+				return;
 			
 			$node instanceof Collection
 				? ($node = &$node->data[$segment])
@@ -126,11 +124,10 @@ class DotCollection extends RecursiveCollection
 		}
 		
 		unset($node[$last]);
-		return $this;
 	}
 	
 	/**
-	 * Filters elements according to the given test. If no test function is
+	 * Filters elements according to given test. If no test function is
 	 * given, it fallbacks to removing all false equivalent values.
 	 * @param callable $fn Test function. Parameters: value, key.
 	 * @return static Collection of all filtered values.
@@ -144,7 +141,7 @@ class DotCollection extends RecursiveCollection
 			array_push($scope, $key);
 			
 			if($fn($value, implode($this->dot, $scope)))
-				$result[$key] = isListable($value)
+				$result[$key] = listable($value)
 					? $this->new($value)->filter($fn)
 					: $value;
 			
@@ -168,7 +165,6 @@ class DotCollection extends RecursiveCollection
 			is_null($key) || !($keyvalue = $ref->get($key))
 				? ($result[/*nokey*/] = $ref->get($value))
 				: ($result[$keyvalue] = $ref->get($value));
-				
 		}
 		
 		return new Collection($result ?? []);
@@ -176,7 +172,7 @@ class DotCollection extends RecursiveCollection
 	
 	/**
 	 * Creates a new instance of class based on an already existing instance.
-	 * @param mixed $target Data to be fed into the new instance.
+	 * @param mixed $target Data to feed into the new instance.
 	 * @return static The new instance.
 	 */
 	protected function new($target = [])
@@ -187,12 +183,11 @@ class DotCollection extends RecursiveCollection
 	
 	/**
 	 * Explodes dot expression into array.
-	 * @param string $key Dot expression key to be split.
+	 * @param string $key Dot expression key to split.
 	 * @return array Dot expression segments.
 	 */
 	protected function undot(string $key): array
 	{
 		return explode($this->dot, trim($key, $this->dot));
 	}
-	
 }

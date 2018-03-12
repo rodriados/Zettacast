@@ -8,10 +8,6 @@
  */
 namespace Zettacast\Stream;
 
-use Zettacast\Contract\Stream\FilterInterface;
-use Zettacast\Contract\Stream\StreamInterface;
-use Zettacast\Exception\Stream\StreamException;
-
 /**
  * This class handles all interactions to a stream.
  * @package Zettacast\Filesystem\Stream
@@ -28,12 +24,13 @@ class Stream implements StreamInterface
 	
 	/**
 	 * Stream constructor.
-	 * @param string $uri Locator of stream to be opened.
+	 * This constructor opens stream from given locator.
+	 * @param string $url Locator of stream to open.
 	 * @param string $mode Opening mode for stream access.
-	 * @param array|StreamContext The context related to the stream.
+	 * @param array|StreamContext The context related to stream.
 	 * @throws StreamException Stream could not be found.
 	 */
-	public function __construct(string $uri, string $mode = 'r', $context = [])
+	public function __construct(string $url, string $mode = 'r', $context = [])
 	{
 		if(!empty($context))
 			$context = !$context instanceof StreamContext
@@ -41,15 +38,15 @@ class Stream implements StreamInterface
 				: $context->raw();
 		
 		$handler = !empty($context)
-			? @fopen($uri, $mode, false, $context)
-			: @fopen($uri, $mode);
+			? @fopen($url, $mode, false, $context)
+			: @fopen($url, $mode);
 		
 		if(!$this->handler = $handler)
-			throw StreamException::couldNotBeOpened($uri);
+			throw StreamException::unopened($url);
 	}
 	
 	/**
-	 * Destructs the stream handler before this object's destruction, thus
+	 * Destructs stream handler before this object's destruction, thus
 	 * preserving all changes eventually made to stream's contents.
 	 */
 	public function __destruct()
@@ -58,7 +55,7 @@ class Stream implements StreamInterface
 	}
 	
 	/**
-	 * Checks for the end-of-file pointer.
+	 * Checks for end-of-file pointer.
 	 * @return bool Has end-of-file been reached?
 	 */
 	public function eof(): bool
@@ -67,10 +64,10 @@ class Stream implements StreamInterface
 	}
 	
 	/**
-	 * Binds a filter to the stream's input or output channels.
-	 * @param FilterInterface|mixed $filter Filter to be applied to stream.
-	 * @param bool $prepend Should this filter be executed before all others?
-	 * @param int $channel Channel to be filtered.
+	 * Binds a filter to stream's input or output channels.
+	 * @param FilterInterface|mixed $filter Filter to apply to stream.
+	 * @param bool $prepend Should this filter execute before all others?
+	 * @param int $channel Channel to filter.
 	 * @return FilterInterface Filter instance.
 	 */
 	public function filter(
@@ -88,7 +85,7 @@ class Stream implements StreamInterface
 	}
 	
 	/**
-	 * Forces a write of all buffered output to the stream.
+	 * Forces a write of all buffered output to stream.
 	 * @return bool Was buffer successfully flushed?
 	 */
 	public function flush(): bool
@@ -97,7 +94,7 @@ class Stream implements StreamInterface
 	}
 	
 	/**
-	 * Sets the stream pointer to the end of stream.
+	 * Sets the stream pointer to end of stream.
 	 * @return bool Was the operation successful?
 	 */
 	public function forward(): bool
@@ -108,7 +105,7 @@ class Stream implements StreamInterface
 	/**
 	 * Allows the creation of a simple reader and writer model by supporting a
 	 * portable way of locking complete streams in an advisory way.
-	 * @param bool $share Should the lock be a shared one, for reading?
+	 * @param bool $share Should lock be a shared one, for reading?
 	 * @param bool $blocking Should execution block while locking?
 	 * @return bool Was lock successfully applied?
 	 * @see Stream::unlock()
@@ -122,9 +119,9 @@ class Stream implements StreamInterface
 	}
 	
 	/**
-	 * Retrieves some metadata about the stream. This class exposes the
-	 * following metadata: wrapper, header, timeout, type, blocked, seekable.
-	 * @param string $data Data name to be retrieved.
+	 * Retrieves some metadata about stream. This class exposes the following
+	 * metadata: wrapper, header, timeout, type, blocked, seekable.
+	 * @param string $data Data name to retrieve.
 	 * @return mixed The metadata value.
 	 */
 	public function metadata(string $data)
@@ -152,8 +149,8 @@ class Stream implements StreamInterface
 	}
 	
 	/**
-	 * Offsets the stream pointer by the given amount.
-	 * @param int $offset Number of bytes to be offset.
+	 * Offsets stream pointer by given amount.
+	 * @param int $offset Number of bytes to offset.
 	 * @return bool Was the operation successful?
 	 */
 	public function offset(int $offset): bool
@@ -162,8 +159,8 @@ class Stream implements StreamInterface
 	}
 	
 	/**
-	 * Writes all of stream contents to the output buffer, from the current
-	 * read point until end-of-file is reached.
+	 * Writes all of stream contents to output buffer, from current read point
+	 * until end-of-file is reached.
 	 * @return int Number of characters sent to output from stream.
 	 */
 	public function passthru(): int
@@ -172,9 +169,9 @@ class Stream implements StreamInterface
 	}
 	
 	/**
-	 * Writes a formatted string to the stream.
-	 * @param string $format String format to be applied to data.
-	 * @param mixed ...$vars Data to be formatted and written to stream.
+	 * Writes a formatted string to stream.
+	 * @param string $format String format to apply to data.
+	 * @param mixed ...$vars Data to format and write to stream.
 	 * @return int Number of bytes written to stream.
 	 */
 	public function printf(string $format, ...$vars): int
@@ -183,8 +180,8 @@ class Stream implements StreamInterface
 	}
 	
 	/**
-	 * Gives access to the object's raw contents. That is, it exposes the
-	 * internal stream that is wrapped by this object instance.
+	 * Gives access to object's raw contents. That is, it exposes the internal
+	 * stream that is usually wrapped by this object instance.
 	 * @return resource The raw stream resource.
 	 */
 	public function raw()
@@ -194,7 +191,7 @@ class Stream implements StreamInterface
 	
 	/**
 	 * Retrieves contents from stream.
-	 * @param int $length Maximum number of bytes to be read from stream.
+	 * @param int $length Maximum number of bytes to read from stream.
 	 * @return string Read stream contents.
 	 */
 	public function read(int $length = null): string
@@ -204,10 +201,10 @@ class Stream implements StreamInterface
 	
 	/**
 	 * Retrieves a line from stream.
-	 * @param int $length Maximum length of line to be read from stream.
+	 * @param int $length Maximum length of line to read from stream.
 	 * @return string Retrieved stream contents.
 	 */
-	public function readLine(int $length = null): string
+	public function readline(int $length = null): string
 	{
 		return fgets($this->handler, $length ?: 8192);
 	}
@@ -215,10 +212,10 @@ class Stream implements StreamInterface
 	/**
 	 * Retrieves contents from stream and puts it into another stream.
 	 * @param resource|StreamInterface $target Target to put content on.
-	 * @param int $length Maximum number of bytes to be retrieved from stream.
+	 * @param int $length Maximum number of bytes to retrieve from stream.
 	 * @return int Length of data read out of stream.
 	 */
-	public function readTo($target, int $length = null): int
+	public function readto($target, int $length = null): int
 	{
 		return $target instanceof StreamInterface
 			? $target->write($this->read($length))
@@ -226,7 +223,7 @@ class Stream implements StreamInterface
 	}
 	
 	/**
-	 * Sets the stream pointer to the beginning of stream.
+	 * Sets stream pointer to the beginning of stream.
 	 * @return bool Was the operation successful?
 	 */
 	public function rewind(): bool
@@ -247,7 +244,7 @@ class Stream implements StreamInterface
 	
 	/**
 	 * Seeks the stream pointer.
-	 * @param int $offset The position to be seeked.
+	 * @param int $offset The position to seek.
 	 * @return bool Was the operation successful?
 	 */
 	public function seek(int $offset): bool
@@ -265,8 +262,8 @@ class Stream implements StreamInterface
 	}
 	
 	/**
-	 * Truncates the stream to the given length. If the given length is larger
-	 * than the stream, it is extended with null bytes.
+	 * Truncates stream to given length. If given length is larger than stream,
+	 * it is extended with null bytes.
 	 * @param int $size The size to truncate to.
 	 * @return bool Was the operation successful?
 	 */
@@ -287,18 +284,18 @@ class Stream implements StreamInterface
 	}
 	
 	/**
-	 * Informs the locator used for instantiating this stream.
+	 * Informs locator used for instantiating this stream.
 	 * @return string The locator of this stream.
 	 */
-	public function uri(): string
+	public function url(): string
 	{
 		return stream_get_meta_data($this->handler)['uri'];
 	}
 	
 	/**
 	 * Writes contents to stream.
-	 * @param string $content Content to be written to stream.
-	 * @param int $length Maximum length of data to be written to stream.
+	 * @param string $content Content to write to stream.
+	 * @param int $length Maximum length of data to write to stream.
 	 * @return int Length of data written to stream.
 	 */
 	public function write(string $content, int $length = null): int
@@ -314,7 +311,7 @@ class Stream implements StreamInterface
 	 * @param int $length Maximum number of bytes to be written to stream.
 	 * @return int Total length of data written to stream.
 	 */
-	public function writeFrom($source, int $length = null): int
+	public function writefrom($source, int $length = null): int
 	{
 		return $source instanceof StreamInterface
 			? $this->write($source->read($length))
@@ -337,5 +334,4 @@ class Stream implements StreamInterface
 		
 		return $stream;
 	}
-	
 }

@@ -4,14 +4,14 @@
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
- * @copyright 2015-2017 Rodrigo Siqueira
+ * @copyright 2015-2018 Rodrigo Siqueira
  */
 namespace Zettacast\Collection;
 
 /**
- * Recursive class. This class has methods appliable for all kinds of
- * recursive collections. Only scalar key types, such as string and int, are
- * acceptable.
+ * The recursive collection class has methods appliable for all kinds of
+ * recursive collections. Only scalar key types, such as strings and integers,
+ * are acceptable in collections.
  * @package Zettacast\Collection
  * @version 1.0
  */
@@ -32,38 +32,36 @@ class RecursiveCollection extends Collection
 	
 	/**
 	 * Applies a callback to all values stored in collection.
-	 * @param callable $fn Callback to be applied. Parameters: value, key.
+	 * @param callable $fn Callback to apply. Parameters: value, key.
 	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
-	 * @return $this Collection for method chaining.
+	 * @return static Collection for method chaining.
 	 */
 	public function apply(callable $fn, $userdata = null)
 	{
-		$userdata = toArray($userdata);
-		
 		foreach(parent::iterate() as $key => $value)
-			$this->data[$key] = isListable($value)
-				? $this->new($value)->apply($fn, ...$userdata)
-				: $fn($value, $key, ...$userdata);
-
+			$this->data[$key] = listable($value)
+				? $this->new($value)->apply($fn, ...toarray($userdata))
+				: $fn($value, $key, ...toarray($userdata));
+		
 		return $this;
 	}
 	
 	/**
-	 * Collapses the collection into a one level shallower collection.
+	 * Collapses collection into a one level shallower collection.
 	 * @return static The collapsed collection.
 	 */
 	public function collapse()
 	{
 		return $this->new(
 			array_reduce($this->data, function($carry, $value) {
-				return array_merge($carry, toArray($value));
+				return array_merge($carry, toarray($value));
 			}, [])
 		);
 	}
 	
 	/**
-	 * Filters elements according to the given test. If no test function is
-	 * given, it fallbacks to removing all false equivalent values.
+	 * Filters elements according to given test. If no test function is given,
+	 * it fallbacks to removing all false values.
 	 * @param callable $fn Test function. Parameters: value, key.
 	 * @return static Collection of all filtered values.
 	 */
@@ -73,7 +71,7 @@ class RecursiveCollection extends Collection
 		
 		foreach(parent::iterate() as $key => $value)
 			if($fn($value, $key))
-				$result[$key] = isListable($value)
+				$result[$key] = listable($value)
 					? $this->new($value)->filter($fn)
 					: $value;
 		
@@ -81,7 +79,7 @@ class RecursiveCollection extends Collection
 	}
 	
 	/**
-	 * Flattens the recursive collection into a single level collection.
+	 * Flattens collection into a single level collection.
 	 * @return Collection The flattened collection.
 	 */
 	public function flatten(): Collection
@@ -93,7 +91,7 @@ class RecursiveCollection extends Collection
 	}
 	
 	/**
-	 * Creates a generator that iterates over the collection.
+	 * Creates a generator that iterates over collection.
 	 * @param bool $listall Should listable objects be yield as well?
 	 * @yield mixed Collection's stored values.
 	 * @return \Generator
@@ -101,7 +99,7 @@ class RecursiveCollection extends Collection
 	public function iterate(bool $listall = false): \Generator
 	{
 		foreach(parent::iterate() as $key => $value) {
-			$check = isListable($value);
+			$check = listable($value);
 			
 			if(!$check || $check && $listall)
 				yield $key => $value;
@@ -117,13 +115,13 @@ class RecursiveCollection extends Collection
 	 * Creates a new collection, the same type as the original, by using a
 	 * function for creating the new elements based on the older ones. The
 	 * callback receives the following parameters respectively: value, key.
-	 * @param callable $fn Function to be used for creating new elements.
+	 * @param callable $fn Function to use for creating new elements.
 	 * @return static New collection instance.
 	 */
 	public function map(callable $fn)
 	{
 		foreach(parent::iterate() as $key => $value)
-			$result[$key] = isListable($value)
+			$result[$key] = listable($value)
 				? $this->new($value)->map($fn)
 				: $fn($value, $key);
 		
@@ -145,7 +143,7 @@ class RecursiveCollection extends Collection
 	 * Iterates over collection and executes a function over every element.
 	 * @param callable $fn Iteration function. Parameters: value, key.
 	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
-	 * @return $this Collection for method chaining.
+	 * @return static Collection for method chaining.
 	 */
 	public function walk(callable $fn, $userdata = null)
 	{

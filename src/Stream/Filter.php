@@ -9,8 +9,6 @@
 namespace Zettacast\Stream;
 
 use Zettacast\Stream\Filter\ClosureFilter;
-use Zettacast\Contract\Stream\FilterInterface;
-use Zettacast\Exception\Stream\FilterException;
 
 /**
  * This class manages filters to be applied to streams.
@@ -20,13 +18,13 @@ use Zettacast\Exception\Stream\FilterException;
 class Filter implements FilterInterface
 {
 	/**
-	 * Parameter to be passed to filter object.
+	 * Parameter to pass to filter object.
 	 * @var mixed Filter parameter.
 	 */
 	protected $param;
 	
 	/**
-	 * The name of the filter to be applied to stream.
+	 * The name of filter to apply to stream.
 	 * @var string Filter name.
 	 */
 	protected $filtername;
@@ -38,11 +36,12 @@ class Filter implements FilterInterface
 	private $instances;
 	
 	/**
-	 * Filter constructor. If the given filtername is not yet registered, this
-	 * object will try to automatically register it. Closures are also accepted
-	 * by this filter manager.
-	 * @param string|\Closure $filter Filter to applied to stream.
-	 * @param mixed $param Parameter to be passed to filter.
+	 * Filter constructor.
+	 * If given filtername is not yet registered, this object will try to
+	 * automatically register it. Closures are also accepted by this filter
+	 * manager.
+	 * @param string|\Closure $filter Filter to apply to stream.
+	 * @param mixed $param Parameter to pass to filter.
 	 * @throws FilterException The given filter name is not known.
 	 * @see ClosureFilter
 	 */
@@ -54,10 +53,10 @@ class Filter implements FilterInterface
 		}
 		
 		if(!in_array($filter, self::list())) {
-			$class = zetta()->resolve($filter)->concrete ?? $filter;
+			$class = zetta()->resolve($filter)['concrete'] ?? $filter;
 			
 			if(!class_exists($class, true))
-				throw FilterException::isNotKnown($filter);
+				throw FilterException::unknown($filter);
 			
 			self::register($filter, $class);
 		}
@@ -69,9 +68,9 @@ class Filter implements FilterInterface
 	
 	/**
 	 * Appends filter to a stream.
-	 * @param resource $stream Stream to be filtered.
-	 * @param int $channel Stream channel to be filtered.
-	 * @return $this Filter for method chaining.
+	 * @param resource $stream Stream to filter.
+	 * @param int $channel Stream channel to filter.
+	 * @return static Filter for method chaining.
 	 */
 	public function append($stream, int $channel = self::ALL)
 	{
@@ -84,9 +83,9 @@ class Filter implements FilterInterface
 	
 	/**
 	 * Prepends filter to a stream.
-	 * @param resource $stream Stream to be filtered.
-	 * @param int $channel Stream channel to be filtered.
-	 * @return $this Filter for method chaining.
+	 * @param resource $stream Stream to filter.
+	 * @param int $channel Stream channel to filter.
+	 * @return static Filter for method chaining.
 	 */
 	public function prepend($stream, int $channel = self::ALL)
 	{
@@ -99,7 +98,7 @@ class Filter implements FilterInterface
 	
 	/**
 	 * Removes the filter from all streams it was applied to.
-	 * @return $this Filter for method chaining.
+	 * @return static Filter for method chaining.
 	 */
 	public function remove()
 	{
@@ -128,5 +127,4 @@ class Filter implements FilterInterface
 	{
 		return stream_filter_register($filter, $class);
 	}
-	
 }

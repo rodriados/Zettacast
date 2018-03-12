@@ -8,7 +8,7 @@
  */
 namespace Zettacast\Stream;
 
-use Zettacast\Contract\ExtractableInterface;
+use Zettacast\Helper\ExtractableInterface;
 
 /**
  * This class handles interactions to a stream contexts. It also allows the
@@ -26,7 +26,7 @@ class StreamContext implements ExtractableInterface
 	protected $context;
 	
 	/**
-	 * Initializes the stream context and prepares it to be applied to stream.
+	 * Initializes the stream context and prepares it to apply to stream.
 	 * @param resource|array $context Context data or the stream itself.
 	 */
 	public function __construct($context = [])
@@ -35,9 +35,9 @@ class StreamContext implements ExtractableInterface
 	}
 	
 	/**
-	 * Allows accessing the context option identified by the given key. This
-	 * key can be expressed in dot notation.
-	 * @param string $opt The context option name to be accessed.
+	 * Allows accessing the context option identified by given key. This key
+	 * can be expressed in dot notation.
+	 * @param string $opt The context option name to access.
 	 * @return mixed The requested option value or null if not found.
 	 */
 	public function get(string $opt)
@@ -52,10 +52,10 @@ class StreamContext implements ExtractableInterface
 	}
 	
 	/**
-	 * Allows changing or creating the context option identified by the given
+	 * Allows changing or creating the context option identified by given key
 	 * key. This key can be expressed in dot notation.
-	 * @param string $opt The context option name to be changed or created.
-	 * @param mixed $value The value to be related to the specified option.
+	 * @param string $opt The context option name to change or create.
+	 * @param mixed $value The value to relate to the specified option.
 	 * @return bool Was the operation successful?
 	 */
 	public function set(string $opt, $value): bool
@@ -79,9 +79,9 @@ class StreamContext implements ExtractableInterface
 	}
 	
 	/**
-	 * Creates a raw context resource from the given parameter. If given an
+	 * Creates a raw context resource from given parameter. If given an
 	 * already created context resource, it will be simply returned unchanged.
-	 * @param array|resource $context Context configuration to be created.
+	 * @param array|resource $context Context configuration to create.
 	 * @return resource The raw context resource created.
 	 */
 	public static function create($context)
@@ -109,7 +109,7 @@ class StreamContext implements ExtractableInterface
 	/**
 	 * Normalizes a context array, so it is formatted as required by all of
 	 * internal PHP functions.
-	 * @param array $context Context array to be normalized.
+	 * @param array $context Context array to normalize.
 	 * @return array The normalized array.
 	 */
 	protected static function normalize(array $context): array
@@ -129,5 +129,4 @@ class StreamContext implements ExtractableInterface
 		
 		return $params ?? [];
 	}
-	
 }

@@ -4,20 +4,19 @@
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
- * @copyright 2015-2017 Rodrigo Siqueira
+ * @copyright 2015-2018 Rodrigo Siqueira
  */
 namespace Zettacast\Autoload;
 
-require FWORKPATH."/Contract/Autoload/LoaderInterface.php";
-require FWORKPATH."/Autoload/Loader/FrameworkLoader.php";
+require SRCPATH.'/Autoload/LoaderInterface.php';
+require SRCPATH.'/Autoload/Loader/InternalLoader.php';
 
-use Zettacast\Autoload\Loader\FrameworkLoader;
-use Zettacast\Contract\Autoload\LoaderInterface;
+use Zettacast\Autoload\Loader\InternalLoader;
 
 /**
- * The autoload class is responsible for loading all classes required by the
- * framework or the application itself. It also lets you set explicit paths for
- * classes to be loaded from.
+ * The autoloader is responsible for loading all objects required by the
+ * application or the framework itself automatically. To be able to do so, the
+ * autoloader requires its lookup folders to be explicitly defined.
  * @package Zettacast\Autoload
  * @version 1.0
  */
@@ -25,68 +24,51 @@ final class Autoload
 {
 	/**
 	 * Stores the loaders already registered in the autoloading system. This
-	 * allows us to keep track of all class loading functions.
-	 * @var LoaderInterface[] Class loader functions registered.
+	 * allows us to keep track of all object loader functions.
+	 * @var LoaderInterface[] Object loader functions registered.
 	 */
 	private $loaders;
 	
 	/**
-	 * Stores the default loader instance for Zettacast classes. This loader is
-	 * special and cannot be closed.
-	 * @var FrameworkLoader Zettacast main loader instance.
+	 * Stores the default loader instance for Zettacast objects. This loader is
+	 * special and cannot be closed nor unregistered.
+	 * @var InternalLoader Zettacast main loader instance.
 	 */
-	private $framework;
+	private $internal;
 	
 	/**
 	 * Autoload constructor.
-	 * Initializes the class and set values to instance properties.
-	 * @param string $fwork Framework files' path.
-	 * @param string $app Application files' path.
-	 * @param string $rsrc Resources files' path.
+	 * Initializes the object and set values to instance properties.
 	 */
-	public function __construct(
-		string $fwork = FWORKPATH,
-		string $app = APPPATH,
-		string $rsrc = VENDORPATH
-	) {
-		$this->loaders = [];
-		$this->framework = new FrameworkLoader($fwork, $app, $rsrc);
-		$this->register($this->framework);
-	}
-	
-	/**
-	 * Checks whether a loader has already been registered to the stack.
-	 * @param LoaderInterface $loader Target to check whether registered.
-	 * @return bool Is loader already registered?
-	 */
-	public function isRegistered(LoaderInterface $loader)
+	public function __construct()
 	{
-		return isset($this->loaders[$hash = spl_object_hash($loader)])
-			&& $this->loaders[$hash];
+		$this->loaders = [];
+		$this->internal = new InternalLoader;
+		
+		$this->register($this->internal);
 	}
 	
 	/**
-	 * Registers a loader to the autoload stack. The autoload function will be
-	 * the responsible for automatically loading all classes invoked by the
-	 * framework or by the application.
-	 * @var LoaderInterface $loader A loader to be registered.
+	 * Registers a loader in autoload stack. The autoload function will be
+	 * responsible for automatically loading all objects invoked by framework
+	 * or by application.
+	 * @var LoaderInterface $loader A loader to register.
 	 * @return bool Was the loader successfully registered?
 	 */
-	public function register(LoaderInterface $loader)
+	public function register(LoaderInterface $loader): bool
 	{
-		if($this->isRegistered($loader)) {
+		if($this->isRegistered($loader))
 			return false;
-		}
 		
 		$this->loaders[spl_object_hash($loader)] = true;
 		return spl_autoload_register([$loader, 'load']);
 	}
 	
 	/**
-	 * Unregisters a class loader from the autoload stack.
-	 * @param LoaderInterface $loader A loader to be unregistered.
+	 * Unregisters a object loader from autoload stack.
+	 * @param LoaderInterface $loader A loader to unregister.
 	 */
-	public function unregister(LoaderInterface $loader)
+	public function unregister(LoaderInterface $loader): void
 	{
 		if($this->isRegistered($loader)) {
 			unset($this->loaders[spl_object_hash($loader)]);
@@ -94,4 +76,13 @@ final class Autoload
 		}
 	}
 	
+	/**
+	 * Checks whether a loader has already been registered in stack.
+	 * @param LoaderInterface $loader Target to check whether registered.
+	 * @return bool Is loader already registered?
+	 */
+	public function isRegistered(LoaderInterface $loader): bool
+	{
+		return (bool)($this->loaders[spl_object_hash($loader)] ?? false);
+	}
 }

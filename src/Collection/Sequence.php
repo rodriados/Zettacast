@@ -4,16 +4,15 @@
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
- * @copyright 2015-2017 Rodrigo Siqueira
+ * @copyright 2015-2018 Rodrigo Siqueira
  */
 namespace Zettacast\Collection;
 
-use Zettacast\Contract\ArrayAccessTrait;
-use Zettacast\Contract\Collection\SequenceInterface;
+use Zettacast\Helper\ArrayAccessTrait;
 
 /**
- * Sequence class. This class has methods appliable for all kinds of sequences.
- * Only integer and sequencial keys are acceptable.
+ * The sequence class has methods appliable for all kinds of sequences. Only
+ * integer and sequencial keys are acceptable in sequences.
  * @package Zettacast\Collection
  * @version 1.0
  */
@@ -22,20 +21,21 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	use ArrayAccessTrait;
 	
 	/**
-	 * Data to be stored.
+	 * Data to store.
 	 * @var \SplDoublyLinkedList Data stored in sequence.
 	 */
 	protected $data;
 	
 	/**
-	 * Sequence constructor. This constructor simply creates a new base for all
-	 * of this object's data to be stored on.
-	 * @param array|\Traversable $data to be stored as a sequence.
+	 * Sequence constructor.
+	 * This constructor simply creates a new base for all of this object's data
+	 * to be stored on.
+	 * @param array|\Traversable $data Data to store as a sequence.
 	 */
 	public function __construct($data = null)
 	{
 		$data = !is_null($data)
-			? toArray($data)
+			? toarray($data)
 			: [];
 		
 		$this->data = new \SplDoublyLinkedList;
@@ -54,8 +54,8 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Accesses the element stored in the given index.
-	 * @param int $index Index to be accessed.
+	 * Accesses element stored in given index.
+	 * @param int $index Index to access.
 	 * @param mixed $default Default value as fallback.
 	 * @return mixed Element stored in given index.
 	 */
@@ -67,8 +67,8 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Checks whether the index exists.
-	 * @param int $index Index to be checked.
+	 * Checks whether index exists.
+	 * @param int $index Index to check existance.
 	 * @return bool Does given index exist?
 	 */
 	public function has($index): bool
@@ -77,30 +77,24 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Sets a value to the given index.
-	 * @param int $index Index to be updated.
-	 * @param mixed $value Value to be stored in index.
-	 * @return $this Sequence for method chaining.
+	 * Sets a value to given index.
+	 * @param int $index Index to update.
+	 * @param mixed $value Value to store in index.
 	 */
-	public function set($index, $value)
+	public function set($index, $value): void
 	{
 		if($index <= $this->count())
 			$this->data->add($index, $value);
-		
-		return $this;
 	}
 	
 	/**
 	 * Removes an element from sequence.
-	 * @param mixed $index Index to be removed.
-	 * @return $this Sequence for method chaining.
+	 * @param mixed $index Index to remove.
 	 */
-	public function del($index)
+	public function del($index): void
 	{
 		if($this->has($index))
 			unset($this->data[$index]);
-		
-		return $this;
 	}
 	
 	/**
@@ -109,28 +103,26 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	 */
 	public function raw(): array
 	{
-		return toArray($this->data);
+		return toarray($this->data);
 	}
 	
 	/**
 	 * Applies a callback to all values stored in sequence.
-	 * @param callable $fn Callback to be applied. Parameters: value, key.
+	 * @param callable $fn Callback to apply. Parameters: value, key.
 	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
-	 * @return $this Sequence for method chaining.
+	 * @return static Sequence for method chaining.
 	 */
 	public function apply(callable $fn, $userdata = null)
 	{
-		$userdata = toArray($userdata);
-		
 		foreach($this->iterate() as $key => $value)
-			$this->data[$key] = $fn($value, $key, ...$userdata);
+			$this->data[$key] = $fn($value, $key, ...toarray($userdata));
 		
 		return $this;
 	}
 	
 	/**
-	 * Chunks the sequence into pieces of the given size.
-	 * @param int $size Size of the chunks.
+	 * Chunks the sequence into pieces of given size.
+	 * @param int $size Size of chunks.
 	 * @return static[] Array of sequence chunks.
 	 */
 	public function chunk(int $size): array
@@ -158,7 +150,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	
 	/**
 	 * Counts the number of elements currently in sequence.
-	 * @return int Number of elements stored in the sequence.
+	 * @return int Number of elements stored in sequence.
 	 */
 	public function count(): int
 	{
@@ -166,8 +158,8 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Return the element the internal pointer currently points to.
-	 * @return mixed Current element in the sequence.
+	 * Returns the element the internal pointer currently points to.
+	 * @return mixed Current element in sequence.
 	 */
 	public function current()
 	{
@@ -201,19 +193,19 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	
 	/**
 	 * Creates a new sequence with all elements except the specified keys.
-	 * @param int|int[] $keys Keys to be forgotten in the new sequence.
+	 * @param int|int[] $keys Keys to forget in new sequence.
 	 * @return static New sequence instance.
 	 */
 	public function except($keys)
 	{
 		return $this->new(
-			array_diff_key($this->raw(), array_flip(toArray($keys)))
+			array_diff_key($this->raw(), array_flip(toarray($keys)))
 		);
 	}
 	
 	/**
-	 * Filters elements according to the given test. If no test function is
-	 * given, it fallbacks to removing all false equivalent values.
+	 * Filters elements according to given test. If no test function is given,
+	 * it fallbacks to removing all false values.
 	 * @param callable $fn Test function. Parameters: value, key.
 	 * @return static Sequence of all filtered values.
 	 */
@@ -226,7 +218,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Returns the first element in the sequence.
+	 * Returns first element in sequence.
 	 * @return mixed Sequence's first element.
 	 */
 	public function first()
@@ -242,12 +234,12 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	public function intersect($items)
 	{
 		return $this->new(
-			array_intersect($this->raw(), toArray($items))
+			array_intersect($this->raw(), toarray($items))
 		);
 	}
 	
 	/**
-	 * Creates a generator that iterates over the sequence.
+	 * Creates a generator that iterates over sequence.
 	 * @yield mixed Sequence's stored values.
 	 */
 	public function iterate(): \Generator
@@ -256,8 +248,8 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Fetches the key the internal pointer currently points to.
-	 * @return int Current element's key in the sequence.
+	 * Fetches key the internal pointer currently points to.
+	 * @return int Current element's key in sequence.
 	 */
 	public function key(): int
 	{
@@ -265,7 +257,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Returns the last element in the sequence.
+	 * Returns last element in the sequence.
 	 * @return mixed Sequence's last element.
 	 */
 	public function last()
@@ -277,7 +269,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	 * Creates a new sequence, the same type as the original, by using a
 	 * function for creating the new elements based on the older ones. The
 	 * callback receives the following parameters respectively: value, key.
-	 * @param callable $fn Function to be used for creating new elements.
+	 * @param callable $fn Function to use for creating new elements.
 	 * @return static New sequence instance.
 	 */
 	public function map(callable $fn)
@@ -291,7 +283,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	
 	/**
 	 * Merges given items into sequence's elements.
-	 * @param mixed $items Items to be merged into sequence.
+	 * @param mixed $items Items to merge into sequence.
 	 * @return static Sequence of all merged elements.
 	 */
 	public function merge($items)
@@ -303,7 +295,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	
 	/**
 	 * Advances the internal pointer one position.
-	 * @return mixed Element in the next position.
+	 * @return mixed Element in next position.
 	 */
 	public function next()
 	{
@@ -313,18 +305,18 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	
 	/**
 	 * Creates a new sequence with a subset of elements.
-	 * @param int|int[] $keys Keys to be included in new sequence.
+	 * @param int|int[] $keys Keys to include in new sequence.
 	 * @return static New sequence instance.
 	 */
 	public function only($keys)
 	{
 		return $this->new(
-			array_intersect_key($this->raw(), array_flip(toArray($keys)))
+			array_intersect_key($this->raw(), array_flip(toarray($keys)))
 		);
 	}
 	
 	/**
-	 * Passes the sequence to the given function and returns the result.
+	 * Passes sequence to given function and returns the result.
 	 * @param callable $fn Function to which sequence is passed to.
 	 * @return mixed Callback's return result.
 	 */
@@ -334,7 +326,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Pops an element out of the top of the sequence.
+	 * Pops an element out of top of sequence.
 	 * @return mixed Popped element.
 	 */
 	public function pop()
@@ -344,7 +336,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	
 	/**
 	 * Rewinds the internal pointer one position.
-	 * @return mixed Element in the previous position.
+	 * @return mixed Element in previous position.
 	 */
 	public function prev()
 	{
@@ -354,7 +346,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	
 	/**
 	 * Pulls an element out of given index.
-	 * @param int $index Index to be pulled off.
+	 * @param int $index Index to pull off.
 	 * @param mixed $default Default value if index not found.
 	 * @return mixed Pulled element.
 	 */
@@ -367,14 +359,12 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Pushes an element onto the end of the sequence.
-	 * @param mixed $value Value to be appended onto the sequence.
-	 * @return $this Sequence for method chaining.
+	 * Pushes an element onto end of sequence.
+	 * @param mixed $value Value to append onto sequence.
 	 */
-	public function push($value)
+	public function push($value): void
 	{
 		$this->data->push($value);
-		return $this;
 	}
 	
 	/**
@@ -405,7 +395,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Returns a reversed copy of the sequence.
+	 * Returns a reversed copy of sequence.
 	 * @return static Reversed sequence.
 	 */
 	public function reverse()
@@ -414,7 +404,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Set the internal pointer of the sequence to its first element.
+	 * Sets the internal pointer of sequence to its first element.
 	 * @return mixed First element in sequence.
 	 */
 	public function rewind()
@@ -424,12 +414,12 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Rotates the sequence by a given number of rotations. If the number of
-	 * rotations is positive, the elements in the bottom of the sequence will
-	 * be rotated to the top. But, if the number of rotations is negative, the
-	 * elements in the top of the sequence will be rotate to the bottom.
-	 * @param int $rotations Number of rotations to be performed.
-	 * @return static New rotate sequence.
+	 * Rotates sequence by a given number of rotations. If number of rotations
+	 * is positive, the elements in bottom of sequence will rotate to top. But,
+	 * if the number of rotations is negative, the elements in top of sequence
+	 * will rotate to bottom.
+	 * @param int $rotations Number of rotations to perform.
+	 * @return static New rotated sequence.
 	 */
 	public function rotate(int $rotations = 1)
 	{
@@ -443,7 +433,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Attemps to find the index of an element stored in sequence.
+	 * Attemps to find index of an element stored in sequence.
 	 * @param mixed $needle Value to be found.
 	 * @param bool $strict Should the search be for identical elements?
 	 * @return int|bool Index of the found element, or false otherwise.
@@ -454,7 +444,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Shifts a value off the bottom of the sequence.
+	 * Shifts a value off the bottom of sequence.
 	 * @return mixed Shifted value.
 	 */
 	public function shift()
@@ -463,21 +453,21 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Shuffles the sequence to an unknown order.
+	 * Shuffles sequence to an unknown order.
 	 * @return static Shuffled sequence.
 	 */
 	public function shuffle()
 	{
 		$data = $this->raw();
 		shuffle($data);
-
+		
 		return $this->new($data);
 	}
 	
 	/**
-	 * Retrieves a slice of the sequence.
+	 * Retrieves a slice of sequence.
 	 * @param int $index Slice initial position.
-	 * @param int $length Length of the slice.
+	 * @param int $length Length of slice.
 	 * @return static Sliced sequence.
 	 */
 	public function slice(int $index, int $length = null)
@@ -499,7 +489,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Removes part of the sequence and replaces it.
+	 * Removes part of sequence and replaces it.
 	 * @param int $offset Initial splice offset.
 	 * @param int $length Length of splice portion.
 	 * @param mixed $replace Replacement for removed slice.
@@ -508,7 +498,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	public function splice(int $offset, int $length = null, $replace = [])
 	{
 		return $this->new(array_splice(
-			toArray($this->data),
+			toarray($this->data),
 			$offset,
 			$length ?: $this->count(),
 			$replace
@@ -516,9 +506,9 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Splits the sequence into the given number of groups.
-	 * @param int $count Number of groups to split the sequence.
-	 * @return array Splitted sequence.
+	 * Splits sequence into given number of groups.
+	 * @param int $count Number of groups to split sequence.
+	 * @return static[] Splitted sequence.
 	 */
 	public function split(int $count): array
 	{
@@ -528,9 +518,9 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Takes the first or last specified number of items.
-	 * @param int $limit Number of items to be taken.
-	 * @return static Sequence of the taken items.
+	 * Takes first or last specified number of items.
+	 * @param int $limit Number of items to take.
+	 * @return static Sequence of taken items.
 	 */
 	public function take(int $limit)
 	{
@@ -540,7 +530,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Passes the sequence to the given function and returns it.
+	 * Passes sequence to given function and returns it.
 	 * @param callable $fn Function to which sequence is passed to.
 	 * @return static Sequence's copy sent to function.
 	 */
@@ -551,14 +541,12 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Pushes an element onto the beginning of the sequence.
-	 * @param mixed $value Value to be prepended onto the sequence.
-	 * @return static Sequence for method chaining.
+	 * Pushes an element onto the beginning of sequence.
+	 * @param mixed $value Value to prepend onto sequence.
 	 */
-	public function unshift($value)
+	public function unshift($value): void
 	{
 		$this->data->unshift($value);
-		return $this;
 	}
 	
 	/**
@@ -578,10 +566,8 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	 */
 	public function walk(callable $fn, $userdata = null)
 	{
-		$userdata = toArray($userdata);
-		
 		foreach($this->iterate() as $key => $value)
-			$fn($value, $key, ...$userdata);
+			$fn($value, $key, ...toarray($userdata));
 		
 		return $this;
 	}
@@ -595,5 +581,4 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	{
 		return new static($target);
 	}
-	
 }

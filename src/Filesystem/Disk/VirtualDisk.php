@@ -10,10 +10,10 @@ namespace Zettacast\Filesystem\Disk;
 
 use Zettacast\Filesystem\File;
 use Zettacast\Collection\Sequence;
+use Zettacast\Stream\StreamInterface;
+use Zettacast\Filesystem\DiskInterface;
 use Zettacast\Collection\RecursiveCollection;
-use Zettacast\Contract\Stream\StreamInterface;
-use Zettacast\Contract\Filesystem\DiskInterface;
-use Zettacast\Contract\Collection\SequenceInterface;
+use Zettacast\Collection\SequenceInterface;
 
 /**
  * Emulates a disk for virtual files. All of the contents saved in this disk
@@ -30,8 +30,8 @@ class VirtualDisk implements DiskInterface
 	protected $storage;
 	
 	/**
-	 * Virtual disk constructor. This constructor simply creates our root
-	 * directory so we have a base where we can put our files on.
+	 * VirtualDisk constructor.
+	 * Creates our root directory so we have a base where we can put our files.
 	 */
 	public function __construct()
 	{
@@ -44,8 +44,8 @@ class VirtualDisk implements DiskInterface
 	}
 	
 	/**
-	 * Creates a copy of a file in the given destiny path.
-	 * @param string $path File to be copied.
+	 * Creates a copy of a file in given destiny path.
+	 * @param string $path File to copy.
 	 * @param string $target Path to which copy is created.
 	 * @return bool Was it possible to copy such a file?
 	 */
@@ -62,8 +62,8 @@ class VirtualDisk implements DiskInterface
 	}
 	
 	/**
-	 * Checks whether a path exists in the driver.
-	 * @param string $path Path to be checked.
+	 * Checks whether a path exists in driver.
+	 * @param string $path Path to check existance.
 	 * @return bool Was the path found?
 	 */
 	public function has(string $path): bool
@@ -73,9 +73,9 @@ class VirtualDisk implements DiskInterface
 	}
 	
 	/**
-	 * Returns all metadata available for given path.
+	 * Returns metadata available for given path.
 	 * @param string $path Target path for metadata request.
-	 * @param string $data Specific data to be retrieved.
+	 * @param string $data Specific data to retrieve.
 	 * @return mixed All metadata values or retrieved specific data.
 	 */
 	public function info(string $path = null, string $data = null)
@@ -90,11 +90,11 @@ class VirtualDisk implements DiskInterface
 	}
 	
 	/**
-	 * Checks whether the given path is a directory.
-	 * @param string $path Path to be checked.
+	 * Checks whether given path is a directory.
+	 * @param string $path Path to check.
 	 * @return bool Is path a directory?
 	 */
-	public function isDir(string $path): bool
+	public function isdir(string $path): bool
 	{
 		$tgt = $this->treat($path);
 		
@@ -103,11 +103,11 @@ class VirtualDisk implements DiskInterface
 	}
 	
 	/**
-	 * Checks whether the given path is a file.
-	 * @param string $path Path to be checked.
+	 * Checks whether given path is a file.
+	 * @param string $path Path to check.
 	 * @return bool Is path a file?
 	 */
-	public function isFile(string $path): bool
+	public function isfile(string $path): bool
 	{
 		$tgt = $this->treat($path);
 		
@@ -116,8 +116,8 @@ class VirtualDisk implements DiskInterface
 	}
 	
 	/**
-	 * Lists all files and directories contained in the given path.
-	 * @param string $dir Path to be listed.
+	 * Lists all files and directories contained in given path.
+	 * @param string $dir Path to list.
 	 * @return SequenceInterface All directory contents in the path.
 	 */
 	public function list(string $dir = null): SequenceInterface
@@ -131,9 +131,9 @@ class VirtualDisk implements DiskInterface
 	}
 	
 	/**
-	 * Creates a new directory into the driver.
-	 * @param string $path Path of the directory to be created.
-	 * @return bool Was the directory successfully created?
+	 * Creates a new directory into driver.
+	 * @param string $path Path of directory to create.
+	 * @return bool Was directory successfully created?
 	 */
 	public function mkdir(string $path): bool
 	{
@@ -174,8 +174,8 @@ class VirtualDisk implements DiskInterface
 	
 	/**
 	 * Opens a file as a directly editable stream.
-	 * @param string $filename File to be opened.
-	 * @param string $mode Reading/writing mode the file should be opened in.
+	 * @param string $filename File to open.
+	 * @param string $mode Reading/writing mode the file should open in.
 	 * @return StreamInterface The directly editable file handler.
 	 */
 	public function open(string $filename, string $mode = 'r'): StreamInterface
@@ -188,8 +188,8 @@ class VirtualDisk implements DiskInterface
 	}
 	
 	/**
-	 * Retrieves all contents from the given file.
-	 * @param string $filename File to be read.
+	 * Retrieves all contents from given file.
+	 * @param string $filename File to read.
 	 * @return string All file contents.
 	 */
 	public function read(string $filename)
@@ -212,12 +212,12 @@ class VirtualDisk implements DiskInterface
 	
 	/**
 	 * Retrieves contents from a file and puts it into a stream.
-	 * @param string $file Source file to be read.
+	 * @param string $file Source file to read.
 	 * @param resource|StreamInterface $stream Target stream to put content on.
-	 * @param int $length Maximum number of bytes to be written to stream.
+	 * @param int $length Maximum number of bytes to write to stream.
 	 * @return int Length of data read from file.
 	 */
-	public function readTo(string $file, $stream, int $length = null): int
+	public function readto(string $file, $stream, int $length = null): int
 	{
 		$fcontent = $this->read($file);
 		
@@ -228,7 +228,7 @@ class VirtualDisk implements DiskInterface
 	
 	/**
 	 * Removes a file or directory from driver.
-	 * @param string $path Path to file to be removed from driver.
+	 * @param string $path Path to file to from driver.
 	 * @return bool Was file or directory successfully removed?
 	 */
 	public function remove(string $path): bool
@@ -244,7 +244,7 @@ class VirtualDisk implements DiskInterface
 	
 	/**
 	 * Removes a directory from driver.
-	 * @param string $path Path to directory to be removed from driver.
+	 * @param string $path Path to directory to remove from driver.
 	 * @return bool Was directory successfully removed?
 	 */
 	public function rmdir(string $path): bool
@@ -265,8 +265,8 @@ class VirtualDisk implements DiskInterface
 	
 	/**
 	 * Appends the content to a file, that will be created if needed.
-	 * @param string $filename Target file path to be written.
-	 * @param mixed $content Content to be written to path.
+	 * @param string $filename Target file path to write.
+	 * @param mixed $content Content to write to path.
 	 * @return int Number of written characters.
 	 */
 	public function update(string $filename, $content): int
@@ -290,11 +290,11 @@ class VirtualDisk implements DiskInterface
 	/**
 	 * Retrieves content from stream and appends it to a file.
 	 * @param resource|StreamInterface $stream Source content is retrieved from.
-	 * @param string $file Target file to be written to.
-	 * @param int $length Maximum number of bytes to be written to file.
+	 * @param string $file Target file to write to.
+	 * @param int $length Maximum number of bytes to write to file.
 	 * @return int Total length of data written to file.
 	 */
-	public function updateFrom($stream, string $file, int $length = null): int
+	public function updatefrom($stream, string $file, int $length = null): int
 	{
 		return $stream instanceof StreamInterface
 			? $this->update($file, $stream->read($length))
@@ -303,8 +303,8 @@ class VirtualDisk implements DiskInterface
 	
 	/**
 	 * Writes the content to a file, that will be created if needed.
-	 * @param string $filename Target file path to be written.
-	 * @param mixed $content Content to be written to path.
+	 * @param string $filename Target file path to write.
+	 * @param mixed $content Content to write to path.
 	 * @return int Number of written characters.
 	 */
 	public function write(string $filename, $content): int
@@ -327,11 +327,11 @@ class VirtualDisk implements DiskInterface
 	/**
 	 * Retrieves content from stream and writes it to a file.
 	 * @param resource|StreamInterface $stream Stream content is retrieved from.
-	 * @param string $file Target file to be written to.
-	 * @param int $length Maximum number of bytes to be written to file.
+	 * @param string $file Target file to write to.
+	 * @param int $length Maximum number of bytes to write to file.
 	 * @return int Total length of data written to file.
 	 */
-	public function writeFrom($stream, string $file, int $length = null): int
+	public function writefrom($stream, string $file, int $length = null): int
 	{
 		return $stream instanceof StreamInterface
 			? $this->write($file, $stream->read($length))
@@ -339,8 +339,8 @@ class VirtualDisk implements DiskInterface
 	}
 	
 	/**
-	 * Treats the virtual paths, so all of them keep a given formatation.
-	 * @param string $path Path to be treated.
+	 * Treats the virtual paths, so all of them keep a uniform formatation.
+	 * @param string $path Path to treat.
 	 * @return string Trated path.
 	 */
 	protected function treat(string $path = null): string
@@ -356,5 +356,4 @@ class VirtualDisk implements DiskInterface
 		
 		return implode('/', $true) ?: '.';
 	}
-	
 }

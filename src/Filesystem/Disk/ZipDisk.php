@@ -11,10 +11,10 @@ namespace Zettacast\Filesystem\Disk;
 use Zettacast\Stream\Stream;
 use Zettacast\Collection\Sequence;
 use Zettacast\Collection\Collection;
-use Zettacast\Contract\Stream\StreamInterface;
-use Zettacast\Contract\Filesystem\DiskInterface;
-use Zettacast\Contract\Collection\SequenceInterface;
-use Zettacast\Exception\Filesystem\FilesystemException;
+use Zettacast\Stream\StreamInterface;
+use Zettacast\Filesystem\DiskInterface;
+use Zettacast\Collection\SequenceInterface;
+use Zettacast\Filesystem\FilesystemException;
 
 /**
  * Disk for accessing a zip file. This driver allows the stored zip files to be
@@ -30,11 +30,16 @@ class ZipDisk implements DiskInterface
 	 */
 	protected $archive;
 	
+	/**
+	 * If file needs a password to decompress, here is where we store it.
+	 * @var string The password for decompressing file.
+	 */
 	protected $password;
 	
 	/**
-	 * This constructor is responsible for opening or creating the zip file.
-	 * @param string $location The location of the zip file to be opened.
+	 * ZipDisk constructor.
+	 * Opens or creates the zip file.
+	 * @param string $location The location of zip file to open.
 	 * @param string $password Password needed to decompress the file.
 	 * @throws FilesystemException The zip file could not be found or created.
 	 */
@@ -47,11 +52,12 @@ class ZipDisk implements DiskInterface
 			$this->archive->setPassword($this->password);
 		
 		if($success !== true)
-			throw FilesystemException::missingFile($location);
+			throw FilesystemException::missingfile($location);
 	}
 	
 	/**
-	 * Closes the zip file and commits all changes made to it. This constructor
+	 * ZipDisk destructor.
+	 * Closes the zip file and commits all changes made to it. This destructor
 	 * is explicitly needed as the zip archive will come back to its original
 	 * form if not previously closed.
 	 */
@@ -62,7 +68,7 @@ class ZipDisk implements DiskInterface
 	
 	/**
 	 * Checks whether a path exists in the disk.
-	 * @param string $path Path to be checked.
+	 * @param string $path Path to check existance.
 	 * @return bool Was the path found?
 	 */
 	public function has(string $path): bool
@@ -75,7 +81,7 @@ class ZipDisk implements DiskInterface
 	
 	/**
 	 * Removes a file from disk.
-	 * @param string $path Path to file to be removed from disk.
+	 * @param string $path Path to file to remove from disk.
 	 * @return bool Was file or directory successfully removed?
 	 */
 	public function remove(string $path): bool
@@ -84,8 +90,8 @@ class ZipDisk implements DiskInterface
 	}
 	
 	/**
-	 * Creates a copy of a file in the given destiny path.
-	 * @param string $path File to be copied.
+	 * Creates a copy of a file in given destiny path.
+	 * @param string $path File to copy.
 	 * @param string $target Path to which copy is created.
 	 * @return bool Was it possible to copy such the file?
 	 */
@@ -100,7 +106,7 @@ class ZipDisk implements DiskInterface
 	/**
 	 * Returns metadata available for given path.
 	 * @param string $path Target path for metadata request.
-	 * @param string $data Specific data to be retrieved.
+	 * @param string $data Specific data to retrieve.
 	 * @return mixed All metadata values or retrieved specific data.
 	 */
 	public function info(string $path = null, string $data = null)
@@ -118,30 +124,30 @@ class ZipDisk implements DiskInterface
 	}
 	
 	/**
-	 * Checks whether the given path is a directory.
-	 * @param string $path Path to be checked.
+	 * Checks whether given path is a directory.
+	 * @param string $path Path to check.
 	 * @return bool Is path a directory?
 	 */
-	public function isDir(string $path): bool
+	public function isdir(string $path): bool
 	{
 		$tgt = $this->treat($path);
 		return (bool)$this->archive->statName($tgt.'/');
 	}
 	
 	/**
-	 * Checks whether the given path is a file.
-	 * @param string $path Path to be checked.
+	 * Checks whether given path is a file.
+	 * @param string $path Path to check.
 	 * @return bool Is path a file?
 	 */
-	public function isFile(string $path): bool
+	public function isfile(string $path): bool
 	{
 		$tgt = $this->treat($path);
 		return (bool)$this->archive->statName($tgt);
 	}
 	
 	/**
-	 * Creates a new directory into the disk.
-	 * @param string $path Path of the directory to be created.
+	 * Creates a new directory into disk.
+	 * @param string $path Path of the directory to create.
 	 * @return bool Was the directory successfully created?
 	 */
 	public function mkdir(string $path): bool
@@ -152,7 +158,7 @@ class ZipDisk implements DiskInterface
 	
 	/**
 	 * Moves given file or directory to another location.
-	 * @param string $path Target path, that will be moved.
+	 * @param string $path Target path, that will move.
 	 * @param string $newpath The new name for target file or directory.
 	 * @return bool Was the file or directory successfully moved?
 	 */
@@ -165,8 +171,8 @@ class ZipDisk implements DiskInterface
 	}
 	
 	/**
-	 * Lists all files and directories contained in the given path.
-	 * @param string $dir Path to be listed.
+	 * Lists all files and directories contained in given path.
+	 * @param string $dir Path to list.
 	 * @return SequenceInterface All directory contents in the path.
 	 */
 	public function list(string $dir = null): SequenceInterface
@@ -188,7 +194,7 @@ class ZipDisk implements DiskInterface
 	
 	/**
 	 * Opens a file as a directly readable stream.
-	 * @param string $filename File to be opened.
+	 * @param string $filename File to open.
 	 * @param string $mode Only reading is allowed for this disk.
 	 * @return StreamInterface The directly readable file handler.
 	 */
@@ -202,8 +208,8 @@ class ZipDisk implements DiskInterface
 	}
 	
 	/**
-	 * Retrieves all contents from the given file.
-	 * @param string $filename File to be read.
+	 * Retrieves all contents from given file.
+	 * @param string $filename File to read.
 	 * @return string All file contents.
 	 */
 	public function read(string $filename)
@@ -214,12 +220,12 @@ class ZipDisk implements DiskInterface
 	
 	/**
 	 * Retrieves contents from a file and puts it into a stream.
-	 * @param string $file Source file to be read.
+	 * @param string $file Source file to read.
 	 * @param resource|Stream $stream Target stream to put content on.
-	 * @param int $length Maximum number of bytes to be written to stream.
+	 * @param int $length Maximum number of bytes to write to stream.
 	 * @return int Length of data read from file.
 	 */
-	public function readTo(string $file, $stream, int $length = null): int
+	public function readto(string $file, $stream, int $length = null): int
 	{
 		$fcontent = $this->read($file);
 		
@@ -230,7 +236,7 @@ class ZipDisk implements DiskInterface
 	
 	/**
 	 * Removes a directory from disk.
-	 * @param string $path Path to directory to be removed from disk.
+	 * @param string $path Path to directory to remove from disk.
 	 * @return bool Was directory successfully removed?
 	 */
 	public function rmdir(string $path): bool
@@ -249,8 +255,8 @@ class ZipDisk implements DiskInterface
 	
 	/**
 	 * Appends the content to a file, that will be created if needed.
-	 * @param string $filename Target file path to be written.
-	 * @param mixed $content Content to be written to path.
+	 * @param string $filename Target file path to write.
+	 * @param mixed $content Content to write to path.
 	 * @return int Number of written characters.
 	 */
 	public function update(string $filename, $content): int
@@ -264,11 +270,11 @@ class ZipDisk implements DiskInterface
 	/**
 	 * Retrieves content from stream and appends it to a file.
 	 * @param resource|Stream $stream Source content is retrieved from.
-	 * @param string $file Target file to be written to.
-	 * @param int $length Maximum number of bytes to be written to file.
+	 * @param string $file Target file to write to.
+	 * @param int $length Maximum number of bytes to write to file.
 	 * @return int Total length of data written to file.
 	 */
-	public function updateFrom($stream, string $file, int $length = null): int
+	public function updatefrom($stream, string $file, int $length = null): int
 	{
 		return $stream instanceof StreamInterface
 			? $this->update($file, $stream->read($length))
@@ -277,8 +283,8 @@ class ZipDisk implements DiskInterface
 	
 	/**
 	 * Writes the content to a file, that will be created if needed.
-	 * @param string $filename Target file path to be written.
-	 * @param mixed $content Content to be written to path.
+	 * @param string $filename Target file path to write.
+	 * @param mixed $content Content to write to path.
 	 * @return int Number of written characters.
 	 */
 	public function write(string $filename, $content): int
@@ -296,11 +302,11 @@ class ZipDisk implements DiskInterface
 	/**
 	 * Retrieves content from stream and writes it to a file.
 	 * @param resource|Stream $stream Stream content is retrieved from.
-	 * @param string $file Target file to be written to.
-	 * @param int $length Maximum number of bytes to be written to file.
+	 * @param string $file Target file to write to.
+	 * @param int $length Maximum number of bytes to write to file.
 	 * @return int Total length of data written to file.
 	 */
-	public function writeFrom($stream, string $file, int $length = null): int
+	public function writefrom($stream, string $file, int $length = null): int
 	{
 		return $stream instanceof StreamInterface
 			? $this->write($file, $stream->read($length))
@@ -308,8 +314,8 @@ class ZipDisk implements DiskInterface
 	}
 	
 	/**
-	 * Reopens the zip file. This is needed whenever we want to commit changes
-	 * to the file. If the changes are not committed, the number of files, for
+	 * Reopens zip file. This is needed whenever we want to commit changes to
+	 * the file. If the changes are not committed, the number of files, for
 	 * instance, can be wrongly calculated.
 	 */
 	protected function reopen()
@@ -333,7 +339,7 @@ class ZipDisk implements DiskInterface
 	}
 	
 	/**
-	 * Returns the directory name of the given path.
+	 * Returns the directory name of given path.
 	 * @param string $path The path to be analyzed.
 	 * @return string The directory name of given path.
 	 */
@@ -342,5 +348,4 @@ class ZipDisk implements DiskInterface
 		$dirname = dirname($path);
 		return $dirname === '.' ? '' : $dirname;
 	}
-	
 }

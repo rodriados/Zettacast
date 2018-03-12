@@ -11,13 +11,13 @@ namespace Zettacast\Filesystem\Disk;
 use Zettacast\Filesystem\File;
 use Zettacast\Filesystem\Info;
 use Zettacast\Collection\Sequence;
-use Zettacast\Contract\Stream\StreamInterface;
-use Zettacast\Contract\Filesystem\DiskInterface;
-use Zettacast\Contract\Collection\SequenceInterface;
-use Zettacast\Exception\Filesystem\FilesystemException;
+use Zettacast\Stream\StreamInterface;
+use Zettacast\Filesystem\DiskInterface;
+use Zettacast\Collection\SequenceInterface;
+use Zettacast\Filesystem\FilesystemException;
 
 /**
- * Dsik for local files. This disk handles all operations to the local
+ * Disk for local files. This disk handles all operations to the local
  * filesystem, where the framework is installed. It cannot handle files out of
  * the document root, though.
  * @package Zettacast\Filesystem
@@ -33,22 +33,23 @@ class LocalDisk implements DiskInterface
 	protected $prefix;
 	
 	/**
-	 * Local disk constructor.
+	 * LocalDisk constructor.
+	 * Boots up the filesystem structure and sets its root path.
 	 * @param string $root Root directory for all operations done in disk.
 	 * @throws FilesystemException The path does not exist or cannot be read.
 	 */
-	public function __construct(string $root = DOCROOT)
+	public function __construct(string $root = ROOTPATH)
 	{
 		$root = realpath($root);
 		$this->prefix = rtrim($root, '\\/');
 		
 		if(!$this->ensure($root))
-			throw FilesystemException::missingDirectory($root);
+			throw FilesystemException::missingdir($root);
 	}
 	
 	/**
-	 * Checks whether a path exists in the disk.
-	 * @param string $path Path to be checked.
+	 * Checks whether a path exists in disk.
+	 * @param string $path Path to check existance.
 	 * @return bool Was the path found?
 	 */
 	public function has(string $path): bool
@@ -59,7 +60,7 @@ class LocalDisk implements DiskInterface
 	
 	/**
 	 * Removes a file from disk.
-	 * @param string $path Path to file to be removed from disk.
+	 * @param string $path Path to file to remove from disk.
 	 * @return bool Was file or directory successfully removed?
 	 */
 	public function remove(string $path): bool
@@ -69,8 +70,8 @@ class LocalDisk implements DiskInterface
 	}
 	
 	/**
-	 * Edits the permission information of the given path.
-	 * @param string $path Path to be editted.
+	 * Edits permission information of given path.
+	 * @param string $path Path to edit permission.
 	 * @param int $perms Permission to be set to given path.
 	 * @return bool Was permission successfully executed?
 	 */
@@ -82,8 +83,8 @@ class LocalDisk implements DiskInterface
 	}
 	
 	/**
-	 * Creates a copy of a file in the given destiny path.
-	 * @param string $path File to be copied.
+	 * Creates a copy of a file in given destiny path.
+	 * @param string $path File to copy.
 	 * @param string $target Path to which copy is created.
 	 * @return bool Was it possible to copy such a file?
 	 */
@@ -98,49 +99,46 @@ class LocalDisk implements DiskInterface
 	}
 	
 	/**
-	 * Returns all metadata available for given path.
+	 * Returns metadata available for given path.
 	 * @param string $path Target path for metadata request.
-	 * @param string $data Specific data to be retrieved.
+	 * @param string $data Specific data to retrieve.
 	 * @return mixed All metadata values or retrieved specific data.
 	 */
 	public function info(string $path = null, string $data = null)
 	{
 		$src = $this->prefix($path ?? '.');
-		$data = !is_null($data) ? 'get'.$data : null;
-		
+
 		return !is_null($data)
-			? method_exists(Info::class, $data)
-				? with(new Info($src))->$data()
-				: null
+			? with(new Info($src))->$data
 			: new Info($src);
 	}
 	
 	/**
-	 * Checks whether the given path is a directory.
-	 * @param string $path Path to be checked.
+	 * Checks whether given path is a directory.
+	 * @param string $path Path to check.
 	 * @return bool Is path a directory?
 	 */
-	public function isDir(string $path): bool
+	public function isdir(string $path): bool
 	{
 		$src = $this->prefix($path);
 		return is_dir($src);
 	}
 	
 	/**
-	 * Checks whether the given path is a file.
-	 * @param string $path Path to be checked.
+	 * Checks whether given path is a file.
+	 * @param string $path Path to check.
 	 * @return bool Is path a file?
 	 */
-	public function isFile(string $path): bool
+	public function isfile(string $path): bool
 	{
 		$src = $this->prefix($path);
 		return is_file($src);
 	}
 	
 	/**
-	 * Lists all files and directories contained in the given path.
-	 * @param string $dir Path to be listed.
-	 * @return SequenceInterface All directory contents in the path.
+	 * Lists all files and directories contained in given path.
+	 * @param string $dir Path to list.
+	 * @return SequenceInterface All directory contents in path.
 	 */
 	public function list(string $dir = null): SequenceInterface
 	{
@@ -152,7 +150,7 @@ class LocalDisk implements DiskInterface
 	
 	/**
 	 * Creates a new directory into the disk.
-	 * @param string $path Path of the directory to be created.
+	 * @param string $path Path of the directory to create.
 	 * @param int $perms Permission to be given to the new directory.
 	 * @return bool Was the directory successfully created?
 	 */
@@ -180,8 +178,8 @@ class LocalDisk implements DiskInterface
 	
 	/**
 	 * Opens a file as a directly editable stream.
-	 * @param string $filename File to be opened.
-	 * @param string $mode Reading/writing mode the file should be opened in.
+	 * @param string $filename File to open.
+	 * @param string $mode Reading/writing mode the file should open in.
 	 * @return StreamInterface The directly editable file handler.
 	 */
 	public function open(string $filename, string $mode = 'r'): StreamInterface
@@ -191,8 +189,8 @@ class LocalDisk implements DiskInterface
 	}
 	
 	/**
-	 * Retrieves all contents from the given file.
-	 * @param string $filename File to be read.
+	 * Retrieves all contents from given file.
+	 * @param string $filename File to read.
 	 * @return string All file contents.
 	 */
 	public function read(string $filename)
@@ -206,12 +204,12 @@ class LocalDisk implements DiskInterface
 	
 	/**
 	 * Retrieves contents from a file and puts it into a stream.
-	 * @param string $file Source file to be read.
+	 * @param string $file Source file to read.
 	 * @param resource|StreamInterface $stream Target stream to put content on.
-	 * @param int $length Maximum number of bytes to be written to stream.
+	 * @param int $length Maximum number of bytes to write to stream.
 	 * @return int Length of data read from file.
 	 */
-	public function readTo(string $file, $stream, int $length = null): int
+	public function readto(string $file, $stream, int $length = null): int
 	{
 		$fcontent = $this->read($file);
 
@@ -222,7 +220,7 @@ class LocalDisk implements DiskInterface
 	
 	/**
 	 * Removes a directory from disk.
-	 * @param string $path Path to directory to be removed from disk.
+	 * @param string $path Path to directory to remove from disk.
 	 * @return bool Was directory successfully removed?
 	 */
 	public function rmdir(string $path): bool
@@ -243,8 +241,8 @@ class LocalDisk implements DiskInterface
 	
 	/**
 	 * Appends the content to a file, that will be created if needed.
-	 * @param string $filename Target file path to be written.
-	 * @param mixed $content Content to be written to path.
+	 * @param string $filename Target file path to write.
+	 * @param mixed $content Content to write to path.
 	 * @return int Number of written characters.
 	 */
 	public function update(string $filename, $content): int
@@ -259,11 +257,11 @@ class LocalDisk implements DiskInterface
 	/**
 	 * Retrieves content from stream and appends it to a file.
 	 * @param resource|StreamInterface $stream Source content is retrieved from.
-	 * @param string $file Target file to be written to.
-	 * @param int $length Maximum number of bytes to be written to file.
+	 * @param string $file Target file to write to.
+	 * @param int $length Maximum number of bytes to write to file.
 	 * @return int Total length of data written to file.
 	 */
-	public function updateFrom($stream, string $file, int $length = null): int
+	public function updatefrom($stream, string $file, int $length = null): int
 	{
 		return $stream instanceof StreamInterface
 			? $this->update($file, $stream->read($length))
@@ -271,7 +269,7 @@ class LocalDisk implements DiskInterface
 	}
 	
 	/**
-	 * Writes the content to a file, that will be created if needed.
+	 * Writes content to a file, that will be created if needed.
 	 * @param string $filename Target file path to be written.
 	 * @param mixed $content Content to be written to path.
 	 * @return int Number of written characters.
@@ -288,11 +286,11 @@ class LocalDisk implements DiskInterface
 	/**
 	 * Retrieves content from stream and writes it to a file.
 	 * @param resource|StreamInterface $stream Stream content is retrieved from.
-	 * @param string $file Target file to be written to.
-	 * @param int $length Maximum number of bytes to be written to file.
+	 * @param string $file Target file to write to.
+	 * @param int $length Maximum number of bytes to write to file.
 	 * @return int Total length of data written to file.
 	 */
-	public function writeFrom($stream, string $file, int $length = null): int
+	public function writefrom($stream, string $file, int $length = null): int
 	{
 		return $stream instanceof StreamInterface
 			? $this->write($file, $stream->read($length))
@@ -301,7 +299,7 @@ class LocalDisk implements DiskInterface
 	
 	/**
 	 * Checks whether a directory exists and creates it if needed.
-	 * @param string $path Path to be ensured it exists.
+	 * @param string $path Path to ensure existance.
 	 * @return bool Does directory exist or was successfully created?
 	 */
 	protected function ensure(string $path): bool
@@ -317,7 +315,7 @@ class LocalDisk implements DiskInterface
 	
 	/**
 	 * Applies the base prefix to given path.
-	 * @param string $path Path to be prefixed.
+	 * @param string $path Path to prefix.
 	 * @return string Prefixed path.
 	 */
 	protected function prefix(string $path): string
@@ -327,12 +325,11 @@ class LocalDisk implements DiskInterface
 	
 	/**
 	 * Removes the base prefix from given string.
-	 * @param string $path Path to be unprefixed.
+	 * @param string $path Path to unprefix.
 	 * @return string Unprefixed path.
 	 */
 	protected function unprefix(string $path): string
 	{
 		return substr($path, strlen($this->prefix.'/'));
 	}
-	
 }

@@ -18,20 +18,20 @@ namespace Zettacast\Exception;
 class Exception extends \Exception
 {
 	/**
-	 * Constructs a new Exception instance. Although public, the inherited
-	 * exceptions should all have static methods responsible for initializing
-	 * the messages carried by them, instead of directly constructing them.
+	 * Exception constructor.
+	 * Constructs a new exception. Although public, the inherited exceptions
+	 * should all have static methods responsible for initializing the messages
+	 * carried by them, instead of directly constructing them.
 	 * @param string $msg The message carried by the exception.
 	 * @param int $code Exception code to be carried.
 	 * @param \Throwable $previous The previously thrown parent exception.
 	 */
 	final public function __construct(
-		string $msg = null,
+		string $msg,
 		int $code = null,
 		\Throwable $previous = null
 	) {
 		parent::__construct($msg, $code, $previous);
 	}
-	
 }
 

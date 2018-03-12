@@ -19,21 +19,21 @@ use Zettacast\Filesystem\Disk\VirtualDisk;
 class Filesystem extends LocalDisk
 {
 	/**
-	 * Local disk constructor.
+	 * Filesystem constructor.
+	 * Creates the local disk instance.
 	 * @param string $root Root directory for all operations done in disk.
 	 */
-	public function __construct(string $root = DOCROOT)
+	public function __construct(string $root = ROOTPATH)
 	{
 		parent::__construct($root);
 	}
 	
 	/**
-	 * Creates a new virtual disk, to be removed at this object destruction.
+	 * Creates a new virtual disk, to be erased at this object destruction.
 	 * @return VirtualDisk New virtual filesystem.
 	 */
 	public static function virtual()
 	{
 		return new VirtualDisk;
 	}
-	
 }

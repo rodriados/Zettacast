@@ -4,30 +4,28 @@
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
- * @copyright 2015-2017 Rodrigo Siqueira
+ * @copyright 2015-2018 Rodrigo Siqueira
  */
 namespace Zettacast\Collection;
 
-use Zettacast\Contract\Collection\QueueInterface;
-
 /**
- * Queue class. This class has methods appliable for all kinds of queues. Only
- * integer key types are acceptable.
+ * The queue class has methods appliable for all kinds of queues. Only integer
+ * keys are acceptable in a queue.
  * @package Zettacast\Collection
  * @version 1.0
  */
 class Queue implements QueueInterface
 {
-	
 	/**
-	 * Data to be stored.
+	 * Data to store.
 	 * @var \SplDoublyLinkedList Data stored in queue.
 	 */
 	protected $data;
 	
 	/**
-	 * Queue constructor. This constructor simply creates a new base for all
-	 * of this object's data to be stored on.
+	 * Queue constructor.
+	 * This constructor simply creates a new base for all of this object's data
+	 * to be stored on.
 	 */
 	public function __construct()
 	{
@@ -49,7 +47,7 @@ class Queue implements QueueInterface
 	 */
 	public function raw(): array
 	{
-		return toArray($this->data);
+		return toarray($this->data);
 	}
 	
 	/**
@@ -74,8 +72,8 @@ class Queue implements QueueInterface
 	}
 	
 	/**
-	 * Return the element the internal pointer currently points to.
-	 * @return mixed Current element in the queue.
+	 * Returns the element the internal pointer currently points to.
+	 * @return mixed Current element in queue.
 	 */
 	public function current()
 	{
@@ -92,8 +90,8 @@ class Queue implements QueueInterface
 	}
 	
 	/**
-	 * Fetches the key the internal pointer currently points to.
-	 * @return int Current element's key in the queue.
+	 * Fetches key the internal pointer currently points to.
+	 * @return int Current element's key in queue.
 	 */
 	public function key(): int
 	{
@@ -111,7 +109,7 @@ class Queue implements QueueInterface
 	}
 	
 	/**
-	 * Peeks at the node that is on the bottom of the queue.
+	 * Peeks at node on the bottom of queue.
 	 * @return mixed Peeked value from queue's bottom position.
 	 */
 	public function peek()
@@ -122,7 +120,7 @@ class Queue implements QueueInterface
 	}
 	
 	/**
-	 * Pops the node that is on the bottom of the queue and returns it.
+	 * Pops node from the bottom of queue and returns it.
 	 * @return mixed Popped value from queue's bottom position.
 	 */
 	public function pop()
@@ -143,18 +141,16 @@ class Queue implements QueueInterface
 	}
 	
 	/**
-	 * Pushes a value and positions it on the top of the queue.
-	 * @param mixed $value Value to be pushed to queue.
-	 * @return $this Queue for method chaining.
+	 * Pushes a value and places it on top of queue.
+	 * @param mixed $value Value to push to queue.
 	 */
-	public function push($value)
+	public function push($value): void
 	{
 		$this->data->push($value);
-		return $this;
 	}
 	
 	/**
-	 * Set the internal pointer of the queue to its first element.
+	 * Sets the internal pointer of queue to its first element.
 	 * @return mixed First element in sequence.
 	 */
 	public function rewind()
@@ -171,5 +167,4 @@ class Queue implements QueueInterface
 	{
 		return $this->data->valid();
 	}
-	
 }

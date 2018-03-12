@@ -10,7 +10,7 @@
 return [
 
 	# Injector module
-	['injector', 'Zettacast\Contract\Injector\InjectorInterface'],
+	['injector', 'Zettacast\Injector\InjectorInterface'],
 	['Zettacast\Injector\InjectorInterface', 'Zettacast\Injector\Injector'],
 	
 	# Autoload module
@@ -18,39 +18,39 @@ return [
 	
 	# Collection module
 	['stack', 'Zettacast\Collection\Stack'],
-	['queue', 'Zettacast\Contract\Collection\QueueInterface'],
-	['sequence', 'Zettacast\Contract\Collection\SequenceInterface'],
-	['collection', 'Zettacast\Contract\Collection\CollectionInterface'],
+	['queue', 'Zettacast\Collection\QueueInterface'],
+	['sequence', 'Zettacast\Collection\SequenceInterface'],
+	['collection', 'Zettacast\Collection\CollectionInterface'],
 	['collection.dot', 'Zettacast\Collection\DotCollection'],
 	['collection.recursive', 'Zettacast\Collection\RecursiveCollection'],
-	['Zettacast\Contract\Collection\QueueInterface', 'Zettacast\Collection\Queue'],
-	['Zettacast\Contract\Collection\SequenceInterface', 'Zettacast\Collection\Sequence'],
-	['Zettacast\Contract\Collection\CollectionInterface', 'Zettacast\Collection\Collection'],
+	['Zettacast\Collection\QueueInterface', 'Zettacast\Collection\Queue'],
+	['Zettacast\Collection\SequenceInterface', 'Zettacast\Collection\Sequence'],
+	['Zettacast\Collection\CollectionInterface', 'Zettacast\Collection\Collection'],
 	
 	# Filesystem module
 	['info', 'Zettacast\Filesystem\Info'],
 	['file', 'Zettacast\Filesystem\File'],
 	['filesystem', 'Zettacast\Filesystem\Filesystem'],
 	['file.virtual', ['Zettacast\Filesystem\File', 'virtual']],
-	['filesystem.zip', 'Zettacast\Filesystem\Driver\ZipDisk'],
-	['filesystem.virtual', 'Zettacast\Filesystem\Driver\VirtualDisk'],
-	['Zettacast\Contract\Filesystem\DiskInterface', 'Zettacast\Filesystem\Driver\LocalDisk'],
+	['filesystem.zip', 'Zettacast\Filesystem\Disk\ZipDisk'],
+	['filesystem.virtual', 'Zettacast\Filesystem\Disk\VirtualDisk'],
+	['Zettacast\Filesystem\DiskInterface', 'Zettacast\Filesystem\Disk\LocalDisk'],
 	
 	# Stream module
-	['filter', 'Zettacast\Contract\Stream\FilterInterface'],
-	['stream', 'Zettacast\Contract\Stream\StreamInterface'],
+	['filter', 'Zettacast\Stream\FilterInterface'],
+	['stream', 'Zettacast\Stream\StreamInterface'],
 	['stream.context', 'Zettacast\Stream\StreamContext'],
 	['stream.virtual', ['Zettacast\Stream\Stream', 'virtual']],
 	['filter.closure', 'Zettacast\Stream\Filter\ClosureFilter'],
 	['filter.callable', 'Zettacast\Stream\Filter\CallableFilter'],
-	['Zettacast\Contract\Stream\StreamInterface', 'Zettacast\Stream\Stream'],
-	['Zettacast\Contract\Stream\FilterInterface', 'Zettacast\Stream\Filter'],
+	['Zettacast\Stream\StreamInterface', 'Zettacast\Stream\Stream'],
+	['Zettacast\Stream\FilterInterface', 'Zettacast\Stream\Filter'],
 	
 	# HTTP module
 	['url', 'Zettacast\Http\Url'],
-	['request', 'Zettacast\Contract\Http\Request'],
-	['response', 'Zettacast\Contract\Http\Response'],
-	['Zettacast\Contract\Http\Kernel', 'Zettacast\Http\Kernel'],
-	['Zettacast\Contract\Http\Request', 'Zettacast\Http\Request'],
+	['request', 'Zettacast\Http\Request'],
+	['response', 'Zettacast\Http\Response'],
+	['Zettacast\Http\Kernel', 'Zettacast\Http\Kernel'],
+	['Zettacast\Http\Request', 'Zettacast\Http\Request'],
 	
 ];

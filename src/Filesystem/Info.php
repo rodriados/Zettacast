@@ -8,28 +8,44 @@
  */
 namespace Zettacast\Filesystem;
 
-use SplFileInfo;
-
 /**
- * Info class gathers information about local files and directories. This is
- * almost a simple wrapper around SplFileInfo.
+ * The file information class gathers information about local files and
+ * directories. This is almost a simple wrapper around SplFileInfo.
+ * @property string $basename The base name of the file.
+ * @property string $dirname The path without filename.
+ * @property string $extension The file extension.
+ * @property string $path The path to the file.
+ * @property int $perms The file permissions.
+ * @property int $permissions The file permissions.
+ * @property string $realpath The absolute path to file.
+ * @property int $size The file size.
+ * @property int $timestamp The last modified time.
+ * @property int $atime The last access time of the file.
+ * @property int $ctime The file last change time.
+ * @property int $mtime The last modified time.
+ * @property string $type The file type.
+ * @property bool $executable Is the file executable?
+ * @property bool $readable Is the file readable?
+ * @property bool $writable Is the file writable?
  * @package Zettacast\Filesystem
+ * @version 1.0
  */
 class Info
 {
 	/**
 	 * Base object for information about a file or directory.
-	 * @var SplFileInfo Information object.
+	 * @var \SplFileInfo Information object.
 	 */
 	protected $spl;
 	
 	/**
-	 * Info constructor. Builds the internal file information object.
-	 * @param string $filename File or directory to be inspected.
+	 * Info constructor.
+	 * Builds the internal file information object.
+	 * @param string $filename File or directory to inspect.
 	 */
-	public function __construct(string $filename = DOCROOT)
+	public function __construct(string $filename = ROOTPATH)
 	{
-		$this->spl = new SplFileInfo($filename);
+		$this->spl = new \SplFileInfo($filename);
 	}
 	
 	/**
@@ -42,125 +58,50 @@ class Info
 	}
 	
 	/**
-	 * This method returns the base name of the file, directory, or link
-	 * without path info.
-	 * @return string The base name of the file.
+	 * Allows access to file or directory info.
+	 * @param string $property The requested property.
+	 * @return mixed The property's value.
 	 */
-	public function getBasename(): string
+	public function __get(string $property)
 	{
-		return $this->spl->getBasename();
-	}
-	
-	/**
-	 * Gets the path without filename.
-	 * @return string Dirname of targeted file.
-	 */
-	public function getDirname(): string
-	{
-		return $this->spl->getPath();
-	}
-	
-	/**
-	 * Retrieves the file extension.
-	 * @return string The file extension.
-	 */
-	public function getExtension(): string
-	{
-		return $this->spl->getExtension();
-	}
-	
-	/**
-	 * Guesses the targeted path mimetype. If directory or link, the guess is
-	 * trivial. For files, the mimetype is guessed based on file's contents.
-	 * @return string Path guessed mimetype.
-	 */
-	public function getMime(): string
-	{
-		return ($type = $this->spl->getType()) === 'file'
-			? with(new \finfo(FILEINFO_MIME_TYPE))
-				->file($this->spl->getRealPath())
-			: $type;
-	}
-	
-	/**
-	 * Returns the path to the file.
-	 * @return string The path to the file.
-	 */
-	public function getPath(): string
-	{
-		return $this->spl->getPathname();
-	}
-	
-	/**
-	 * Gets the file permissions for the file.
-	 * @return int The file permissions.
-	 */
-	public function getPermissions(): int
-	{
-		return $this->spl->getPerms();
-	}
-	
-	/**
-	 * This method expands all symbolic links, resolves relative references and
-	 * returns the real path to the file.
-	 * @return string The absolute path to file.
-	 */
-	public function getRealpath(): string
-	{
-		return $this->spl->getRealPath();
-	}
-	
-	/**
-	 * Returns the filesize in bytes for the file referenced.
-	 * @return int The file size.
-	 */
-	public function getSize(): int
-	{
-		return $this->spl->getSize();
-	}
-	
-	/**
-	 * Returns the time when the contents of the file were changed. The time
-	 * returned is a Unix timestamp.
-	 * @return int The last modified time.
-	 */
-	public function getTimestamp(): int
-	{
-		return $this->spl->getMTime();
-	}
-	
-	/**
-	 * Returns the type of the file referenced.
-	 * @return string The file type.
-	 */
-	public function getType(): string
-	{
-		return $this->spl->getType();
+		static $info = [
+			'basename'      => 'getBasename',
+			'dirname'       => 'getPath',
+			'extension'     => 'getExtension',
+			'path'          => 'getPathname',
+			'perms'         => 'getPerms',
+			'permissions'   => 'getPerms',
+			'realpath'      => 'getRealPath',
+			'size'          => 'getSize',
+			'timestamp'     => 'getMTime',
+			'atime'         => 'getATime',
+			'ctime'         => 'getCTime',
+			'mtime'         => 'getMTime',
+			'type'          => 'getType',
+			'executable'    => 'isExecutable',
+			'readable'      => 'isReadable',
+			'writable'      => 'isWritable',
+		];
+		
+		return isset($info[$property])
+			? $this->spl->{$info[$property]}()
+			: null;
 	}
 	
 	/**
 	 * Checks whether path is directory.
 	 * @return bool Is path a directory?
 	 */
-	public function isDir(): bool
+	public function isdir(): bool
 	{
 		return $this->spl->isDir();
-	}
-	
-	/**
-	 * Checks whether the file is executable.
-	 * @return bool Is the file executable?
-	 */
-	public function isExecutable(): bool
-	{
-		return $this->spl->isExecutable();
 	}
 	
 	/**
 	 * Checks whether path is file.
 	 * @return bool Is path a file?
 	 */
-	public function isFile(): bool
+	public function isfile(): bool
 	{
 		return $this->spl->isFile();
 	}
@@ -169,27 +110,22 @@ class Info
 	 * Checks whether path is link.
 	 * @return bool Is path a link?
 	 */
-	public function isLink(): bool
+	public function islink(): bool
 	{
 		return $this->spl->isLink();
 	}
 	
 	/**
-	 * Checks whether the file is readable.
-	 * @return bool Is the file readable?
+	 * Guesses targeted path mimetype. If directory or link, the guess is
+	 * trivial. For files, the mimetype is guessed based on file's contents.
+	 * @return string Path guessed mimetype.
 	 */
-	public function isReadable(): bool
+	public function mime(): string
 	{
-		return $this->spl->isReadable();
-	}
-	
-	/**
-	 * Checks whether the file is writable.
-	 * @return bool Is the file writable?
-	 */
-	public function isWritable(): bool
-	{
-		return $this->spl->isWritable();
+		return ($type = $this->spl->getType()) === 'file'
+			? with(new \finfo(FILEINFO_MIME_TYPE))
+				->file($this->spl->getRealPath())
+			: $type;
 	}
 	
 	/**
@@ -216,5 +152,4 @@ class Info
 		$clone->spl = $this->spl->getPathInfo();
 		return $clone;
 	}
-	
 }

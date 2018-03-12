@@ -7,7 +7,7 @@ final class StreamTest extends \PHPUnit\Framework\TestCase
 {
 	public function testFilterStream()
 	{
-		$filter = new Filter(Filter\ClosureFilter::class, function() {
+		$filter = zetta('filter', 'filter.closure', function() {
 			if(!$data = $this->read())
 				return self::SUCCESS;
 			
@@ -18,7 +18,7 @@ final class StreamTest extends \PHPUnit\Framework\TestCase
 			return self::SUCCESS;
 		});
 		
-		$stream = Stream::virtual('0 1 2 3 4 5 6 7 8 9');
+		$stream = zetta('stream.virtual', '0 1 2 3 4 5 6 7 8 9');
 		$this->assertInstanceOf(Stream::class, $stream);
 		$this->assertInstanceOf(Filter::class, $filter);
 		

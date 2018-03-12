@@ -4,20 +4,16 @@
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
- * @copyright 2015-2017 Rodrigo Siqueira
+ * @copyright 2015-2018 Rodrigo Siqueira
  */
 namespace Zettacast\Injector;
 
 use Zettacast\Collection\Collection;
-use Zettacast\Contract\StorageInterface;
-use Zettacast\Injector\Binder\DefaultBinder;
-use Zettacast\Injector\Binder\ContextualBinder;
-use Zettacast\Contract\Injector\BinderInterface;
-use Zettacast\Contract\Injector\InjectorInterface;
+use Zettacast\Helper\StorageInterface;
 
 /**
- * The Injector class is responsible for handling dependency injection. This
- * works so complex objects, with their many dependencies can be much more
+ * The injector class is responsible for handling dependency injection. This
+ * works so complex objects, with their many dependencies, can be much more
  * easily instantiated anywhere around the application.
  * @package Zettacast\Injector
  * @version 1.0
@@ -56,13 +52,13 @@ class Injector implements InjectorInterface
 		BinderInterface $binder = null,
 		StorageInterface $shared = null
 	) {
+		$this->binder = $binder ?? new Binder;
 		$this->shared = $shared ?? new Collection;
-		$this->binder = $binder ?? new DefaultBinder;
 		$this->assembler = new Assembler($this);
 	}
 	
 	/**
-	 * Retrieves an instance shared with the injector.
+	 * Retrieves an instance shared with injector.
 	 * @param mixed $abstract Requested abstract object name.
 	 * @return mixed Requested instance or null if not found.
 	 */
@@ -73,7 +69,7 @@ class Injector implements InjectorInterface
 	
 	/**
 	 * Checks whether injector knows a shared instance.
-	 * @param mixed $abstract Abstract object name to be checked.
+	 * @param mixed $abstract Abstract object name to check existance.
 	 * @return bool Is shared instance known to injector?
 	 */
 	public function has($abstract): bool
@@ -82,42 +78,38 @@ class Injector implements InjectorInterface
 	}
 	
 	/**
-	 * Shares an instance with the injector.
-	 * @param mixed $abstract Abstract object name to be shared.
-	 * @param mixed $instance The existing instance to be shared.
-	 * @return $this Injector for method chaining.
+	 * Shares an instance with injector.
+	 * @param mixed $abstract Abstract object name to share.
+	 * @param mixed $instance The existing instance to share.
 	 */
-	public function set($abstract, $instance)
+	public function set($abstract, $instance): void
 	{
 		$this->binder->unbind($abstract);
 		$this->shared->set($abstract, $instance);
-		return $this;
 	}
 	
 	/**
-	 * Deletes a shared instance from the injector.
-	 * @param mixed $abstract Abstract object name to be deleted.
-	 * @return $this Injector for method chaining.
+	 * Deletes a shared instance from injector.
+	 * @param mixed $abstract Abstract object name to delete.
 	 */
-	public function del($abstract)
+	public function del($abstract): void
 	{
 		$this->shared->del($abstract);
-		return $this;
 	}
 	
 	/**
-	 * Retrieves an element bound in or shared to the injector.
+	 * Retrieves an element bound in or shared to injector.
 	 * @param string $abstract Requested abstraction name.
-	 * @return object Requested abstraction or null if not found.
+	 * @return array Requested abstraction or null if not found.
 	 */
-	public function resolve(string $abstract)
+	public function resolve(string $abstract): ?array
 	{
 		return $this->binder->resolve($abstract);
 	}
 	
 	/**
 	 * Checks whether given abstract is bound to a concrete implementation.
-	 * @param string $abstract Abstraction to be checked.
+	 * @param string $abstract Abstraction to check.
 	 * @return bool Is abstraction known to binder?
 	 */
 	public function knows(string $abstract): bool
@@ -128,27 +120,23 @@ class Injector implements InjectorInterface
 	/**
 	 * Creates a new abstraction binding or aliasing, allowing for them to have
 	 * their names enshortened or be instantiated.
-	 * @param string $abstract Abstraction to be bound.
+	 * @param string $abstract Abstraction to bind.
 	 * @param string|\Closure $target Concrete object to abstraction.
-	 * @param bool $shared Should abstraction be registered as a singleton?
-	 * @return $this Injector for method chaining.
+	 * @param bool $shared Should abstraction register as a singleton?
 	 */
-	public function bind(string $abstract, $target, bool $shared = false)
+	public function bind(string $abstract, $target, bool $shared = false): void
 	{
 		$this->binder->bind($abstract, $target, $shared);
 		$this->shared->del($abstract);
-		return $this;
 	}
 	
 	/**
 	 * Unbinds an abstraction, and drops all of its known instances.
-	 * @param string $abstract Abstraction to be forgotten by the injector.
-	 * @return $this Injector for method chaining.
+	 * @param string $abstract Abstraction for injector to forget.
 	 */
-	public function unbind(string $abstract)
+	public function unbind(string $abstract): void
 	{
 		$this->binder->unbind($abstract);
-		return $this;
 	}
 	
 	/**
@@ -162,9 +150,9 @@ class Injector implements InjectorInterface
 	}
 	
 	/**
-	 * Creates a factory for the given abstraction.
-	 * @param string $abstract Abstraction to be wrapped.
-	 * @param array $outer Default parameters to be sent to instance.
+	 * Creates a factory for given abstraction.
+	 * @param string $abstract Abstraction to wrap.
+	 * @param array $outer Default parameters to send to instance.
 	 * @return \Closure Factory for abstraction.
 	 */
 	public function factory(string $abstract, array $outer = []): \Closure
@@ -175,8 +163,8 @@ class Injector implements InjectorInterface
 	}
 	
 	/**
-	 * Resolve the given abstraction and inject its dependencies if needed.
-	 * @param string $abstract Abstraction to be resolved.
+	 * Resolves given abstraction and injects its dependencies if needed.
+	 * @param string $abstract Abstraction to resolve.
 	 * @param array $params Parameters to be used when instantiating.
 	 * @return mixed Resolved abstraction.
 	 */
@@ -187,13 +175,12 @@ class Injector implements InjectorInterface
 	
 	/**
 	 * Wraps a function and solves all of its dependencies.
-	 * @param callable $fn Function to be wrapped.
-	 * @param array $params Default parameters to be used when invoked.
+	 * @param callable $fn Function to wrap.
+	 * @param array $params Default parameters to use when invoked.
 	 * @return \Closure Wrapped function.
 	 */
 	public function wrap(callable $fn, array $params = []): \Closure
 	{
 		return $this->assembler->wrap($fn, $params);
 	}
-	
 }

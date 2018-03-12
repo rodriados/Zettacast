@@ -4,26 +4,27 @@
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
- * @copyright 2015-2017 Rodrigo Siqueira
+ * @copyright 2015-2018 Rodrigo Siqueira
  */
 namespace Zettacast\Collection;
 
 /**
- * Stack class. This class has methods appliable for all kinds of stacks. Only
- * integer key types are acceptable.
+ * The stack class has methods appliable for all kinds of stacks. Only integer
+ * key types are acceptable in stacks.
  * @package Zettacast\Collection
  * @version 1.0
  */
 class Stack extends Queue
 {
 	/**
-	 * Stack constructor. This constructor simply creates a new base for all
-	 * of this object's data to be stored on.
+	 * Stack constructor.
+	 * This constructor simply creates a new base for all of this object's data
+	 * to be stored on.
 	 */
 	public function __construct()
 	{
 		parent::__construct();
-		$this->forceLIFO();
+		$this->lifo();
 	}
 	
 	/**
@@ -33,13 +34,13 @@ class Stack extends Queue
 	public function clear(): array
 	{
 		$old = parent::clear();
-		$this->forceLIFO();
+		$this->lifo();
 		
 		return $old;
 	}
 	
 	/**
-	 * Peeks at the node that is on the top of the stack.
+	 * Peeks at node on the top of stack.
 	 * @return mixed Peeked value from stack's top position.
 	 */
 	public function peek()
@@ -50,7 +51,7 @@ class Stack extends Queue
 	}
 	
 	/**
-	 * Pops the node that is on the top of the stack and returns it.
+	 * Pops node from the top of stack and returns it.
 	 * @return mixed Popped value from stack's top position.
 	 */
 	public function pop()
@@ -61,12 +62,11 @@ class Stack extends Queue
 	}
 	
 	/**
-	 * Forces the data to be iterated in the "Last In, First Out" mode, so the
-	 * internal queue is transformed into a stack.
+	 * Forces data to iterate in last-in-first-out mode, so the internal queue
+	 * becomes a stack.
 	 */
-	private function forceLIFO()
+	private function lifo()
 	{
 		$this->data->setIteratorMode(\SplDoublyLinkedList::IT_MODE_LIFO);
 	}
-	
 }

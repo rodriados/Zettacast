@@ -1,53 +1,30 @@
 <?php
 /**
  * Zettacast bootstrap file.
+ * This file is responsible for booting the framework up and starting all basic
+ * code needed for a perfectly functional execution.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
- * @copyright 2015-2017 Rodrigo Siqueira
+ * @copyright 2017 Rodrigo Siqueira
  */
-
-/**#@+
- * Let us define some constant values. Firstly, we have to make it clear that
- * Zettacast is booted and when it happened. These constants actually do not
- * mean much, but may useful when using Zettacast along with other frameworks.
- * Although we cannot imagine why you would do such a thing, haha.
- * @var mixed Zettacast initialization constants.
- */
-define('ZETTACAST', 'Zettacast');
-define('ZBOOTTIME', microtime(true));
-define('ZBOOTMEMO', memory_get_usage(true));
-#define('ZDEBUG', true);
-/**#@-*/
-
-/**#@+
- * These constants hold the path of the application's and framework's
- * directories. You should alter these constants every time you change the
- * location or name of the folders.
- * @var string Directory constants.
- */
-define('DOCROOT',       realpath(dirname(__DIR__)));
-define('APPPATH',       DOCROOT.'/app');
-define('FWORKPATH',     DOCROOT.'/src');
-define('CONFIGPATH',    DOCROOT.'/config');
-define('PUBLICPATH',    DOCROOT.'/public');
-define('VENDORPATH',    DOCROOT.'/vendor');
-define('TMPPATH',       DOCROOT.'/tmp');
-define('LOGPATH',       TMPPATH.'/log');
-define('CACHEPATH',     TMPPATH.'/cache');
-/**#@-*/
 
 /*
- * Creates a loader object. This object will be responsible for loading all
+ * Include files needed for the correct functioning of the framework. The
+ * global functions created by the framework are available from this point.
+ */
+require SRCPATH.'/functions.php';
+require SRCPATH.'/Autoload/Autoload.php';
+
+/*
+ * Create an autoloader object. This object will be responsible for loading all
  * requested classes, interfaces or the like for the framework when needed.
  */
-require FWORKPATH.'/Helper/functions.php';
-require FWORKPATH.'/Autoload/Autoload.php';
-$loader = new Zettacast\Autoload\Autoload;
+$loader = new \Zettacast\Autoload\Autoload;
 
 /*
- * Starts a new Zettacast framework instance. From now on, all objects can have
+ * Start a new Zettacast framework instance. From now on, all objects can have
  * their instances built with dependency injection, that is, you will not need
  * to be worried with instantiating complex objects: we can do it for you.
  */
-zetta()->set(Zettacast\Autoload\Autoload::class, $loader);
+zetta()->set(\Zettacast\Autoload\Autoload::class, $loader);

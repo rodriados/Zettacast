@@ -25,7 +25,7 @@ abstract class Handler
 	 * @param int $line The line on file where error occurred.
 	 * @throws Error A framework error instance.
 	 */
-	public static function handleError(
+	public static function error(
 		int $level,
 		string $message,
 		string $file = null,
@@ -41,7 +41,7 @@ abstract class Handler
 	 * @param \Throwable $e The exception or error to be handled.
 	 * @return bool Was the exception successfully handled?
 	 */
-	public static function handleException(\Throwable $e)
+	public static function exception(\Throwable $e)
 	{
 		if($e instanceof \Error)
 			$e = Error::build($e);
@@ -67,9 +67,9 @@ abstract class Handler
 	 * Handles the script shutdown. This method verifies whether the execution
 	 * was interrupted by a fatal error and proceeds to log it.
 	 */
-	public static function handleShutdown()
+	public static function shutdown()
 	{
-		if(!is_null($e = Error::last()) && $e->isFatal())
-			self::handleException($e);
+		if(!is_null($e = Error::last()) && $e->fatal())
+			self::exception($e);
 	}
 }

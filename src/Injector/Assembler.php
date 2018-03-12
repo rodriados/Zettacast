@@ -4,13 +4,11 @@
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
- * @copyright 2015-2017 Rodrigo Siqueira
+ * @copyright 2015-2018 Rodrigo Siqueira
  */
 namespace Zettacast\Injector;
 
 use Zettacast\Collection\Stack;
-use Zettacast\Contract\Injector\InjectorInterface;
-use Zettacast\Exception\Injector\InjectorException;
 
 /**
  * The assembler class is responsible for directly handling dependency
@@ -36,8 +34,9 @@ class Assembler
 	private $stack;
 	
 	/**
-	 * Assembler constructor. This constructor simply sets all properties to
-	 * the received parameters or empty objects.
+	 * Assembler constructor.
+	 * This constructor simply sets all properties to the received parameters
+	 * or empty objects.
 	 * @param InjectorInterface $injector Currently active injector instance.
 	 */
 	public function __construct(InjectorInterface $injector)
@@ -47,9 +46,9 @@ class Assembler
 	}
 	
 	/**
-	 * Resolve the given abstraction and inject dependencies if needed.
-	 * @param string $abstract Abstraction to be resolved.
-	 * @param array $params Parameters to be used when instantiating.
+	 * Resolves given abstraction and inject dependencies if needed.
+	 * @param string $abstract Abstraction to resolve.
+	 * @param array $params Parameters to use when instantiating.
 	 * @return mixed Resolved abstraction.
 	 */
 	public function make(string $abstract, array $params = [])
@@ -58,9 +57,9 @@ class Assembler
 			? $this->injector->resolve($abstract)
 			: $this->injector->when($this->stack->peek())->resolve($abstract);
 		
-		$concrete = $bond->concrete ?? $abstract;
-		$context = $bond->context ?? false;
-		$shared = $bond->shared ?? false;
+		$concrete = $bond['concrete'] ?? $abstract;
+		$context = $bond['context'] ?? false;
+		$shared = $bond['shared'] ?? false;
 		
 		if(!$context && is_scalar($concrete) && $this->injector->has($concrete))
 			return $this->injector->get($concrete);
@@ -70,7 +69,7 @@ class Assembler
 				? $this->build($concrete, $params)
 				: $this->make($concrete, $params)
 			: $concrete(...$params);
-	
+		
 		if(!$context && $shared)
 			$this->injector->set($abstract, $object);
 		
@@ -78,9 +77,9 @@ class Assembler
 	}
 	
 	/**
-	 * Wraps a function and solves all of its dependencies.
-	 * @param callable $fn Function to be wrapped.
-	 * @param array $outer Parameters to be used when invoked.
+	 * Wraps a function and resolve all of its dependencies.
+	 * @param callable $fn Function to wrap.
+	 * @param array $outer Parameters to use when invoked.
 	 * @return \Closure Wrapped function.
 	 * @throws InjectorException The given method cannot be wrapped.
 	 */
@@ -92,8 +91,8 @@ class Assembler
 		
 		if($reflect instanceof \ReflectionMethod
 		   && !$reflect->isStatic() && !is_object($fn[0]))
-			throw InjectorException::requiredInstance(...$fn);
-			
+			throw InjectorException::missing(...$fn);
+		
 		$call = $reflect instanceof \ReflectionMethod
 			? [$reflect->isStatic() ? null : $fn[0]]
 			: [];
@@ -110,20 +109,20 @@ class Assembler
 	
 	/**
 	 * Builds an instance of the given type and injects its dependencies.
-	 * @param string $concrete Type to be instantiated.
-	 * @param array $params Parameters to be used when instantiating.
+	 * @param string $concrete Type to instantiate.
+	 * @param array $params Parameters to use when instantiating.
 	 * @return mixed Resolved and dependency injected object.
 	 * @throws InjectorException The object could not be assembled.
 	 */
 	protected function build(string $concrete, array $params = [])
 	{
 		if(!class_exists($concrete))
-			throw InjectorException::doesNotExist($concrete);
+			throw InjectorException::inexistant($concrete);
 		
 		$reflect = new \ReflectionClass($concrete);
 		
 		if(!$reflect->isInstantiable())
-			throw InjectorException::notInstantiable($concrete);
+			throw InjectorException::uninstantiable($concrete);
 		
 		if(is_null($constructor = $reflect->getConstructor()))
 			return $reflect->newInstance();
@@ -138,7 +137,7 @@ class Assembler
 	/**
 	 * Resolves all dependencies from a building or wrapping request.
 	 * @param \ReflectionParameter[] $requested Requested dependencies.
-	 * @param array $params Parameters to be used instead of building.
+	 * @param array $params Parameters to use instead of building.
 	 * @return array Resolved dependencies.
 	 */
 	protected function resolve(array $requested, array $params = []): array
@@ -149,47 +148,49 @@ class Assembler
 			elseif(isset($params[$id]))
 				$solved[] = $params[$id];
 			elseif(!is_null($dependency->getClass()))
-				$solved[] = $this->buildObject($dependency);
+				$solved[] = $this->mount($dependency);
 			else /* not explicitly given param nor typed argument */
-				$solved[] = $this->buildPrimitive($dependency);
-		
+				$solved[] = $this->guess($dependency);
+
 		return $solved ?? [];
 	}
 	
 	/**
 	 * Tries to resolve a primitive dependency.
-	 * @param \ReflectionParameter $param Parameter to be resolved.
+	 * @param \ReflectionParameter $param Parameter to resolve.
 	 * @return mixed Resolved primitive.
 	 * @throws InjectorException Parameter could not be resolved.
 	 */
-	private function buildPrimitive(\ReflectionParameter $param)
+	private function guess(\ReflectionParameter $param)
 	{
 		$context = $this->stack->peek();
 		$info = $this->injector->when($context)->resolve('$'.$param->name);
 		
-		if(isset($info->concrete))
-			return $info->concrete instanceof \Closure
-				? ($info->concrete)($this->injector)
-				: $info->concrete;
+		if(isset($info['concrete']))
+			return $info['concrete'] instanceof \Closure
+				? ($info['concrete'])($this->injector)
+				: $info['concrete'];
 		
 		if($param->isDefaultValueAvailable())
 			return $param->getDefaultValue();
-			
+		
 		$this->stack->pop();
-		throw InjectorException::notResolvable($context, $param->name);
+		throw InjectorException::unresolvable($context, $param->name);
 	}
 	
 	/**
 	 * Tries to resolve an object dependency.
-	 * @param \ReflectionParameter $param Parameter to be resolved.
+	 * @param \ReflectionParameter $param Parameter to resolve.
 	 * @return mixed Resolved object.
 	 * @throws InjectorException Exception thrown resolving parameter.
 	 */
-	private function buildObject(\ReflectionParameter $param)
+	private function mount(\ReflectionParameter $param)
 	{
 		try {
 			return $this->make($param->getClass()->getName());
-		} catch(InjectorException $e) {
+		}
+		
+		catch(InjectorException $e) {
 			if($param->isOptional())
 				return $param->getDefaultValue();
 			
@@ -197,5 +198,4 @@ class Assembler
 			throw $e;
 		}
 	}
-	
 }

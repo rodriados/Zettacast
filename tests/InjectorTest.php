@@ -1,7 +1,7 @@
 <?php
 
 use Zettacast\Injector\Injector;
-use Zettacast\Exception\Injector\InjectorException;
+use Zettacast\Injector\InjectorException;
 require __DIR__.'/assets/injector.php';
 
 final class InjectorTest extends \PHPUnit\Framework\TestCase

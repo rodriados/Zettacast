@@ -64,9 +64,9 @@ class Error extends \ErrorException
 	
 	/**
 	 * Informs whether the error being carried is fatal.
-	 * @return bool Is the captured error fatal?
+	 * @return bool Is captured error fatal?
 	 */
-	final public function isFatal(): bool
+	final public function fatal(): bool
 	{
 		return $this->severity & self::FATAL;
 	}
@@ -96,6 +96,5 @@ class Error extends \ErrorException
 			? new static($e['message'], $e['type'], $e['file'], $e['line'])
 			: null;
 	}
-	
 }
 

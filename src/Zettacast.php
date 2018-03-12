@@ -4,20 +4,17 @@
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
- * @copyright 2015-2017 Rodrigo Siqueira
+ * @copyright 2015-2018 Rodrigo Siqueira
  */
 namespace Zettacast;
 
-use Zettacast\Facade\Config;
-use Zettacast\Exception\Handler;
+use Zettacast\Injector\Binder;
 use Zettacast\Injector\Injector;
-use Zettacast\Injector\Binder\DefaultBinder;
-use Zettacast\Contract\Injector\BinderInterface;
-use Zettacast\Contract\SingletonTrait;
+use Zettacast\Helper\SingletonTrait;
 
 /**
- * Boots framework and starts its main classes and modules, allowing its
- * correct usage and execution.
+ * The Zettacast class boots the framework and starts its main classes and
+ * modules, allowing its correct usage and execution.
  * @version 1.0
  */
 final class Zettacast extends Injector
@@ -53,27 +50,27 @@ final class Zettacast extends Injector
 	/**#@-*/
 	
 	/**
+	 * Zettacast constructor.
 	 * This method is responsible for setting the minimal configuration and
 	 * gathering information about the environment so the framework can work
 	 * correctly and execute the application as expected.
-	 * @param string $root Document root directory path.
 	 */
-	public function __construct(string $root = DOCROOT)
+	public function __construct()
 	{
-		$binder = $this->bindInternal();
+		$binder = $this->helpers();
 		parent::__construct($binder);
 		
-		$this->set('path', $root.'/app');
-		$this->set('path.base', $root);
-		$this->set('path.public', $root.'/public');
-		$this->set('path.zetta', $root.'/src');
+		$this->set('path', APPPATH);
+		$this->set('path.base', ROOTPATH);
+		$this->set('path.public', WWWPATH);
+		$this->set('path.zetta', SRCPATH);
 		
 		$this->set(self::class, $this);
 		$this->set(Injector::class, $this);
 		
-		set_error_handler([Handler::class, 'handleError']);
-		set_exception_handler([Handler::class, 'handleException']);
-		register_shutdown_function([Handler::class, 'handleShutdown']);
+		#set_error_handler([Handler::class, 'error']);
+		#set_exception_handler([Handler::class, 'exception']);
+		#register_shutdown_function([Handler::class, 'shutdown']);
 	}
 	
 	/**
@@ -83,32 +80,25 @@ final class Zettacast extends Injector
 	 */
 	public function bootstrap()
 	{
-		setlocale(LC_ALL, Config::get('app.locale', 'en_US'));
-		mb_internal_encoding(Config::get('app.charset', 'UTF-8'));
-		date_default_timezone_set(Config::get('app.timezone', 'UTC'));
+		#setlocale(LC_ALL, Config::get('app.locale', 'en_US'));
+		#mb_internal_encoding(Config::get('app.charset', 'UTF-8'));
+		#date_default_timezone_set(Config::get('app.timezone', 'UTC'));
 		
 		$this->set('mode', isset($_SERVER['argv']) ? self::CLI : self::APP);
 	}
 	
 	/**
-	 * Tries to load the framework bindings from the cache. If not possible,
-	 * the bindings are loaded from the PHP file.
-	 * @return BinderInterface The injector binder ready for usage.
+	 * Creates all shortcut aliases given by framework.
+	 * @return Binder The injector binder ready for usage.
 	 */
-	private function bindInternal(): BinderInterface
+	private function helpers(): Binder
 	{
-		if(file_exists($cache = CACHEPATH.'/bindings.cache'))
-			if(filemtime($cache) > filemtime(FWORKPATH.'/bindings.php'))
-				return unserialize(file_get_contents($cache));
+		$binder = new Binder;
+		$helpers = require SRCPATH.'/bindings.php';
 		
-		$binder = new DefaultBinder;
-		$data = require FWORKPATH.'/bindings.php';
-		
-		foreach($data as $binding)
+		foreach($helpers as $binding)
 			$binder->bind(...$binding);
 		
-		file_put_contents($cache, serialize($binder));
 		return $binder;
 	}
-	
 }

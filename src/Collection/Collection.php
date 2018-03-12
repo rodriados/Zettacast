@@ -4,17 +4,17 @@
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
- * @copyright 2015-2017 Rodrigo Siqueira
+ * @copyright 2015-2018 Rodrigo Siqueira
  */
 namespace Zettacast\Collection;
 
-use Zettacast\Contract\ArrayAccessTrait;
-use Zettacast\Contract\ObjectAccessTrait;
-use Zettacast\Contract\Collection\CollectionInterface;
+use Zettacast\Helper\ArrayAccessTrait;
+use Zettacast\Helper\ObjectAccessTrait;
 
 /**
- * Collection class. This class has methods appliable for all kinds of
- * collections. Only scalar key types, such as string and int, are acceptable.
+ * The collection class. This class has methods appliable for all kinds of
+ * collections. Only scalar key types, such as strings and integers, are
+ * acceptable in all kinds of collection.
  * @package Zettacast\Collection
  * @version 1.0
  */
@@ -30,14 +30,14 @@ class Collection implements CollectionInterface, \ArrayAccess
 	protected $data = [];
 	
 	/**
-	 * Collection constructor. This constructor simply sets the data received
-	 * as the data stored in collection.
+	 * Collection constructor.
+	 * This constructor sets the data received as data stored in collection.
 	 * @param array|\Traversable $data Data to be stored.
 	 */
 	public function __construct($data = null)
 	{
 		$this->data = !is_null($data)
-			? toArray($data)
+			? toarray($data)
 			: [];
 	}
 	
@@ -56,7 +56,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Checks whether element key exists.
-	 * @param mixed $key Key to be checked if exists.
+	 * @param mixed $key Key to check existance.
 	 * @return bool Does key exist?
 	 */
 	public function has($key): bool
@@ -65,43 +65,34 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Sets a value to the given key.
-	 * @param mixed $key Key to be created or updated.
-	 * @param mixed $value Value to be stored in key.
-	 * @return $this Collection for method chaining.
+	 * Sets a value to given key.
+	 * @param mixed $key Key to create or update.
+	 * @param mixed $value Value to store in key.
 	 */
-	public function set($key, $value)
+	public function set($key, $value): void
 	{
 		if(is_null($key)) $this->data[] = $value;
 		else $this->data[$key] = $value;
-
-		return $this;
 	}
 	
 	/**
 	 * Removes an element from collection.
-	 * @param mixed $key Key to be removed.
-	 * @return $this Collection for method chaining.
+	 * @param mixed $key Key to remove.
 	 */
-	public function del($key)
+	public function del($key): void
 	{
 		if($this->has($key))
 			unset($this->data[$key]);
-		
-		return $this;
 	}
 	
 	/**
-	 * Adds a group of elements to the collection.
-	 * @param array $values Values to be added to collection.
-	 * @return $this Collection for method chaining.
+	 * Adds a group of elements to collection.
+	 * @param array $values Values to add to collection.
 	 */
-	public function add(array $values = [])
+	public function add(array $values = []): void
 	{
 		foreach($values as $key => $value)
 			$this->set($key, $value);
-		
-		return $this;
 	}
 	
 	/**
@@ -115,23 +106,21 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Applies a callback to all values stored in collection.
-	 * @param callable $fn Callback to be applied. Parameters: value, key.
+	 * @param callable $fn Callback to apply. Parameters: value, key.
 	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
-	 * @return $this Collection for method chaining.
+	 * @return static Collection for method chaining.
 	 */
 	public function apply(callable $fn, $userdata = null)
 	{
-		$userdata = toArray($userdata);
-		
 		foreach($this->iterate() as $key => $value)
-			$this->data[$key] = $fn($value, $key, ...$userdata);
+			$this->data[$key] = $fn($value, $key, ...toarray($userdata));
 		
 		return $this;
 	}
 	
 	/**
-	 * Chunks the collection into pieces of the given size.
-	 * @param int $size Size of the chunks.
+	 * Chunks the collection into pieces of given size.
+	 * @param int $size Size of chunks.
 	 * @return static[] Array of collection of chunks.
 	 */
 	public function chunk(int $size): array
@@ -153,12 +142,13 @@ class Collection implements CollectionInterface, \ArrayAccess
 	{
 		$ref = $this->data;
 		$this->data = [];
+		
 		return $ref;
 	}
 	
 	/**
 	 * Counts the number of elements currently in collection.
-	 * @return int Number of elements stored in the collection.
+	 * @return int Number of elements stored in collection.
 	 */
 	public function count(): int
 	{
@@ -167,7 +157,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Return the element the internal pointer currently points to.
-	 * @return mixed Current element in the collection.
+	 * @return mixed Current element in collection.
 	 */
 	public function current()
 	{
@@ -175,15 +165,15 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Gets items in collection that are not present in the given items.
+	 * Gets items in collection that are not present in given items.
 	 * @param array|Collection $items Items to differ from.
 	 * @param bool $keys Should keys also be compared?
-	 * @return static Diff'd array.
+	 * @return static The diff'd collection.
 	 */
 	public function diff($items, bool $keys = false)
 	{
 		$fn = $keys ? 'array_diff_assoc' : 'array_diff';
-		return $this->new($fn($this->data, toArray($items)));
+		return $this->new($fn($this->data, toarray($items)));
 	}
 	
 	/**
@@ -192,10 +182,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 */
 	public function divide(): array
 	{
-		return [
-			$this->keys(),
-			$this->values()
-		];
+		return [$this->keys(), $this->values()];
 	}
 	
 	/**
@@ -224,20 +211,20 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Creates a new collection with all elements except the specified keys.
-	 * @param mixed|mixed[] $keys Keys to be forgotten in the new collection.
+	 * Creates a new collection with all elements except specified keys.
+	 * @param mixed|mixed[] $keys Keys to forget in new collection.
 	 * @return static New collection instance.
 	 */
 	public function except($keys)
 	{
 		return $this->new(
-			array_diff_key($this->data, array_flip(toArray($keys)))
+			array_diff_key($this->data, array_flip(toarray($keys)))
 		);
 	}
 	
 	/**
-	 * Filters elements according to the given test. If no test function is
-	 * given, it fallbacks to removing all false equivalent values.
+	 * Filters elements according to given test. If no test function is
+	 * given, it fallbacks to removing all false values.
 	 * @param callable $fn Test function. Parameters: value, key.
 	 * @return static Collection of all filtered values.
 	 */
@@ -258,11 +245,11 @@ class Collection implements CollectionInterface, \ArrayAccess
 	public function intersect($items, bool $keys = false)
 	{
 		$fn = $keys ? 'array_intersect_assoc' : 'array_intersect';
-		return $this->new($fn($this->data, toArray($items)));
+		return $this->new($fn($this->data, toarray($items)));
 	}
 	
 	/**
-	 * Creates a generator that iterates over the collection.
+	 * Create a generator that iterates over collection.
 	 * @yield mixed Collection's stored values.
 	 */
 	public function iterate(): \Generator
@@ -271,8 +258,8 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Fetches the key the internal pointer currently points to.
-	 * @return mixed Current element's key in the collection.
+	 * Fetches key the internal pointer currently points to.
+	 * @return mixed Current element's key in collection.
 	 */
 	public function key()
 	{
@@ -289,27 +276,28 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Creates a new collection, the same type as the original, by using a
-	 * function for creating the new elements based on the older ones. The
-	 * callback receives the following parameters respectively: value, key.
-	 * @param callable $fn Function to be used for creating new elements.
+	 * Creates a new collection, the same type as original, by using a function
+	 * for creating the new elements based on the older ones. The callback
+	 * receives the following parameters respectively: value, key.
+	 * @param callable $fn Function to use for creating new elements.
 	 * @return static New collection instance.
 	 */
 	public function map(callable $fn)
 	{
 		$keys = array_keys($this->data);
 		$values = array_map($fn, $this->data, $keys);
+		
 		return $this->new(array_combine($keys, $values));
 	}
 	
 	/**
 	 * Merges given items with this collection's elements.
-	 * @param mixed $items Items to be merged with collection.
+	 * @param mixed $items Items to merge with collection.
 	 * @return static Collection of merged elements.
 	 */
 	public function merge($items)
 	{
-		return $this->new(array_merge($this->data, toArray($items)));
+		return $this->new(array_merge($this->data, toarray($items)));
 	}
 	
 	/**
@@ -323,18 +311,18 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Creates a new collection with a subset of elements.
-	 * @param mixed|mixed[] $keys Keys to be included in new collection.
+	 * @param mixed|mixed[] $keys Keys to include in new collection.
 	 * @return static New collection instance.
 	 */
 	public function only($keys)
 	{
 		return $this->new(
-			array_intersect_key($this->data, array_flip(toArray($keys)))
+			array_intersect_key($this->data, array_flip(toarray($keys)))
 		);
 	}
 	
 	/**
-	 * Passes the collection to the given function and returns the result.
+	 * Passes the collection to given function and returns its result.
 	 * @param callable $fn Function to which collection is passed to.
 	 * @return mixed Callback's return result.
 	 */
@@ -354,7 +342,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Gets a value from collection and removes it.
-	 * @param mixed $key Key to be pulled.
+	 * @param mixed $key Key to pull.
 	 * @param mixed $default Default value if key not found.
 	 * @return mixed Pulled value.
 	 */
@@ -362,14 +350,14 @@ class Collection implements CollectionInterface, \ArrayAccess
 	{
 		$value = $this->get($key, $default);
 		$this->del($key);
-
+		
 		return $value;
 	}
 	
 	/**
 	 * Returns randomly selected elements from collection. If the amount
-	 * requested is larger than the collection itself, return value will simply
-	 * be shuffled collection and will not have the requested amount of items.
+	 * requested is larger than the collection itself, return value will be
+	 * the collection shuffled and will not have the requested amount of items.
 	 * @param int $sample Amount of elements to be selected.
 	 * @return static Randomly selected elements from collection.
 	 */
@@ -394,13 +382,13 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Replaces collection according to the given data.
-	 * @param mixed $items Items to be replaced in the collection.
+	 * Replaces collection according to given data.
+	 * @param mixed $items Items to replace in collection.
 	 * @return static Collection with replaced data.
 	 */
 	public function replace($items)
 	{
-		return $this->new(array_replace($this->data, toArray($items)));
+		return $this->new(array_replace($this->data, toarray($items)));
 	}
 	
 	/**
@@ -413,9 +401,9 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Searches collection for a given value and returns successful key.
-	 * @param mixed|callable $needle Value being searched or test function.
-	 * @param bool $strict Should search enforce element types?
+	 * Searches collection for given value and returns the successful key.
+	 * @param mixed|callable $needle Value to search or test function.
+	 * @param bool $strict Should search enforce strict element types?
 	 * @return mixed|bool Successful key or false if none.
 	 */
 	public function search($needle, bool $strict = false)
@@ -431,7 +419,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Shuffles the elements in the collection.
+	 * Shuffles the elements in collection.
 	 * @return static Shuffled collection.
 	 */
 	public function shuffle()
@@ -443,7 +431,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Splits the collection into the given number of groups.
+	 * Splits collection into given number of groups.
 	 * @param int $count Number of groups to split the collection.
 	 * @return array Splitted collection.
 	 */
@@ -455,7 +443,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Passes the collection to the given function and returns it.
+	 * Passes collection to given function and returns it.
 	 * @param callable $fn Function to which collection is passed to.
 	 * @return static Collection's copy sent to function.
 	 */
@@ -466,13 +454,13 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Unites collection with given items.
-	 * @param mixed $items Items to be united with collection.
+	 * Unions collection with given items.
+	 * @param mixed $items Items to union with collection.
 	 * @return static United collection.
 	 */
 	public function union($items)
 	{
-		return $this->new($this->data + toArray($items));
+		return $this->new($this->data + toarray($items));
 	}
 	
 	/**
@@ -506,14 +494,12 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 * Iterates over collection and executes a function over every element.
 	 * @param callable $fn Iteration function. Parameters: value, key.
 	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
-	 * @return $this Collection for method chaining.
+	 * @return static Collection for method chaining.
 	 */
 	public function walk(callable $fn, $userdata = null)
 	{
-		$userdata = toArray($userdata);
-		
 		foreach($this->iterate() as $key => $value)
-			$fn($value, $key, ...$userdata);
+			$fn($value, $key, ...toarray($userdata));
 		
 		return $this;
 	}
@@ -525,7 +511,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 */
 	public function zip(...$items): array
 	{
-		$items = array_map('toArray', $items);
+		$items = array_map('toarray', $items);
 		
 		return array_map(function(...$params) {
 			return $this->new($params);
@@ -534,7 +520,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Creates a new instance of class based on an already existing instance.
-	 * @param mixed $target Data to be fed into the new instance.
+	 * @param mixed $target Data to feed into new instance.
 	 * @return static The new instance.
 	 */
 	protected function new($target = [])
@@ -545,13 +531,13 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Creates a new instance of class based on an already existing instance,
-	 * and using by-reference assignment to data stored in new instance.
-	 * @param mixed &$target Data to be fed into the new instance.
+	 * and using by-reference assignment to data stored in instance.
+	 * @param mixed &$target Data to feed into new instance.
 	 * @return static The new instance.
 	 */
 	protected function ref(&$target)
 	{
-		if(!isListable($target))
+		if(!listable($target))
 			return $target;
 		
 		$obj = $this->new();
@@ -559,5 +545,4 @@ class Collection implements CollectionInterface, \ArrayAccess
 		
 		return $obj;
 	}
-	
 }

@@ -92,7 +92,13 @@ final class CollectionTest extends \PHPUnit\Framework\TestCase
 		$this->assertInstanceOf(Queue::class, $queue);
 		$this->assertTrue($queue->empty());
 		
-		$queue->push(0)->push(1)->push(2)->push(3)->push(4)->push(5);
+		$queue->push(0);
+		$queue->push(1);
+		$queue->push(2);
+		$queue->push(3);
+		$queue->push(4);
+		$queue->push(5);
+		
 		$this->assertFalse($queue->empty());
 		$this->assertEquals($queue->peek(), 0);
 		$this->assertEquals($queue->pop(), 0);
@@ -112,7 +118,13 @@ final class CollectionTest extends \PHPUnit\Framework\TestCase
 		$this->assertInstanceOf(Stack::class, $queue);
 		$this->assertTrue($queue->empty());
 		
-		$queue->push(5)->push(4)->push(3)->push(2)->push(1)->push(0);
+		$queue->push(5);
+		$queue->push(4);
+		$queue->push(3);
+		$queue->push(2);
+		$queue->push(1);
+		$queue->push(0);
+		
 		$this->assertFalse($queue->empty());
 		$this->assertEquals($queue->peek(), 0);
 		$this->assertEquals($queue->pop(), 0);
@@ -146,5 +158,4 @@ final class CollectionTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals($seq[6], 7);
 		unset($seq[6]);
 	}
-	
 }

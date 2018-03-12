@@ -4,16 +4,16 @@
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
- * @copyright 2016 Rodrigo Siqueira
+ * @copyright 2015-2018 Rodrigo Siqueira
  */
 namespace Zettacast\Autoload\Loader;
 
 use Zettacast\Collection\Collection;
-use Zettacast\Contract\Autoload\LoaderInterface;
+use Zettacast\Autoload\LoaderInterface;
 
 /**
- * The Space loader class is responsible for implementing the loading of
- * classes in namespaces explicitly listed along the execution.
+ * The namespace loader class is responsible for loading objects in namespaces
+ * explicitly listed along framework execution.
  * @package Zettacast\Autoload
  * @version 1.0
  */
@@ -27,17 +27,21 @@ class NamespaceLoader implements LoaderInterface
 	protected $data;
 	
 	/**
-	 * Space loader constructor. This constructor simply sets all of its
-	 * properties to empty collections.
+	 * NamespaceLoader constructor.
+	 * This constructor simply sets all of its properties to empty collections.
+	 * @param array $data Initial namespace bindings.
 	 */
-	public function __construct()
+	public function __construct(array $data = [])
 	{
 		$this->data = new Collection;
+		
+		foreach($data as $key => $value)
+			$this->set($key, $value);
 	}
 	
 	/**
 	 * Tries to load an invoked and not yet loaded object.
-	 * @param string $obj Object to be loaded.
+	 * @param string $obj Object to load.
 	 * @return bool Was the object successfully loaded?
 	 */
 	public function load(string $obj): bool
@@ -62,31 +66,24 @@ class NamespaceLoader implements LoaderInterface
 	
 	/**
 	 * Registers a new namespace folder.
-	 * @param string $space Namespace to be registered.
+	 * @param string $space Namespace to register.
 	 * @param string $folder Folder containing namespace's objects.
-	 * @return $this Object loader for method chaining.
 	 */
-	public function set(string $space, string $folder)
+	public function set(string $space, string $folder): void
 	{
 		$space = ltrim($space, '\\');
 		$folder = rtrim($folder, '/');
-		
 		$this->data->set($space, $folder);
-		return $this;
 	}
 	
 	/**
-	 * Removes an entry from the map. Classes to be loaded using this loader
-	 * will not be unloaded if they have already been loaded.
-	 * @param string $space Namespace to be removed.
-	 * @return $this Space loader for method chaining.
+	 * Removes an entry from map. Objects to load using this loader will not
+	 * unload if they have already been previously loaded.
+	 * @param string $space Namespace to remove.
 	 */
-	public function del($space)
+	public function del(string $space): void
 	{
 		$space = ltrim($space, '\\');
-		
 		$this->data->del($space);
-		return $this;
 	}
-	
 }

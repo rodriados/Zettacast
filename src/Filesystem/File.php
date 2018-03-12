@@ -9,8 +9,7 @@
 namespace Zettacast\Filesystem;
 
 use Zettacast\Stream\Stream;
-use Zettacast\Exception\Stream\StreamException;
-use Zettacast\Exception\Filesystem\FilesystemException;
+use Zettacast\Stream\StreamException;
 
 /**
  * This class acts as wrapper to a local stream as a file handler.
@@ -21,17 +20,19 @@ class File extends Stream
 {
 	/**
 	 * File constructor.
-	 * @param string $filename File to be opened.
+	 * Opens file and sets it up for usage.
+	 * @param string $filename File to open.
 	 * @param string $mode Access mode for opening file.
 	 * @throws FilesystemException File could not be found.
 	 */
 	public function __construct(string $filename, string $mode = 'r')
 	{
 		try {
-			parent::__construct('file://'.$filename, $mode);
-		} catch(StreamException $e) {
-			throw FilesystemException::missingFile($filename, $e);
+			parent::__construct($filename, $mode);
+		}
+		
+		catch(StreamException $e) {
+			throw FilesystemException::missingfile($filename, $e);
 		}
 	}
-	
 }
