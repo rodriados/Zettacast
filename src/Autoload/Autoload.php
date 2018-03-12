@@ -38,51 +38,83 @@ final class Autoload
 	
 	/**
 	 * Autoload constructor.
-	 * Initializes the object and set values to instance properties.
+	 * Creates the internal framework loader and registers it.
 	 */
 	public function __construct()
 	{
 		$this->loaders = [];
 		$this->internal = new InternalLoader;
 		
-		$this->register($this->internal);
+		$this->register(spl_object_hash($this->internal), $this->internal);
+	}
+	
+	/**
+	 * Checks whether a loader has already been registered in stack.
+	 * @param string $name Name of loader to check existance.
+	 * @return bool Is loader already registered?
+	 */
+	public function has(string $name): bool
+	{
+		return isset($this->loaders[$name]);
+	}
+	
+	/**
+	 * Recovers access to a registered loader.
+	 * @param string $name The name of loader to recover.
+	 * @return LoaderInterface The recovered loader.
+	 */
+	public function get(string $name): ?LoaderInterface
+	{
+		return $this->loaders[$name] ?? null;
 	}
 	
 	/**
 	 * Registers a loader in autoload stack. The autoload function will be
 	 * responsible for automatically loading all objects invoked by framework
 	 * or by application.
-	 * @var LoaderInterface $loader A loader to register.
+	 * @param string $name The name to use for loader identification.
+	 * @param LoaderInterface $loader A loader to register.
 	 * @return bool Was the loader successfully registered?
 	 */
-	public function register(LoaderInterface $loader): bool
+	public function register(string $name, LoaderInterface $loader): bool
 	{
-		if($this->isRegistered($loader))
+		if($this->has($name))
 			return false;
 		
-		$this->loaders[spl_object_hash($loader)] = true;
+		$this->loaders[$name] = $loader;
 		return spl_autoload_register([$loader, 'load']);
 	}
 	
 	/**
 	 * Unregisters a object loader from autoload stack.
-	 * @param LoaderInterface $loader A loader to unregister.
+	 * @param string $name Name of loader to unregister.
 	 */
-	public function unregister(LoaderInterface $loader): void
+	public function unregister(string $name): void
 	{
-		if($this->isRegistered($loader)) {
-			unset($this->loaders[spl_object_hash($loader)]);
-			spl_autoload_unregister([$loader, 'load']);
+		if($this->has($name)) {
+			spl_autoload_unregister([$this->loaders[$name], 'load']);
+			unset($this->loaders[$name]);
 		}
 	}
 	
 	/**
-	 * Checks whether a loader has already been registered in stack.
-	 * @param LoaderInterface $loader Target to check whether registered.
-	 * @return bool Is loader already registered?
+	 * Registers a new alias.
+	 * @param string $alias Aliased name to register.
+	 * @param string $target Original name alias refers to.
 	 */
-	public function isRegistered(LoaderInterface $loader): bool
+	public function alias(string $alias, string $target): void
 	{
-		return (bool)($this->loaders[spl_object_hash($loader)] ?? false);
+		$this->internal->alias($alias, $target);
+	}
+	
+	/**
+	 * Removes an alias from map. Objects loaded using alias will not unload if
+	 * they have already been loaded, but they will not be able to load using
+	 * their aliased name anymore.
+	 * @param string $alias Alias to remove.
+	 */
+	public function unalias(string $alias): void
+	{
+		$this->internal->unalias($alias);
 	}
 }
