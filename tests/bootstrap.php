@@ -48,6 +48,7 @@ define('APPPATH', ROOTPATH.'/app');
 define('SRCPATH', ROOTPATH.'/src');
 define('TMPPATH', ROOTPATH.'/tmp');
 define('CFGPATH', APPPATH.'/config');
+define('WWWPATH', ROOTPATH.'/public');
 /**#@-*/
 
 /*
