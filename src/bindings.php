@@ -12,6 +12,7 @@ return [
 	['autoload', 'Zettacast\Autoload\Autoload'],
 	
 	# Miscellaneous objects
+	['uri', 'Zettacast\Support\Uri'],
 	['config', 'Zettacast\Support\Config'],
 	
 	# Injector module

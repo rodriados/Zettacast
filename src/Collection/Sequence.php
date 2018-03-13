@@ -84,7 +84,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	public function set($index, $value): void
 	{
 		if($index <= $this->count())
-			$this->data->add($index, $value);
+			$this->data[$index] = $value;
 	}
 	
 	/**
