@@ -8,18 +8,20 @@
  * @copyright 2015-2017 Rodrigo Siqueira
  */
 return [
-
+	# Autoload module
+	['autoload', 'Zettacast\Autoload\Autoload'],
+	
+	# Miscellaneous objects
+	['config', 'Zettacast\Support\Config'],
+	
 	# Injector module
 	['injector', 'Zettacast\Injector\InjectorInterface'],
 	['Zettacast\Injector\InjectorInterface', 'Zettacast\Injector\Injector'],
 	
-	# Autoload module
-	['autoload', 'Zettacast\Autoload\Autoload'],
-	
 	# Collection module
 	['stack', 'Zettacast\Collection\Stack'],
-	['queue', 'Zettacast\Collection\QueueInterface'],
-	['sequence', 'Zettacast\Collection\SequenceInterface'],
+	['queue', 'Zettacast\Collection\Queue'],
+	['sequence', 'Zettacast\Collection\Sequence'],
 	['collection', 'Zettacast\Collection\CollectionInterface'],
 	['collection.dot', 'Zettacast\Collection\DotCollection'],
 	['collection.recursive', 'Zettacast\Collection\RecursiveCollection'],
@@ -47,10 +49,9 @@ return [
 	['Zettacast\Stream\FilterInterface', 'Zettacast\Stream\Filter'],
 	
 	# HTTP module
-	['url', 'Zettacast\Http\Url'],
-	['request', 'Zettacast\Http\Request'],
-	['response', 'Zettacast\Http\Response'],
-	['Zettacast\Http\Kernel', 'Zettacast\Http\Kernel'],
-	['Zettacast\Http\Request', 'Zettacast\Http\Request'],
-	
+	#['url', 'Zettacast\Http\Url'],
+	#['request', 'Zettacast\Http\Request'],
+	#['response', 'Zettacast\Http\Response'],
+	#['Zettacast\Http\Kernel', 'Zettacast\Http\Kernel'],
+	#['Zettacast\Http\Request', 'Zettacast\Http\Request'],
 ];

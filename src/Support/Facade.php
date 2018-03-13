@@ -11,11 +11,11 @@ namespace Zettacast\Support;
 abstract class Facade
 {
 	/**
-	 * Façaded object instance. This is the instance called when calling for a
-	 * method of a façaded class.
-	 * @var mixed Façaded object instance.
+	 * Keeps all façade instances in a single place. This allows us to use many
+	 * different façades at the same time, using their accessors as an index.
+	 * @var array Façaded objects instances.
 	 */
-	private static $instance = null;
+	private static $instance = [];
 	
 	/**
 	 * Handles dynamic static calls to façaded object.
@@ -35,14 +35,13 @@ abstract class Facade
 	 */
 	protected static function i(): object
 	{
-		if(isset(self::$instance))
-			return self::$instance;
+		if(is_object($accessor = static::accessor()))
+			return $accessor;
 		
-		$access = static::accessor();
+		if(isset(self::$instance[$accessor]))
+			return self::$instance[$accessor];
 		
-		return self::$instance = !is_object($access)
-			? zetta($access)
-			: $access;
+		return self::$instance[$accessor] = zetta($accessor);
 	}
 	
 	/**

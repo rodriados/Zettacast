@@ -49,5 +49,4 @@ return [
 	 * feel free to change it if you think you need to.
 	 */
 	'charset' => 'UTF-8',
-	
 ];

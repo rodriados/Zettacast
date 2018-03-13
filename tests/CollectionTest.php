@@ -26,6 +26,9 @@ final class CollectionTest extends \PHPUnit\Framework\TestCase
 	public function testCollection()
 	{
 		$col = new Collection([.5,1,1.5,2,2.5,3,3.5,4,4.5,5]);
+		$this->assertEquals($col[0], .5);
+		$this->assertEquals($col->get(0), .5);
+		$this->assertTrue($col->has(8));
 		$this->assertEquals($col->raw(), with(clone $col)->raw());
 		$this->assertEquals($col->count(), 10);
 		$this->assertEquals($col->apply(function($value): int {

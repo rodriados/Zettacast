@@ -49,7 +49,7 @@ define('ROOTPATH', realpath(dirname(__DIR__)));
 define('APPPATH', ROOTPATH.'/app');
 define('SRCPATH', ROOTPATH.'/src');
 define('TMPPATH', ROOTPATH.'/tmp');
-define('CFGPATH', APPPATH.'/config');
+define('CFGPATH', ROOTPATH.'/config');
 define('WWWPATH', realpath(__DIR__));
 /**#@-*/
 

@@ -11,11 +11,10 @@ namespace Zettacast\Facade;
 use Zettacast\Support\Facade;
 use Zettacast\Stream\StreamInterface;
 use Zettacast\Collection\SequenceInterface;
-use Zettacast\Filesystem\Filesystem as baseclass;
 
 /**
  * Zettacast's Filesystem façade class.
- * This class exposes package:filesystem\Filesystem methods to external usage.
+ * This class exposes the Filesystem package methods to external usage.
  * @method static bool chmod(string $path, int $perms = 0777)
  * @method static bool copy(string $path, string $target)
  * @method static bool has(string $path)
@@ -55,6 +54,6 @@ final class File extends Facade
 	 */
 	protected static function accessor()
 	{
-		return baseclass::class;
+		return 'filesystem';
 	}
 }
