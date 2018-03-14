@@ -56,7 +56,7 @@ class DotCollection extends RecursiveCollection
 				: ($node = &$node[$segment]);
 		}
 		
-		return $this->ref($node);
+		return self::ref($node, $this);
 	}
 	
 	/**
@@ -160,7 +160,7 @@ class DotCollection extends RecursiveCollection
 	public function pluck($value, $key = null): Collection
 	{
 		foreach($this->data as $item) {
-			$ref = $this->ref($item);
+			$ref = self::ref($item, $this);
 			
 			is_null($key) || !($keyvalue = $ref->get($key))
 				? ($result[/*nokey*/] = $ref->get($value))

@@ -26,7 +26,7 @@ class RecursiveCollection extends Collection
 	public function get($key, $default = null)
 	{
 		return $this->has($key)
-			? $this->ref($this->data[$key])
+			? self::ref($this->data[$key], $this)
 			: $default;
 	}
 	
@@ -107,7 +107,7 @@ class RecursiveCollection extends Collection
 			if($check)
 				yield from ($value instanceof Collection)
 					? $value->iterate()
-					: $value;
+					: $this->new($value)->iterate();
 		}
 	}
 	
@@ -147,14 +147,11 @@ class RecursiveCollection extends Collection
 	 */
 	public function walk(callable $fn, $userdata = null)
 	{
-		$userdata = toArray($userdata);
-		
 		foreach(parent::iterate() as $key => $value)
-			isListable($value)
-				? $this->ref($value)->walk($fn, ...$userdata)
-				: $fn($value, $key, ...$userdata);
+			listable($value)
+				? $this->new($value)->walk($fn, ...toarray($userdata))
+				: $fn($value, $key, ...toarray($userdata));
 		
 		return $this;
 	}
-	
 }

@@ -519,6 +519,23 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
+	 * Creates a new instance of class based on an already existing instance,
+	 * and using by-reference assignment to data stored in instance.
+	 * @param mixed &$target Data to feed into new instance.
+	 * @param Collection $base Instance to use as a base for new ref instance.
+	 * @return static The new instance.
+	 */
+	public static function ref(&$target, Collection $base = null)
+	{
+		if(!is_array($target) and !$target instanceof \ArrayAccess)
+			return $target;
+		
+		$obj = $base ? $base->new() : new static();
+		$obj->data = &$target;
+		return $obj;
+	}
+	
+	/**
 	 * Creates a new instance of class based on an already existing instance.
 	 * @param mixed $target Data to feed into new instance.
 	 * @return static The new instance.
@@ -526,23 +543,6 @@ class Collection implements CollectionInterface, \ArrayAccess
 	protected function new($target = [])
 	{
 		$obj = new static($target);
-		return $obj;
-	}
-	
-	/**
-	 * Creates a new instance of class based on an already existing instance,
-	 * and using by-reference assignment to data stored in instance.
-	 * @param mixed &$target Data to feed into new instance.
-	 * @return static The new instance.
-	 */
-	protected function ref(&$target)
-	{
-		if(!listable($target))
-			return $target;
-		
-		$obj = $this->new();
-		$obj->data = &$target;
-		
 		return $obj;
 	}
 }
