@@ -49,9 +49,9 @@ class Info
 	 * Expresses this object as a string, so it can be easily used as one.
 	 * @return string The spicified path during object construction.
 	 */
-	public function __toString(): string
+	public function __tostring(): string
 	{
-		return $this->spl->__toString();
+		return (string)$this->spl;
 	}
 	
 	/**
