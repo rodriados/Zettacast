@@ -24,9 +24,6 @@ namespace Zettacast\Filesystem;
  * @property int $ctime The file last change time.
  * @property int $mtime The last modified time.
  * @property string $type The file type.
- * @property bool $executable Is the file executable?
- * @property bool $readable Is the file readable?
- * @property bool $writable Is the file writable?
  * @package Zettacast\Filesystem
  * @version 1.0
  */
@@ -78,9 +75,6 @@ class Info
 			'ctime'         => 'getCTime',
 			'mtime'         => 'getMTime',
 			'type'          => 'getType',
-			'executable'    => 'isExecutable',
-			'readable'      => 'isReadable',
-			'writable'      => 'isWritable',
 		];
 		
 		return isset($info[$property])
@@ -95,6 +89,15 @@ class Info
 	public function isdir(): bool
 	{
 		return $this->spl->isDir();
+	}
+	
+	/**
+	 * Checks whether path is executable.
+	 * @return bool Is path executable?
+	 */
+	public function isexecutable(): bool
+	{
+		return $this->spl->isExecutable();
 	}
 	
 	/**
@@ -113,6 +116,24 @@ class Info
 	public function islink(): bool
 	{
 		return $this->spl->isLink();
+	}
+	
+	/**
+	 * Checks whether path is readable.
+	 * @return bool Is path readable?
+	 */
+	public function isreadable(): bool
+	{
+		return $this->spl->isReadable();
+	}
+	
+	/**
+	 * Checks whether path is writable.
+	 * @return bool Is path writable?
+	 */
+	public function iswritable(): bool
+	{
+		return $this->spl->isWritable();
 	}
 	
 	/**
