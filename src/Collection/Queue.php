@@ -9,8 +9,8 @@
 namespace Zettacast\Collection;
 
 /**
- * The queue class has methods appliable for all kinds of queues. Only integer
- * keys are acceptable in a queue.
+ * The queue class. This class has methods that allow the creation of a queue,
+ * that is, a sequence of elements following the first-in-first-out protocol.
  * @package Zettacast\Collection
  * @version 1.0
  */
@@ -24,8 +24,7 @@ class Queue implements QueueInterface
 	
 	/**
 	 * Queue constructor.
-	 * This constructor simply creates a new base for all of this object's data
-	 * to be stored on.
+	 * Sets up the internal queue structure.
 	 */
 	public function __construct()
 	{
@@ -33,8 +32,9 @@ class Queue implements QueueInterface
 	}
 	
 	/**
-	 * Clone magic method. This method allows a correct cloning of this
-	 * object's contents, so it does not interfere with the original object.
+	 * Queue clone magic method.
+	 * Clones the internal queue structure so the cloned object can be totally
+	 * independent from the original one.
 	 */
 	public function __clone()
 	{

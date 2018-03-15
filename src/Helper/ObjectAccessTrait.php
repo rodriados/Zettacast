@@ -11,6 +11,7 @@ namespace Zettacast\Helper;
 trait ObjectAccessTrait
 {
 	/**
+	 * Object access property magic method.
 	 * Accesses data in object using object notation.
 	 * @param string $key Property name to access.
 	 * @return mixed Property value.
@@ -21,6 +22,7 @@ trait ObjectAccessTrait
 	}
 	
 	/**
+	 * Object check property magic method.
 	 * Checks whether a property exists in object.
 	 * @param string $key Property to check.
 	 * @return bool Does the property exist?
@@ -31,6 +33,7 @@ trait ObjectAccessTrait
 	}
 	
 	/**
+	 * Object store property magic method.
 	 * Sets data in object using object notation.
 	 * @param string $key Property to create or update.
 	 * @param mixed $value Data to save.
@@ -41,6 +44,7 @@ trait ObjectAccessTrait
 	}
 	
 	/**
+	 * Object delete property magic method.
 	 * Deletes data from object using object notation.
 	 * @param mixed $key Property to erase.
 	 */

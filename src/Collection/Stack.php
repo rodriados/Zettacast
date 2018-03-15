@@ -9,8 +9,8 @@
 namespace Zettacast\Collection;
 
 /**
- * The stack class has methods appliable for all kinds of stacks. Only integer
- * key types are acceptable in stacks.
+ * The stack class. This class has methods that allow the creation of a queue,
+ * that is, a sequence of elements following the last-in-first-out protocol.
  * @package Zettacast\Collection
  * @version 1.0
  */

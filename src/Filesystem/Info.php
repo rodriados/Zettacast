@@ -46,6 +46,7 @@ class Info
 	}
 	
 	/**
+	 * Info string representation magic method.
 	 * Expresses this object as a string, so it can be easily used as one.
 	 * @return string The spicified path during object construction.
 	 */
@@ -55,6 +56,7 @@ class Info
 	}
 	
 	/**
+	 * Info access property magic method.
 	 * Allows access to file or directory info.
 	 * @param string $property The requested property.
 	 * @return mixed The property's value.

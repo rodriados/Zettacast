@@ -26,6 +26,7 @@ class StreamContext implements ExtractableInterface
 	protected $context;
 	
 	/**
+	 * StreamContext constructor.
 	 * Initializes the stream context and prepares it to apply to stream.
 	 * @param resource|array $context Context data or the stream itself.
 	 */

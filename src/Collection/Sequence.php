@@ -11,8 +11,9 @@ namespace Zettacast\Collection;
 use Zettacast\Helper\ArrayAccessTrait;
 
 /**
- * The sequence class has methods appliable for all kinds of sequences. Only
- * integer and sequencial keys are acceptable in sequences.
+ * The sequence class. This class has methods appliable for all kinds of
+ * sequences which keeps its elements ordered as given and allows them to be
+ * taken out in both directions.
  * @package Zettacast\Collection
  * @version 1.0
  */
@@ -28,8 +29,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	
 	/**
 	 * Sequence constructor.
-	 * This constructor simply creates a new base for all of this object's data
-	 * to be stored on.
+	 * Stores given data in sequence.
 	 * @param array|\Traversable $data Data to store as a sequence.
 	 */
 	public function __construct($data = null)
@@ -45,8 +45,9 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Clone magic method. This method allows a correct cloning of this
-	 * object's contents, so it does not interfere with the original object.
+	 * Sequence clone magic method.
+	 * Clones the internal sequence structure so the cloned object can be
+	 * totally independent from the original one.
 	 */
 	public function __clone()
 	{

@@ -25,8 +25,8 @@ class DotCollection extends RecursiveCollection
 	
 	/**
 	 * Dot constructor.
-	 * This constructor simply sets the data received as the data stored in
-	 * collection, and defines the depth-separator.
+	 * Sets given data as the data stored by collection and defines it's depth
+	 * separator indicator, which is usually a dot.
 	 * @param array|\Traversable $data Data to store.
 	 * @param string $dot Depth-separator.
 	 */
@@ -127,8 +127,8 @@ class DotCollection extends RecursiveCollection
 	}
 	
 	/**
-	 * Filters elements according to given test. If no test function is
-	 * given, it fallbacks to removing all false equivalent values.
+	 * Filters elements according to given test. If no test function is given,
+	 * it fallbacks to removing all false equivalent values.
 	 * @param callable $fn Test function. Parameters: value, key.
 	 * @return static Collection of all filtered values.
 	 */

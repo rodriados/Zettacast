@@ -46,6 +46,7 @@ class Stream implements StreamInterface
 	}
 	
 	/**
+	 * Stream destructor.
 	 * Destructs stream handler before this object's destruction, thus
 	 * preserving all changes eventually made to stream's contents.
 	 */

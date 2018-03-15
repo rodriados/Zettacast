@@ -31,7 +31,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Collection constructor.
-	 * This constructor sets the data received as data stored in collection.
+	 * Sets given data as the data stored by collection.
 	 * @param array|\Traversable $data Data to be stored.
 	 */
 	public function __construct($data = null)
@@ -101,7 +101,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 */
 	public function raw(): array
 	{
-		return toArray($this->data);
+		return toarray($this->data);
 	}
 	
 	/**
@@ -270,7 +270,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 * Returns all element keys currently present in collection.
 	 * @return self Collection of this collection element's keys.
 	 */
-	public function keys(): self
+	public function keys(): Collection
 	{
 		return new self(array_keys($this->data));
 	}
@@ -485,7 +485,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 * Returns all element values currently present in collection.
 	 * @return self Collection of this collection element's values.
 	 */
-	public function values(): self
+	public function values(): Collection
 	{
 		return new self(array_values($this->data));
 	}
@@ -523,7 +523,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 * and using by-reference assignment to data stored in instance.
 	 * @param mixed &$target Data to feed into new instance.
 	 * @param Collection $base Instance to use as a base for new ref instance.
-	 * @return static The new instance.
+	 * @return static|mixed The new instance or original data.
 	 */
 	public static function ref(&$target, Collection $base = null)
 	{
