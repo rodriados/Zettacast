@@ -185,7 +185,10 @@ class Uri
 		
 		$this->cp = $d;
 		$this->cp['port'] = $d['port'] ? (int)$d['port'] : null;
-		parse_str($d['query'], $this->cp['query']);
+		
+		is_array($d['query'])
+			? $this->cp['query'] = $d['query']
+			: parse_str($d['query'], $this->cp['query']);
 	}
 	
 	/**
