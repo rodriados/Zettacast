@@ -83,7 +83,7 @@ class Uri
 	 * Checks whether the stored URI is absolute.
 	 * @return bool Is the URI absolute?
 	 */
-	public function isabsolute(): bool
+	public function absolute(): bool
 	{
 		return $this->cp['scheme']
 		    || !$this->cp['authority'] && $this->cp['full'][0] == '/';
@@ -93,9 +93,9 @@ class Uri
 	 * Checks whether the stored URI is relative.
 	 * @return bool Is the URI relative?
 	 */
-	public function isrelative(): bool
+	public function relative(): bool
 	{
-		return !$this->isabsolute();
+		return !$this->absolute();
 	}
 	
 	/**
@@ -223,10 +223,9 @@ class Uri
 	 */
 	protected static function normalize(?string $path): string
 	{
-		$path = explode('/', $path);
-		$leading = (int)(count($path) > 1 && !$path[0]);
 		$norm = [null, null];
-		$actual = $leading;
+		$path = explode('/', $path);
+		$actual = $leading = (int)(count($path) > 1 && !$path[0]);
 		
 		foreach($path as $segment)
 			if($segment == '.') {

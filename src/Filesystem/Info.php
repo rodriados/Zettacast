@@ -85,21 +85,21 @@ class Info
 	}
 	
 	/**
+	 * Checks whether path is executable.
+	 * @return bool Is path executable?
+	 */
+	public function executable(): bool
+	{
+		return $this->spl->isExecutable();
+	}
+	
+	/**
 	 * Checks whether path is directory.
 	 * @return bool Is path a directory?
 	 */
 	public function isdir(): bool
 	{
 		return $this->spl->isDir();
-	}
-	
-	/**
-	 * Checks whether path is executable.
-	 * @return bool Is path executable?
-	 */
-	public function isexecutable(): bool
-	{
-		return $this->spl->isExecutable();
 	}
 	
 	/**
@@ -124,7 +124,7 @@ class Info
 	 * Checks whether path is readable.
 	 * @return bool Is path readable?
 	 */
-	public function isreadable(): bool
+	public function readable(): bool
 	{
 		return $this->spl->isReadable();
 	}
@@ -133,7 +133,7 @@ class Info
 	 * Checks whether path is writable.
 	 * @return bool Is path writable?
 	 */
-	public function iswritable(): bool
+	public function writable(): bool
 	{
 		return $this->spl->isWritable();
 	}
