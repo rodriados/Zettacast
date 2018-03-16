@@ -12,6 +12,7 @@ namespace Zettacast\Support;
  * The universal resource identification class. This class is responsible for
  * identifying external or internally known resources. This object simply holds
  * the URI and is not responsible for making sense out of it.
+ * @todo Refactor the class instantiation. It is easily cracked using array.
  * @property string $full The full URI, with all of its components.
  * @property string $scheme The URI scheme.
  * @property string $authority The URI authority.
@@ -178,9 +179,9 @@ class Uri
 	{
 		$d = [];
 		
-		foreach(self::COMPONENT as $part)
-			$d[$part] = isset($data[$part]) && $data[$part]
-				? $data[$part]
+		foreach(self::COMPONENT as $cp)
+			$d[$cp] = isset($data[$cp]) && $data[$cp]
+				? $data[$cp]
 				: null;
 		
 		$this->cp = $d;

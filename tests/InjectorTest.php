@@ -40,6 +40,23 @@ final class InjectorTest extends \PHPUnit\Framework\TestCase
 		$this->assertFalse(zetta()->has(AInterface::class));
 	}
 	
+	public function testCanBindClosure()
+	{
+		zetta()->bind(AInterface::class, function() {
+			return new A;
+		});
+		
+		zetta()->bind(BInterface::class, function() {
+			return zetta(B::class);
+		});
+		
+		zetta()->bind(CInterface::class, C::class);
+		zetta()->bind(DInterface::class, D::class);
+		
+		$this->assertInstanceOf(A::class, zetta(AInterface::class));
+		$this->assertInstanceOf(B::class, zetta(BInterface::class));
+	}
+	
 	public function testCanWrap()
 	{
 		zetta()->bind(AInterface::class, A::class);
@@ -82,5 +99,4 @@ final class InjectorTest extends \PHPUnit\Framework\TestCase
 		$this->expectException(InjectorException::class);
 		zetta()->make(EInterface::class);
 	}
-	
 }

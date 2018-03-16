@@ -142,13 +142,15 @@ class Assembler
 	 */
 	protected function resolve(array $requested, array $params = []): array
 	{
+		$count = 0;
+		
 		foreach($requested as $id => $dependency)
 			if(isset($params[$dependency->name]))
 				$solved[] = $params[$dependency->name];
-			elseif(isset($params[$id]))
-				$solved[] = $params[$id];
-			elseif(!is_null($dependency->getClass()))
+			elseif(!is_null($dependency->getClass()) && ++$count)
 				$solved[] = $this->mount($dependency);
+			elseif(isset($params[$id - $count]))
+				$solved[] = $params[$id - $count];
 			else /* not explicitly given param nor typed argument */
 				$solved[] = $this->guess($dependency);
 

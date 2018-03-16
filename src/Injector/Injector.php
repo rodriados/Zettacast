@@ -21,19 +21,19 @@ use Zettacast\Helper\StorageInterface;
 class Injector implements InjectorInterface
 {
 	/**
-	 * Collection of shared data. Objects or any kind of data can be shared in
-	 * the injector. Shared objects will be instantiated only once.
-	 * @var Collection Shared data collection.
-	 */
-	protected $shared;
-	
-	/**
 	 * Abstraction binder instance. This object is responsible for allowing
 	 * abstractions to be instantiated by linking them to a concrete
 	 * implementation.
 	 * @var BinderInterface Abstraction binder instance.
 	 */
 	protected $binder;
+	
+	/**
+	 * Collection of shared data. Objects or any kind of data can be shared in
+	 * the injector. Shared objects will be instantiated only once.
+	 * @var Collection Shared data collection.
+	 */
+	protected $shared;
 	
 	/**
 	 * Object assembler instance. This object is responsible for instantiating,
@@ -140,6 +140,16 @@ class Injector implements InjectorInterface
 	}
 	
 	/**
+	 * Drops any instance or binding related to given abstraction.
+	 * @param string $abstract Abstraction to be dropped from injector.
+	 */
+	public function drop(string $abstract): void
+	{
+		$this->shared->del($abstract);
+		$this->binder->unbind($abstract);
+	}
+	
+	/**
 	 * Informs the context to which binding operations should act upon.
 	 * @param string $scope Creation scope to which binding is applied.
 	 * @return BinderInterface Binder responsible for the given context.
@@ -171,6 +181,18 @@ class Injector implements InjectorInterface
 	public function make(string $abstract, array $params = [])
 	{
 		return $this->assembler->make($abstract, $params);
+	}
+	
+	/**
+	 * Calls a function after solving all of its dependencies.
+	 * @param callable $fn Function to call.
+	 * @param array $param Parameters to use when calling.
+	 * @return mixed The function return value.
+	 */
+	public function call(callable $fn, array $param = [])
+	{
+		$wrapped = $this->wrap($fn, $param);
+		return $wrapped();
 	}
 	
 	/**
