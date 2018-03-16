@@ -71,7 +71,7 @@ final class InjectorTest extends \PHPUnit\Framework\TestCase
 		$this->assertInstanceOf(D::class, $f());
 		
 		$f = zetta()->wrap([D::class, 'staticF']);
-		$r = $f([null, 1089]);
+		$r = $f([1089]);
 		$this->assertInstanceOf(A::class, $r[0]);
 		$this->assertEquals($r[1], 1089);
 		
@@ -87,11 +87,11 @@ final class InjectorTest extends \PHPUnit\Framework\TestCase
 		zetta()->bind(CInterface::class, C::class);
 		zetta()->bind(DInterface::class, D::class);
 		
-		$f = zetta()->wrap([zetta()->make(D::class), 'instanceF'], [null, 57.48]);
+		$f = zetta()->wrap([zetta()->make(D::class), 'instanceF'], [57.48]);
 		$r = $f();
 		$this->assertInstanceOf(A::class, $r[0]);
 		$this->assertEquals($r[1], 57.48);
-		$this->assertEquals($f([null,100.18])[1], 100.18);
+		$this->assertEquals($f([100.18])[1], 100.18);
 	}
 	
 	public function testExceptionUninstantiable()
