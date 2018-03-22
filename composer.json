@@ -20,6 +20,6 @@
 		}
 	},
 	"archive": {
-		"exclude": ["/tests", "/resource", "/tmp"]
+		"exclude": ["/test", "/build", "/tmp"]
 	}
 }
