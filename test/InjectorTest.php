@@ -13,6 +13,12 @@ final class InjectorTest extends \PHPUnit\Framework\TestCase
 		$this->assertInstanceOf(Injector::class, zetta());
 	}
 	
+	public function testCannotInstantiate()
+	{
+		$this->expectException(InjectorException::class);
+		zetta(DInterface::class);
+	}
+	
 	public function testCanBind()
 	{
 		zetta()->bind(AInterface::class, A::class);
@@ -38,6 +44,10 @@ final class InjectorTest extends \PHPUnit\Framework\TestCase
 		
 		zetta()->del(AInterface::class);
 		$this->assertFalse(zetta()->has(AInterface::class));
+		
+		zetta()->drop('testD');
+		$this->expectException(InjectorException::class);
+		zetta('testD');
 	}
 	
 	public function testCanBindClosure()
@@ -69,6 +79,7 @@ final class InjectorTest extends \PHPUnit\Framework\TestCase
 		
 		$f = zetta()->wrap('f');
 		$this->assertInstanceOf(D::class, $f());
+		$this->assertInstanceOf(D::class, zetta()->call('f'));
 		
 		$f = zetta()->wrap([D::class, 'staticF']);
 		$r = $f([1089]);
@@ -92,6 +103,18 @@ final class InjectorTest extends \PHPUnit\Framework\TestCase
 		$this->assertInstanceOf(A::class, $r[0]);
 		$this->assertEquals($r[1], 57.48);
 		$this->assertEquals($f([100.18])[1], 100.18);
+	}
+	
+	public function testCanShareBoundInstance()
+	{
+		zetta()->bind(AInterface::class, A::class, true);
+		zetta()->bind(BInterface::class, B::class, true);
+		zetta()->bind(CInterface::class, C::class, true);
+		zetta()->bind(DInterface::class, D::class, true);
+		$i1 = zetta(DInterface::class);
+		$i2 = zetta(DInterface::class);
+		
+		$this->assertEquals(spl_object_hash($i1), spl_object_hash($i2));
 	}
 	
 	public function testExceptionUninstantiable()

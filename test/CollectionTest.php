@@ -21,6 +21,23 @@ final class CollectionTest extends \PHPUnit\Framework\TestCase
 		$this->assertTrue(isset($c2['a']));
 		$this->assertFalse(isset($c2['c']));
 		$this->assertTrue($c1->empty());
+		
+		$this->assertEquals(1, $c2->rewind());
+		$this->assertEquals(1, $c2->current());
+		$this->assertEquals(2, $c2->next());
+		$this->assertEquals(1, $c2->prev());
+		$this->assertEquals('a', $c2->key());
+		$this->assertEquals([new Collection(['a','b']),new Collection([1,2])], $c2->divide());
+		$this->assertTrue($c2->every());
+		$this->assertFalse($c2->every(function($v) {return $v == 1;}));
+		$this->assertEquals(new Collection(['b' => 2]), $c2->except('a'));
+		$this->assertEquals(new Collection(['b' => 2]), $c2->only('b'));
+		$this->assertEquals(new Collection(['a'=>2,'b'=>4]), $c2->map(function($v){return $v * 2;}));
+		$this->assertEquals(3, $c2->reduce(function($c, $v) {return $c + $v;}));
+		$this->assertEquals('b', $c2->search(2));
+		
+		$this->assertEquals(['a' => 1, 'b' => 2], $c2->clear());
+		$this->assertTrue($c2->empty());
 	}
 	
 	public function testCollection()
@@ -43,11 +60,17 @@ final class CollectionTest extends \PHPUnit\Framework\TestCase
 	
 	public function testRecursiveCollection()
 	{
-		$rec = new RecursiveCollection([[1,2,3],[4,5,6],[7,8,9]]);
+		$rec = new RecursiveCollection([[1,2,3],[[4,5,6]],[7,8,9]]);
 		$this->assertInstanceOf(RecursiveCollection::class, $rec);
 		$this->assertFalse($rec->empty());
 		
-		$this->assertEquals($rec->collapse()->raw(), [1,2,3,4,5,6,7,8,9]);
+		$this->assertEquals($rec->collapse()->raw(), [1,2,3,[4,5,6],7,8,9]);
+		$this->assertEquals($rec->flatten()->raw(), [1,2,3,4,5,6,7,8,9]);
+		$this->assertEquals($rec->get(0)->get(2), 3);
+		$this->assertEquals($rec->get(7, "default"), "default");
+		
+		$rec->apply(function($v){return $v * 2;});
+		$this->assertEquals([2,4,6], $rec->get(0)->raw());
 	}
 	
 	public function testDotCollection()

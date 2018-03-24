@@ -24,6 +24,36 @@ final class StreamTest extends \PHPUnit\Framework\TestCase
 		
 		$stream->filter($filter, Filter::READ);
 		$this->assertEquals($stream->read(), '0 2 4 6 8 10 12 14 16 18');
+		$this->assertTrue($stream->eof());
 	}
 	
+	public function testStream()
+	{
+		$original = zetta('stream.virtual', "original stream");
+		$stream = zetta('stream.virtual');
+
+		$stream->writefrom($original);
+		$original->seek(0);
+		$stream->seek(0);
+		
+		$this->assertEquals($original->tell(), 0);
+		$this->assertEquals($stream->tell(), 0);
+		$this->expectOutputString("original streamoriginal stream");
+		$this->assertEquals($original->passthru(), $stream->passthru());
+		
+		$original->offset(-15);
+		$stream->offset(-15);
+		$this->assertEquals($original->tell(), 0);
+		$this->assertEquals($stream->tell(), 0);
+		$this->assertEquals($original->read(), $stream->readline());
+		
+		$original->seek(0);
+		$stream->seek(0);
+		$this->assertTrue($original->truncate(1));
+		$this->assertEquals('o', $original->read());
+		
+		$original->seek(0);
+		$stream->readto($original);
+		$this->assertEquals($original->readline(), $stream->readline());
+	}
 }
