@@ -12,7 +12,6 @@ return [
 	['autoload', 'Zettacast\Autoload\Autoload'],
 	
 	# Miscellaneous objects
-	['uri', 'Zettacast\Support\Uri'],
 	['config', 'Zettacast\Support\Config'],
 	
 	# Injector module
@@ -40,6 +39,7 @@ return [
 	['Zettacast\Filesystem\DiskInterface', 'Zettacast\Filesystem\Disk\LocalDisk'],
 	
 	# Stream module
+	['uri', 'Zettacast\Stream\Uri'],
 	['filter', 'Zettacast\Stream\FilterInterface'],
 	['stream', 'Zettacast\Stream\StreamInterface'],
 	['stream.context', 'Zettacast\Stream\StreamContext'],

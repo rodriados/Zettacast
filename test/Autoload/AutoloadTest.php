@@ -53,7 +53,7 @@ final class AutoloadTest extends TestCase
 		$this->assertInstanceOf(CarelessObject::class, $careless);
 		$this->assertInstanceOf(CodelessObject::class, $codeless);
 		
-		Autoload::get('object')->del('HopelessObject');
+		Autoload::get('object')->del(__NAMESPACE__.'\\HopelessObject');
 		
 		$this->expectException(\Error::class);
 		new HopelessObject;

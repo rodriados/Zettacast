@@ -11,19 +11,6 @@ namespace Zettacast\Filesystem;
 /**
  * The file information class gathers information about local files and
  * directories. This is almost a simple wrapper around SplFileInfo.
- * @property string $basename The base name of the file.
- * @property string $dirname The path without filename.
- * @property string $extension The file extension.
- * @property string $path The path to the file.
- * @property int $perms The file permissions.
- * @property int $permissions The file permissions.
- * @property string $realpath The absolute path to file.
- * @property int $size The file size.
- * @property int $timestamp The last modified time.
- * @property int $atime The last access time of the file.
- * @property int $ctime The file last change time.
- * @property int $mtime The last modified time.
- * @property string $type The file type.
  * @package Zettacast\Filesystem
  * @version 1.0
  */
@@ -31,7 +18,7 @@ class Info
 {
 	/**
 	 * Base object for information about a file or directory.
-	 * @var \SplFileInfo Information object.
+	 * @var \SplFileInfo Built-in information object.
 	 */
 	protected $spl;
 	
@@ -53,44 +40,6 @@ class Info
 	public function __tostring(): string
 	{
 		return (string)$this->spl;
-	}
-	
-	/**
-	 * Info access property magic method.
-	 * Allows access to file or directory info.
-	 * @param string $property The requested property.
-	 * @return mixed The property's value.
-	 */
-	public function __get(string $property)
-	{
-		static $info = [
-			'basename'      => 'getBasename',
-			'dirname'       => 'getPath',
-			'extension'     => 'getExtension',
-			'path'          => 'getPathname',
-			'perms'         => 'getPerms',
-			'permissions'   => 'getPerms',
-			'realpath'      => 'getRealPath',
-			'size'          => 'getSize',
-			'timestamp'     => 'getMTime',
-			'atime'         => 'getATime',
-			'ctime'         => 'getCTime',
-			'mtime'         => 'getMTime',
-			'type'          => 'getType',
-		];
-		
-		return isset($info[$property])
-			? $this->spl->{$info[$property]}()
-			: null;
-	}
-	
-	/**
-	 * Checks whether path is executable.
-	 * @return bool Is path executable?
-	 */
-	public function executable(): bool
-	{
-		return $this->spl->isExecutable();
 	}
 	
 	/**
@@ -121,6 +70,15 @@ class Info
 	}
 	
 	/**
+	 * Checks whether path is executable.
+	 * @return bool Is path executable?
+	 */
+	public function executable(): bool
+	{
+		return $this->spl->isExecutable();
+	}
+	
+	/**
 	 * Checks whether path is readable.
 	 * @return bool Is path readable?
 	 */
@@ -145,9 +103,8 @@ class Info
 	 */
 	public function mime(): string
 	{
-		return ($type = $this->spl->getType()) === 'file'
-			? with(new \finfo(FILEINFO_MIME_TYPE))
-				->file($this->spl->getRealPath())
+		return ($type = $this->type()) === 'file'
+			? with(new \finfo(FILEINFO_MIME_TYPE))->file($this->realpath())
 			: $type;
 	}
 	
@@ -157,10 +114,10 @@ class Info
 	 * @param string $mode File opening mode.
 	 * @return File Stream to file contents.
 	 */
-	public function open(string $mode = 'r'): File
+	public function open(string $mode = 'r'): ?File
 	{
-		return $this->spl->isFile()
-			? new File($this->spl->getRealPath(), $mode)
+		return $this->isfile()
+			? new File($this->realpath(), $mode)
 			: null;
 	}
 	
@@ -174,5 +131,114 @@ class Info
 		$clone = clone $this;
 		$clone->spl = $this->spl->getPathInfo();
 		return $clone;
+	}
+	
+	/**
+	 * Retrieves the base name of path.
+	 * @return string The path's base name.
+	 */
+	public function basename(): string
+	{
+		return $this->spl->getBasename();
+	}
+	
+	/**
+	 * Retrieves the directory name of path.
+	 * @return string The path's directory name.
+	 */
+	public function dirname(): string
+	{
+		return $this->spl->getPath();
+	}
+	
+	/**
+	 * Retrieves the extension of file.
+	 * @return string The file's extension.
+	 */
+	public function extension(): ?string
+	{
+		return $this->spl->getExtension() ?: null;
+	}
+	
+	/**
+	 * Retrieves the path to file or directory.
+	 * @return string The file or directory's path.
+	 */
+	public function path(): string
+	{
+		return $this->spl->getPathname();
+	}
+	
+	/**
+	 * Retrieves the permissions of path.
+	 * @return int The path's permissions.
+	 */
+	public function perms(): int
+	{
+		return $this->spl->getPerms();
+	}
+	
+	/**
+	 * Retrieves the absolute path of file or directory.
+	 * @return string The file or directory's absolute path.
+	 */
+	public function realpath(): ?string
+	{
+		return $this->spl->getRealPath() ?: null;
+	}
+	
+	/**
+	 * Retrieves the size of file.
+	 * @return int The file's size.
+	 */
+	public function size(): int
+	{
+		return $this->spl->getSize();
+	}
+	
+	/**
+	 * Retrieves the path last access time.
+	 * @return int The last access time of path.
+	 */
+	public function atime(): int
+	{
+		return $this->spl->getATime();
+	}
+	
+	/**
+	 * Retrieves the path creation time. It might not be accurate depending on
+	 * the system. In most UNIX based systems there is no creation time.
+	 * @return int The creation time of path.
+	 */
+	public function ctime(): int
+	{
+		return $this->spl->getCTime();
+	}
+	
+	/**
+	 * Retrieves the path last modified time.
+	 * @return int The last modified time of path.
+	 */
+	public function mtime(): int
+	{
+		return $this->spl->getMTime();
+	}
+	
+	/**
+	 * Retrieves the path last modified time.
+	 * @return int The last modified time of path.
+	 */
+	public function timestamp(): int
+	{
+		return $this->mtime();
+	}
+	
+	/**
+	 * Informs the type of path.
+	 * @return string The type of path.
+	 */
+	public function type(): string
+	{
+		return $this->spl->getType();
 	}
 }

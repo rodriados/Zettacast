@@ -109,7 +109,7 @@ class LocalDisk implements DiskInterface
 		$src = $this->prefix($path ?? '.');
 
 		return !is_null($data)
-			? with(new Info($src))->$data
+			? with(new Info($src))->$data()
 			: new Info($src);
 	}
 	
