@@ -1,11 +1,20 @@
 <?php
+/**
+ * Zettacast\Test\Autoload test file.
+ * @package Zettacast
+ * @author Rodrigo Siqueira <rodriados@gmail.com>
+ * @license MIT License
+ * @copyright 2015-2018 Rodrigo Siqueira
+ */
+namespace Zettacast\Test\Autoload;
 
 use Zettacast\Facade\Autoload;
 use Zettacast\Autoload\Loader\ObjectLoader;
 use Zettacast\Autoload\Loader\NamespaceLoader;
 use Zettacast\Autoload\Autoload as Autoloader;
+use PHPUnit\Framework\TestCase;
 
-final class AutoloadTest extends \PHPUnit\Framework\TestCase
+final class AutoloadTest extends TestCase
 {
 	public function testCanUseAlias()
 	{
@@ -15,25 +24,25 @@ final class AutoloadTest extends \PHPUnit\Framework\TestCase
 			'Del' => \Zettacast\Collection\Collection::class,
 		]);
 		
-		$col = new Col;
-		$stk = new Stk;
+		$col = new \Col;
+		$stk = new \Stk;
 		
 		$this->assertInstanceOf(\Zettacast\Collection\Collection::class, $col);
 		$this->assertInstanceOf(\Zettacast\Collection\Stack::class, $stk);
 		
 		Autoload::unalias('Del');
 		
-		$this->expectException(Error::class);
-		new Del;
+		$this->expectException(\Error::class);
+		new \Del;
 	}
 	
 	public function testCanUseObjectLoader()
 	{
 		Autoload::register('object', [
-			'UselessObject' => __DIR__.'/assets/class1.php',
-			'CarelessObject' => __DIR__.'/assets/class2.php',
-			'CodelessObject' => __DIR__.'/assets/class3.php',
-			'HopelessObject' => __DIR__.'/assets/class4.php',
+			__NAMESPACE__.'\\CarelessObject' => __DIR__.'/assets/CarelessObject.php',
+			__NAMESPACE__.'\\CodelessObject' => __DIR__.'/assets/CodelessObject.php',
+			__NAMESPACE__.'\\HopelessObject' => __DIR__.'/assets/HopelessObject.php',
+			__NAMESPACE__.'\\UselessObject'  => __DIR__.'/assets/UselessObject.php',
 		]);
 		
 		$useless = new UselessObject;
@@ -46,7 +55,7 @@ final class AutoloadTest extends \PHPUnit\Framework\TestCase
 		
 		Autoload::get('object')->del('HopelessObject');
 		
-		$this->expectException(Error::class);
+		$this->expectException(\Error::class);
 		new HopelessObject;
 	}
 	
@@ -54,21 +63,20 @@ final class AutoloadTest extends \PHPUnit\Framework\TestCase
 	{
 		Autoload::register('namespace', [
 			'EmptyNamespace' => __DIR__.'/assets',
-			'VoidNamespace' => __DIR__.'/assets',
+			'VoidNamespace'  => __DIR__.'/assets',
 		]);
 		
-		$n1 = new EmptyNamespace\namespace1;
-		$n2 = new EmptyNamespace\namespace2;
+		$n1 = new \EmptyNamespace\Empty1;
+		$n2 = new \EmptyNamespace\Empty2;
 		
-		$this->assertInstanceOf(EmptyNamespace\namespace1::class, $n1);
-		$this->assertInstanceOf(EmptyNamespace\namespace2::class, $n2);
+		$this->assertInstanceOf(\EmptyNamespace\Empty1::class, $n1);
+		$this->assertInstanceOf(\EmptyNamespace\Empty2::class, $n2);
 		
 		Autoload::get('namespace')->del('VoidNamespace');
 		
-		$this->expectException(Error::class);
-		new VoidNamespace\namespace3;
+		$this->expectException(\Error::class);
+		new \VoidNamespace\Void1;
 	}
-	
 	
 	public function testCanUseAllLoaderTogether()
 	{
@@ -90,22 +98,22 @@ final class AutoloadTest extends \PHPUnit\Framework\TestCase
 		$this->assertFalse($autoload->has('namespace'));
 		$autoload->register('namespace', $space);
 		
-		$obj->set('UselessObject', __DIR__.'/assets/class1.php');
-		$obj->set('CarelessObject', __DIR__.'/assets/class2.php');
-		$obj->set('CodelessObject', __DIR__.'/assets/class3.php');
-		$obj->set('HopelessObject', __DIR__.'/assets/class4.php');
+		$obj->set('CarelessObject', __DIR__.'/assets/CarelessObject.php');
+		$obj->set('CodelessObject', __DIR__.'/assets/CodelessObject.php');
+		$obj->set('HopelessObject', __DIR__.'/assets/HopelessObject.php');
+		$obj->set('UselessObject',  __DIR__.'/assets/UselessObject.php');
 		
 		$space->set('EmptyNamespace', __DIR__.'/assets');
 		$space->set('VoidNamespace', __DIR__.'/assets');
 		
-		$autoload->alias('N1', EmptyNamespace\namespace1::class);
-		$autoload->alias('N2', EmptyNamespace\namespace2::class);
+		$autoload->alias('N1', \EmptyNamespace\Empty1::class);
+		$autoload->alias('N2', \EmptyNamespace\Empty2::class);
 		$autoload->alias('Useless', UselessObject::class);
 		$autoload->alias('Codeless', CodelessObject::class);
 		
-		$this->assertInstanceOf(UselessObject::class, new Useless);
-		$this->assertInstanceOf(CodelessObject::class, new Codeless);
-		$this->assertInstanceOf(\EmptyNamespace\namespace1::class, new N1);
-		$this->assertInstanceOf(\EmptyNamespace\namespace2::class, new N2);
+		$this->assertInstanceOf(UselessObject::class, new \Useless);
+		$this->assertInstanceOf(CodelessObject::class, new \Codeless);
+		$this->assertInstanceOf(\EmptyNamespace\Empty1::class, new \N1);
+		$this->assertInstanceOf(\EmptyNamespace\Empty2::class, new \N2);
 	}
 }

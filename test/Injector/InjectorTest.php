@@ -1,10 +1,20 @@
 <?php
+/**
+ * Zettacast\Test\Injector test file.
+ * @package Zettacast
+ * @author Rodrigo Siqueira <rodriados@gmail.com>
+ * @license MIT License
+ * @copyright 2015-2018 Rodrigo Siqueira
+ */
+namespace Zettacast\Test\Injector;
 
 use Zettacast\Injector\Injector;
 use Zettacast\Injector\InjectorException;
+use PHPUnit\Framework\TestCase;
+
 require __DIR__.'/assets/injector.php';
 
-final class InjectorTest extends \PHPUnit\Framework\TestCase
+final class InjectorTest extends TestCase
 {
 	public function testCanInstantiate()
 	{
@@ -77,9 +87,9 @@ final class InjectorTest extends \PHPUnit\Framework\TestCase
 		$d = zetta()->factory(DInterface::class);
 		$this->assertInstanceOf(D::class, $d());
 		
-		$f = zetta()->wrap('f');
+		$f = zetta()->wrap(__NAMESPACE__.'\\f');
 		$this->assertInstanceOf(D::class, $f());
-		$this->assertInstanceOf(D::class, zetta()->call('f'));
+		$this->assertInstanceOf(D::class, zetta()->call(__NAMESPACE__.'\\f'));
 		
 		$f = zetta()->wrap([D::class, 'staticF']);
 		$r = $f([1089]);

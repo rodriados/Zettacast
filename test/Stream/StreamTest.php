@@ -1,9 +1,18 @@
 <?php
+/**
+ * Zettacast\Test\Stream test file.
+ * @package Zettacast
+ * @author Rodrigo Siqueira <rodriados@gmail.com>
+ * @license MIT License
+ * @copyright 2015-2018 Rodrigo Siqueira
+ */
+namespace Zettacast\Test\Stream;
 
 use Zettacast\Stream\Filter;
 use Zettacast\Stream\Stream;
+use PHPUnit\Framework\TestCase;
 
-final class StreamTest extends \PHPUnit\Framework\TestCase
+final class StreamTest extends TestCase
 {
 	public function testFilterStream()
 	{

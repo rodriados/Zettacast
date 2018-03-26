@@ -1,4 +1,12 @@
 <?php
+/**
+ * Zettacast\Test\Collection test file.
+ * @package Zettacast
+ * @author Rodrigo Siqueira <rodriados@gmail.com>
+ * @license MIT License
+ * @copyright 2015-2018 Rodrigo Siqueira
+ */
+namespace Zettacast\Test\Collection;
 
 use Zettacast\Collection\Stack;
 use Zettacast\Collection\Queue;
@@ -6,8 +14,9 @@ use Zettacast\Collection\Sequence;
 use Zettacast\Collection\Collection;
 use Zettacast\Collection\DotCollection;
 use Zettacast\Collection\RecursiveCollection;
+use PHPUnit\Framework\TestCase;
 
-final class CollectionTest extends \PHPUnit\Framework\TestCase
+final class CollectionTest extends TestCase
 {
 	public function testCanInstantiate()
 	{

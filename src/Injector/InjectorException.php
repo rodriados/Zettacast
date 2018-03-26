@@ -20,41 +20,41 @@ class InjectorException extends Exception
 	/**
 	 * Creates an injector exception.
 	 * @param string $abstract Non-existant object name.
-	 * @return static Created exception.
+	 * @return static The created injector exception.
 	 */
 	public static function inexistant(string $abstract)
 	{
-		return new static(sprintf(
-			_('The class "%s" does not exist.'),
+		return static::format(
+			_('The class "%1$s" does not exist.'),
 			$abstract
-		));
+		);
 	}
 	
 	/**
 	 * Creates an injector exception.
 	 * @param string $abstract Non-instantiable object name.
-	 * @return static Created exception.
+	 * @return static The created injector exception.
 	 */
 	public static function uninstantiable(string $abstract)
 	{
-		return new static(sprintf(
-			_('The abstraction "%s" is not instantiable.'),
+		return static::format(
+			_('The abstraction "%1$s" is not instantiable.'),
 			$abstract
-		));
+		);
 	}
 	
 	/**
 	 * Creates an injector exception.
 	 * @param string $abstract Object name which instantiation failed.
 	 * @param string $param Parameter that cannot be resolved.
-	 * @return static Created exception.
+	 * @return static The created injector exception.
 	 */
 	public static function unresolvable(string $abstract, string $param)
 	{
-		return new static(sprintf(
-			_('The parameter "$%s", needed by "%s", could not be resolved.'),
+		return static::format(
+			_('The parameter "%1$s" needed by "%2$s", could not be resolved.'),
 			$param, $abstract
-		));
+		);
 	}
 	
 	/**
@@ -65,9 +65,9 @@ class InjectorException extends Exception
 	 */
 	public static function missing(string $class, string $method)
 	{
-		return new static(sprintf(
-			_('An instance of "%s" is needed for wrapping "%s::%s".'),
-			$class, $class, $method
-		));
+		return static::format(
+			_('An instance of "%1$s" is needed for wrapping "%1$s::%2$s".'),
+			$class, $method
+		);
 	}
 }

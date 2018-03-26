@@ -19,14 +19,14 @@ class StreamException extends Exception
 {
 	/**
 	 * Creates a stream operation exception.
-	 * @param string $url The locator of string that issued exception.
+	 * @param string $uri The identifier of stream that issued exception.
 	 * @return static The created stream exception.
 	 */
-	public static function unopened(string $url)
+	public static function unopened(string $uri)
 	{
-		return new static(sprintf(
-			_('The stream identified by "%s" could not be found or opened.'),
-			$url
-		));
+		return static::format(
+			_('The stream identified by "%1$s" could not be found or opened.'),
+			$uri
+		);
 	}
 }

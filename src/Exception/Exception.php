@@ -33,5 +33,16 @@ class Exception extends \Exception
 	) {
 		parent::__construct($msg, $code, $previous);
 	}
+	
+	/**
+	 * Creates a new exception from a formatted string.
+	 * @param string $format The exception's message format.
+	 * @param mixed[] ...$args The format's arguments.
+	 * @return static The created exception.
+	 */
+	public static function format(string $format, ...$args)
+	{
+		return new static(sprintf($format, ...$args));
+	}
 }
 

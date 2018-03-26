@@ -1,5 +1,6 @@
 # Zettacast
-![license MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg) ![version pre-alpha](https://img.shields.io/badge/version-pre--alpha-green.svg)
+![license MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg)
+![version pre-alpha](https://img.shields.io/badge/version-pre--alpha-green.svg)
 [![Build Status](https://travis-ci.org/rodriados/zettacast.svg?branch=master)](https://travis-ci.org/rodriados/zettacast)
 [![Coverage Status](https://coveralls.io/repos/github/rodriados/zettacast/badge.svg)](https://coveralls.io/github/rodriados/zettacast)
 

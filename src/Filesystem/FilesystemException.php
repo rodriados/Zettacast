@@ -20,26 +20,26 @@ class FilesystemException extends Exception
 	/**
 	 * Creates a filesystem operation exception.
 	 * @param string $dirname The name of missing directory.
-	 * @return static The created stream exception.
+	 * @return static The created filesystem exception.
 	 */
 	public static function missingdir(string $dirname)
 	{
-		return new static(sprintf(
-			_('The directory "%s" is missing or could not be accessed.'),
+		return static::format(
+			_('The directory "%1$s" is missing or could not be accessed.'),
 			$dirname
-		));
+		);
 	}
 	
 	/**
 	 * Creates a filesystem operation exception.
 	 * @param string $filename The name of missing file.
 	 * @param Exception $e The parent exception previously raised.
-	 * @return static The created stream exception.
+	 * @return static The created filesystem exception.
 	 */
 	public static function missingfile(string $filename, Exception $e = null)
 	{
 		return new static(sprintf(
-			_('The file "%s" does not exist or could not be accessed.'),
+			_('The file "%1$s" does not exist or could not be accessed.'),
 			$filename
 		), null, $e);
 	}
