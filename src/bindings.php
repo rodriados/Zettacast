@@ -39,7 +39,6 @@ return [
 	['Zettacast\Filesystem\DiskInterface', 'Zettacast\Filesystem\Disk\LocalDisk'],
 	
 	# Stream module
-	['uri', 'Zettacast\Stream\Uri'],
 	['filter', 'Zettacast\Stream\FilterInterface'],
 	['stream', 'Zettacast\Stream\StreamInterface'],
 	['stream.context', 'Zettacast\Stream\StreamContext'],
@@ -55,4 +54,7 @@ return [
 	#['response', 'Zettacast\Http\Response'],
 	#['Zettacast\Http\Kernel', 'Zettacast\Http\Kernel'],
 	#['Zettacast\Http\Request', 'Zettacast\Http\Request'],
+	
+	# Uri module
+	['uri', 'Zettacast\Uri\Uri'],
 ];

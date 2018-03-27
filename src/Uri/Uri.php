@@ -1,21 +1,21 @@
 <?php
 /**
- * Zettacast\Stream\Uri class file.
+ * Zettacast\Uri\Uri class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2017 Rodrigo Siqueira
  */
-namespace Zettacast\Stream;
+namespace Zettacast\Uri;
 
 /**
  * The universal resource identification class. This class is responsible for
  * identifying external or internally known resources. This object simply holds
  * the URI and is not responsible for making sense out of it.
- * @package Zettacast\Stream
+ * @package Zettacast\Uri
  * @version 1.0
  */
-class Uri
+class Uri implements UriInterface
 {
 	/**
 	 * The URI components list. This variable lists all existing components in
@@ -35,9 +35,9 @@ class Uri
 	protected const RGX = [
 		'scheme'   => '[a-z][a-z0-9.+-]*',
 		'userinfo' => '[^@]*',
-		'host'     => '[^\[\]:/?#]*|\[[0-9a-fv:.]+\]',
+		'host'     => '(?:[^\[\]:/?#]*|\[[0-9a-fv:.]+\])',
 		'port'     => '[0-9]*',
-		'path'     => '/|/?[^/?#]+(?:/[^/?#]*)*',
+		'path'     => '(?:/|/?[^/?#]+(?:/[^/?#]*)*)',
 		'query'    => '[^#]*',
 		'fragment' => '.*'
 	];
@@ -116,7 +116,7 @@ class Uri
 	public function absolute(): bool
 	{
 		return $this->scheme()
-		       || !$this->authority() && $this->full()[0] == '/';
+			|| !$this->authority() && ($p = $this->path()) && $p[0] == '/';
 	}
 	
 	/**
@@ -152,7 +152,7 @@ class Uri
 	 */
 	public function host(): ?string
 	{
-		return $this->host ?: null;
+		return $this->host ?? null;
 	}
 	
 	/**
@@ -224,11 +224,11 @@ class Uri
 	 */
 	public function full(): string
 	{
-		$full[] = ($p = $this->scheme())    ? $p . ':'               : null;
-		$full[] = ($p = $this->authority()) ? '//' . $p              : null;
-		$full[] = ($p = $this->path())      ? self::normalize($p)    : null;
-		$full[] = ($p = $this->query())     ? '?' . self::encode($p) : null;
-		$full[] = ($p = $this->fragment())  ? '#' . $p               : null;
+		$full[] = ($p = $this->scheme())   ? $p . ':'               : null;
+		$full[] = ($p = $this->authority()) !== null ? '//' . $p    : null;
+		$full[] = ($p = $this->path())     ? self::normalize($p)    : null;
+		$full[] = ($p = $this->query())    ? '?' . self::encode($p) : null;
+		$full[] = ($p = $this->fragment()) ? '#' . $p               : null;
 		
 		return implode('', $full);
 	}
@@ -255,19 +255,19 @@ class Uri
 	 * base for the transformation. This method executes reference
 	 * transformation in conformity with RFC3986.
 	 * @param string|array|Uri $ref The reference to be transformed.
-	 * @return self The transformed reference.
+	 * @return UriInterface The transformed reference.
 	 */
-	public function reference($ref)
+	public function reference($ref): UriInterface
 	{
 		$tgt = [];
 		$copyref = false;
 		
-		if(!$ref instanceof Uri)
-			$ref = new self($ref);
+		if(!$ref instanceof UriInterface)
+			$ref = new static($ref);
 		
-		foreach(['scheme', 'authority', 'path', 'query', 'fragment'] as $comp) {
-			$copyref = $copyref || $ref->$comp();
-			$tgt[$comp] = $copyref ? $ref->$comp() : $this->$comp();
+		foreach(['scheme', 'authority', 'path', 'query', 'fragment'] as $cp) {
+			$copyref = $copyref || $ref->$cp();
+			$tgt[$cp] = $copyref ? $ref->$cp() : $this->$cp();
 		}
 		
 		if(!$ref->scheme() && !$ref->authority() && $ref->path()) {
@@ -286,7 +286,7 @@ class Uri
 			'$~iu', $tgt['authority'], $m
 		);
 		
-		return new self(array_merge($tgt, $m));
+		return new static(array_merge($tgt, $m));
 	}
 	
 	/**
@@ -301,11 +301,17 @@ class Uri
 		
 		foreach(self::COMPONENT as $comp)
 			if(isset($data[$comp]) && $data[$comp]) {
-				if(!preg_match('~'.self::RGX[$comp].'~iu', $data[$comp]))
+				if(!preg_match('~^'.self::RGX[$comp].'$~iu', $data[$comp]))
 					throw UriException::unmatched($comp, $data[$comp]);
 				
 				$this->$comp = $data[$comp];
 			}
+		
+		if(!$this->host && isset($data['authority']))
+			$this->host = $data['authority'] ? '' : null;
+		
+		if($this->path && $this->authority() !== null && $this->path[0] != '/')
+			$this->path = '/'.$this->path;
 	}
 	
 	/**
@@ -319,9 +325,10 @@ class Uri
 		
 		if(!isset($regex))
 			$regex = '~^(?:(?<scheme>'.     self::RGX['scheme']  .'):)?+(?!$)'.
-			    '(?://(?!$)(?:(?<userinfo>'.self::RGX['userinfo'].')@)?+(?!$)'.
-			    '(?<host>'.                 self::RGX['host']    .')'.
-			    '(?::(?<port>'.             self::RGX['port']    .'))?)?+'.
+			    '(?<authority>//(?!$)'.
+			        '(?:(?<userinfo>'.      self::RGX['userinfo'].')@)?+(?!$)'.
+			        '(?<host>'.             self::RGX['host']    .')'.
+			        '(?::(?<port>'.         self::RGX['port']    .'))?)?+'.
 			    '(?<path>'.                 self::RGX['path']    .')?'.
 			    '(?:\?(?<query>'.           self::RGX['query']   .'))?'.
 			    '(?:#(?<fragment>'.         self::RGX['fragment'].'))?$~iu';
@@ -333,6 +340,12 @@ class Uri
 			$this->$comp = isset($m[$comp]) && $m[$comp]
 				? $m[$comp]
 				: null;
+		
+		if($this->path && $m['authority'] && $this->path[0] != '/')
+			throw UriException::invalid($uri);
+		
+		if(!isset($this->host) && isset($m['authority']))
+			$this->host = $m['authority'] ? '' : null;
 	}
 	
 	/**
@@ -344,7 +357,9 @@ class Uri
 	{
 		$d = toarray($data);
 		$d = http_build_query($d, null, '&', PHP_QUERY_RFC3986);
-		return rtrim(str_replace(['=&','%5B','%5D'], ['&','[',']'], $d), '=');
+		$d = str_replace(['=&','%5B','%5D','%2F'], ['&','[',']','/'], $d);
+		
+		return rtrim($d, '=');
 	}
 	
 	/**
@@ -354,9 +369,10 @@ class Uri
 	 */
 	protected static function decode(string $query): array
 	{
-		$q = str_replace('+', '%2B', $query);
+		$q = str_replace(['+','.'], ['%2B','#'], $query);
 		parse_str($q, $decoded);
-		return $decoded;
+		
+		return self::fix($decoded);
 	}
 	
 	/**
@@ -384,5 +400,24 @@ class Uri
 		
 		$path = implode('/', array_slice($norm, 0, $actual + 1));
 		return $path;
+	}
+	
+	/**
+	 * Fixes some irregulaties with the built-in parse_str function.
+	 * @param array $encoded The encoded query array to fix.
+	 * @return array The fixed query array.
+	 */
+	private static function fix(array $encoded): array
+	{
+		foreach($encoded as $key => $value) {
+			if(is_array($value))
+				$fixed[str_replace(['%2B', '#'], ['+', '.'], $key)] =
+					self::fix($value);
+			else
+				$fixed[str_replace(['%2B', '#'], ['+', '.'], $key)] =
+					str_replace(['%2B', '#'], ['+', '.'], $value);
+		}
+
+		return $fixed ?? [];
 	}
 }

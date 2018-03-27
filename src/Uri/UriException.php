@@ -1,13 +1,13 @@
 <?php
 /**
- * Zettacast\Stream\UriException class file.
+ * Zettacast\Uri\UriException class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2018 Rodrigo Siqueira
  */
 
-namespace Zettacast\Stream;
+namespace Zettacast\Uri;
 
 use Zettacast\Exception\Exception;
 
