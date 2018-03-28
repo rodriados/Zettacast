@@ -19,7 +19,7 @@ chdir(dirname(__DIR__));
  * Sets error reporting level and display errors settings. It is recommended to
  * change these values when in production use.
  */
-error_reporting(-1);
+error_reporting(~0);
 ini_set('display_errors', 1);
 
 /**#@+

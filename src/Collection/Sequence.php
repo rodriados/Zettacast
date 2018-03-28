@@ -30,7 +30,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	/**
 	 * Sequence constructor.
 	 * Stores given data in sequence.
-	 * @param array|\Traversable $data Data to store as a sequence.
+	 * @param mixed $data Data to store as a sequence.
 	 */
 	public function __construct($data = null)
 	{
@@ -110,13 +110,15 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	/**
 	 * Applies a callback to all values stored in sequence.
 	 * @param callable $fn Callback to apply. Parameters: value, key.
-	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
+	 * @param mixed $userdata Optional extra parameters for function.
 	 * @return static Sequence for method chaining.
 	 */
 	public function apply(callable $fn, $userdata = null)
 	{
+		$userdata = toarray($userdata);
+		
 		foreach($this->iterate() as $key => $value)
-			$this->data[$key] = $fn($value, $key, ...toarray($userdata));
+			$this->data[$key] = $fn($value, $key, ...$userdata);
 		
 		return $this;
 	}
@@ -229,10 +231,10 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	
 	/**
 	 * Intersects given items with sequence's elements.
-	 * @param array|Sequence $items Items to intersect with sequence.
+	 * @param iterable $items Items to intersect with sequence.
 	 * @return static Sequence of intersected elements.
 	 */
-	public function intersect($items)
+	public function intersect(iterable $items)
 	{
 		return $this->new(
 			array_intersect($this->raw(), toarray($items))
@@ -284,13 +286,13 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	
 	/**
 	 * Merges given items into sequence's elements.
-	 * @param mixed $items Items to merge into sequence.
+	 * @param iterable $items Items to merge into sequence.
 	 * @return static Sequence of all merged elements.
 	 */
-	public function merge($items)
+	public function merge(iterable $items)
 	{
 		return $this->new(
-			array_merge($this->raw(), array_values($items))
+			array_merge($this->raw(), array_values(toarray($items)))
 		);
 	}
 	
@@ -562,13 +564,15 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	/**
 	 * Iterates over sequence and executes a function over every element.
 	 * @param callable $fn Iteration function. Parameters: value, key.
-	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
+	 * @param mixed $userdata Optional extra parameters for function.
 	 * @return static Sequence for method chaining.
 	 */
 	public function walk(callable $fn, $userdata = null)
 	{
+		$userdata = toarray($userdata);
+		
 		foreach($this->iterate() as $key => $value)
-			$fn($value, $key, ...toarray($userdata));
+			$fn($value, $key, ...$userdata);
 		
 		return $this;
 	}

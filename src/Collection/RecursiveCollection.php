@@ -33,15 +33,17 @@ class RecursiveCollection extends Collection
 	/**
 	 * Applies a callback to all values stored in collection.
 	 * @param callable $fn Callback to apply. Parameters: value, key.
-	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
+	 * @param mixed $userdata Optional extra parameters for function.
 	 * @return static Collection for method chaining.
 	 */
 	public function apply(callable $fn, $userdata = null)
 	{
+		$userdata = toarray($userdata);
+		
 		foreach(parent::iterate() as $key => $value)
 			$this->data[$key] = listable($value)
-				? $this->new($value)->apply($fn, ...toarray($userdata))
-				: $fn($value, $key, ...toarray($userdata));
+				? $this->new($value)->apply($fn, ...$userdata)
+				: $fn($value, $key, ...$userdata);
 		
 		return $this;
 	}
@@ -142,15 +144,17 @@ class RecursiveCollection extends Collection
 	/**
 	 * Iterates over collection and executes a function over every element.
 	 * @param callable $fn Iteration function. Parameters: value, key.
-	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
+	 * @param mixed $userdata Optional extra parameters for function.
 	 * @return static Collection for method chaining.
 	 */
 	public function walk(callable $fn, $userdata = null)
 	{
+		$userdata = toarray($userdata);
+		
 		foreach(parent::iterate() as $key => $value)
 			listable($value)
-				? $this->new($value)->walk($fn, ...toarray($userdata))
-				: $fn($value, $key, ...toarray($userdata));
+				? $this->new($value)->walk($fn, ...$userdata)
+				: $fn($value, $key, ...$userdata);
 		
 		return $this;
 	}

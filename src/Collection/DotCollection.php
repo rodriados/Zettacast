@@ -27,7 +27,7 @@ class DotCollection extends RecursiveCollection
 	 * Dot constructor.
 	 * Sets given data as the data stored by collection and defines it's depth
 	 * separator indicator, which is usually a dot.
-	 * @param array|\Traversable $data Data to store.
+	 * @param mixed $data Data to store.
 	 * @param string $dot Depth-separator.
 	 */
 	public function __construct($data = null, string $dot = '.')

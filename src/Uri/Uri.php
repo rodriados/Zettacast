@@ -88,15 +88,18 @@ class Uri implements UriInterface
 	 * Uri constructor.
 	 * Parses the resource locator and builds up the object.
 	 * @param string|array $uri URI data to store in this object.
-	 * @param array|\Traversable $query Query variables to relate to given URI.
+	 * @param iterable $query Query variables to relate to given URI.
 	 */
-	public function __construct($uri, $query = [])
+	public function __construct($uri, iterable $query = [])
 	{
 		is_string($uri)
 			? $this->parse($uri)
 			: $this->initialize(toarray($uri));
 		
 		$this->port = ((int)$this->port) ?: null;
+		$this->query = $query
+			? array_merge($this->query(), $query)
+			: $this->query;
 	}
 	
 	/**

@@ -32,7 +32,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	/**
 	 * Collection constructor.
 	 * Sets given data as the data stored by collection.
-	 * @param array|\Traversable $data Data to be stored.
+	 * @param mixed $data Data to be stored.
 	 */
 	public function __construct($data = null)
 	{
@@ -87,9 +87,9 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Adds a group of elements to collection.
-	 * @param array $values Values to add to collection.
+	 * @param iterable $values Values to add to collection.
 	 */
-	public function add(array $values = []): void
+	public function add(iterable $values = []): void
 	{
 		foreach($values as $key => $value)
 			$this->set($key, $value);
@@ -107,13 +107,15 @@ class Collection implements CollectionInterface, \ArrayAccess
 	/**
 	 * Applies a callback to all values stored in collection.
 	 * @param callable $fn Callback to apply. Parameters: value, key.
-	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
+	 * @param mixed $userdata Optional extra parameters for function.
 	 * @return static Collection for method chaining.
 	 */
 	public function apply(callable $fn, $userdata = null)
 	{
+		$userdata = toarray($userdata);
+		
 		foreach($this->iterate() as $key => $value)
-			$this->data[$key] = $fn($value, $key, ...toarray($userdata));
+			$this->data[$key] = $fn($value, $key, ...$userdata);
 		
 		return $this;
 	}
@@ -166,11 +168,11 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Gets items in collection that are not present in given items.
-	 * @param array|Collection $items Items to differ from.
+	 * @param iterable $items Items to differ from.
 	 * @param bool $keys Should keys also be compared?
 	 * @return static The diff'd collection.
 	 */
-	public function diff($items, bool $keys = false)
+	public function diff(iterable $items, bool $keys = false)
 	{
 		$fn = $keys ? 'array_diff_assoc' : 'array_diff';
 		return $this->new($fn($this->data, toarray($items)));
@@ -212,7 +214,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Creates a new collection with all elements except specified keys.
-	 * @param mixed|mixed[] $keys Keys to forget in new collection.
+	 * @param mixed|array $keys Keys to forget in new collection.
 	 * @return static New collection instance.
 	 */
 	public function except($keys)
@@ -238,11 +240,11 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Intersects given items with collection's elements.
-	 * @param array|Collection $items Items to intersect with collection.
+	 * @param iterable $items Items to intersect with collection.
 	 * @param bool $keys Should keys also be compared?
 	 * @return static Collection of intersected elements.
 	 */
-	public function intersect($items, bool $keys = false)
+	public function intersect(iterable $items, bool $keys = false)
 	{
 		$fn = $keys ? 'array_intersect_assoc' : 'array_intersect';
 		return $this->new($fn($this->data, toarray($items)));
@@ -292,10 +294,10 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Merges given items with this collection's elements.
-	 * @param mixed $items Items to merge with collection.
+	 * @param iterable $items Items to merge with collection.
 	 * @return static Collection of merged elements.
 	 */
-	public function merge($items)
+	public function merge(iterable $items)
 	{
 		return $this->new(array_merge($this->data, toarray($items)));
 	}
@@ -311,7 +313,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Creates a new collection with a subset of elements.
-	 * @param mixed|mixed[] $keys Keys to include in new collection.
+	 * @param mixed|array $keys Keys to include in new collection.
 	 * @return static New collection instance.
 	 */
 	public function only($keys)
@@ -383,10 +385,10 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Replaces collection according to given data.
-	 * @param mixed $items Items to replace in collection.
+	 * @param iterable $items Items to replace in collection.
 	 * @return static Collection with replaced data.
 	 */
-	public function replace($items)
+	public function replace(iterable $items)
 	{
 		return $this->new(array_replace($this->data, toarray($items)));
 	}
@@ -455,10 +457,10 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Unions collection with given items.
-	 * @param mixed $items Items to union with collection.
+	 * @param iterable $items Items to union with collection.
 	 * @return static United collection.
 	 */
-	public function union($items)
+	public function union(iterable $items)
 	{
 		return $this->new($this->data + toarray($items));
 	}
@@ -493,29 +495,31 @@ class Collection implements CollectionInterface, \ArrayAccess
 	/**
 	 * Iterates over collection and executes a function over every element.
 	 * @param callable $fn Iteration function. Parameters: value, key.
-	 * @param mixed|mixed[] $userdata Optional extra parameters for function.
+	 * @param mixed $userdata Optional extra parameters for function.
 	 * @return static Collection for method chaining.
 	 */
 	public function walk(callable $fn, $userdata = null)
 	{
+		$userdata = toarray($userdata);
+		
 		foreach($this->iterate() as $key => $value)
-			$fn($value, $key, ...toarray($userdata));
+			$fn($value, $key, ...$userdata);
 		
 		return $this;
 	}
 	
 	/**
 	 * Zips collection together with one or more arrays.
-	 * @param mixed[] ...$items Items to zip collection with.
-	 * @return array Array of zipped collections.
+	 * @param iterable[] $items Items to zip collection with.
+	 * @return static Array of zipped collections.
 	 */
-	public function zip(...$items): array
+	public function zip(iterable ...$items)
 	{
 		$items = array_map('toarray', $items);
 		
-		return array_map(function(...$params) {
-			return $this->new($params);
-		}, $this->data, ...$items);
+		return $this->new(array_map(function(...$params) {
+				return $this->new($params);
+			}, $this->data, ...$items));
 	}
 	
 	/**
