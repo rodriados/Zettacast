@@ -8,8 +8,6 @@
  */
 namespace Zettacast\Facade;
 
-use Zettacast\Support\Facade;
-
 /**
  * Zettacast's Config façade class.
  * This class creates a methods for easily accessing configuration files.

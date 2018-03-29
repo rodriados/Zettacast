@@ -1,12 +1,12 @@
 <?php
 /**
- * Zettacast\Support\Facade class file.
+ * Zettacast\Facade\Facade class file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2018 Rodrigo Siqueira
  */
-namespace Zettacast\Support;
+namespace Zettacast\Facade;
 
 abstract class Facade
 {

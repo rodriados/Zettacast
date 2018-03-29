@@ -8,7 +8,6 @@
  */
 namespace Zettacast\Facade;
 
-use Zettacast\Support\Facade;
 use Zettacast\Autoload\LoaderInterface;
 use Zettacast\Autoload\Loader\ObjectLoader;
 use Zettacast\Autoload\Loader\NamespaceLoader;

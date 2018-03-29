@@ -8,6 +8,7 @@
  */
 namespace Zettacast\Stream;
 
+use Zettacast\Uri\UriInterface;
 use Zettacast\Helper\ExtractableInterface;
 
 /**
@@ -106,10 +107,10 @@ interface StreamInterface extends ExtractableInterface
 	public function tell(): int;
 	
 	/**
-	 * Informs locator used for instantiating this stream.
-	 * @return string The locator of this stream.
+	 * Informs identifier used for instantiating this stream.
+	 * @return UriInterface The identifier of this stream.
 	 */
-	public function url(): string;
+	public function uri(): UriInterface;
 	
 	/**
 	 * Writes contents to stream.

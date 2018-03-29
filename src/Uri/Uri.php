@@ -186,7 +186,10 @@ class Uri implements UriInterface
 	 */
 	public function path(): ?string
 	{
-		return $this->path ?: null;
+		return is_array($this->path)
+				? implode('/', $this->path)
+				: $this->path
+			?: null;
 	}
 	
 	/**
@@ -245,12 +248,10 @@ class Uri implements UriInterface
 	 */
 	public function segment(int $index): ?string
 	{
-		static $segments;
-		
-		if(!isset($segments))
-			$segments = explode('/', $this->path());
-		
-		return $segments[$index] ?? null;
+		if(!is_array($this->path))
+			$this->path = explode('/', $this->path);
+			
+		return $this->path[$index] ?? null;
 	}
 	
 	/**

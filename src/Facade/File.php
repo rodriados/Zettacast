@@ -8,7 +8,6 @@
  */
 namespace Zettacast\Facade;
 
-use Zettacast\Support\Facade;
 use Zettacast\Stream\StreamInterface;
 use Zettacast\Collection\SequenceInterface;
 

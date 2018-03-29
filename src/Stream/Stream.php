@@ -8,6 +8,9 @@
  */
 namespace Zettacast\Stream;
 
+use Zettacast\Uri\Uri;
+use Zettacast\Uri\UriInterface;
+
 /**
  * This class handles all interactions to a stream.
  * @package Zettacast\Filesystem\Stream
@@ -15,6 +18,12 @@ namespace Zettacast\Stream;
  */
 class Stream implements StreamInterface
 {
+	/**
+	 * The stream identifier.
+	 * @var UriInterface The internal stream identifier.
+	 */
+	protected $uri;
+	
 	/**
 	 * Internal stream handler, responsible for keeping it open for
 	 * access and intermediating all operations.
@@ -25,24 +34,27 @@ class Stream implements StreamInterface
 	/**
 	 * Stream constructor.
 	 * This constructor opens stream from given locator.
-	 * @param string $url Locator of stream to open.
+	 * @param mixed $uri Identifier of stream to open.
 	 * @param string $mode Opening mode for stream access.
 	 * @param array|StreamContext The context related to stream.
 	 * @throws StreamException Stream could not be found.
 	 */
-	public function __construct(string $url, string $mode = 'r', $context = [])
+	public function __construct($uri, string $mode = 'rb', $context = [])
 	{
 		if(!empty($context))
 			$context = !$context instanceof StreamContext
 				? StreamContext::create($context)
 				: $context->raw();
 		
+		if(!$uri instanceof UriInterface)
+			$uri = new Uri($uri);
+		
 		$handler = !empty($context)
-			? @fopen($url, $mode, false, $context)
-			: @fopen($url, $mode);
+			? @fopen($this->uri = $uri, $mode, false, $context)
+			: @fopen($this->uri = $uri, $mode);
 		
 		if(!$this->handler = $handler)
-			throw StreamException::unopened($url);
+			throw StreamException::unopened($this->uri);
 	}
 	
 	/**
@@ -53,6 +65,16 @@ class Stream implements StreamInterface
 	public function __destruct()
 	{
 		fclose($this->handler);
+	}
+	
+	/**
+	 * Stream string representation magic method.
+	 * Allows the object to be represented as a string.
+	 * @return string String representation for this object.
+	 */
+	public function __tostring(): string
+	{
+		return $this->uri();
 	}
 	
 	/**
@@ -285,12 +307,12 @@ class Stream implements StreamInterface
 	}
 	
 	/**
-	 * Informs locator used for instantiating this stream.
-	 * @return string The locator of this stream.
+	 * Informs identifier used for instantiating this stream.
+	 * @return UriInterface The identifier of this stream.
 	 */
-	public function url(): string
+	public function uri(): UriInterface
 	{
-		return stream_get_meta_data($this->handler)['uri'];
+		return $this->uri;
 	}
 	
 	/**

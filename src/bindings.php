@@ -57,4 +57,5 @@ return [
 	
 	# Uri module
 	['uri', 'Zettacast\Uri\Uri'],
+	['Zettacast\Uri\UriInterface', 'Zettacast\Uri\Uri']
 ];
