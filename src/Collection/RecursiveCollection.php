@@ -34,14 +34,14 @@ class RecursiveCollection extends Collection
 	 * Applies a callback to all values stored in collection.
 	 * @param callable $fn Callback to apply. Parameters: value, key.
 	 * @param mixed $userdata Optional extra parameters for function.
-	 * @return static Collection for method chaining.
+	 * @return static The current collection for method chaining.
 	 */
 	public function apply(callable $fn, $userdata = null)
 	{
 		$userdata = toarray($userdata);
 		
-		foreach(parent::iterate() as $key => $value)
-			$this->data[$key] = listable($value)
+		foreach($this->iterate() as $key => $value)
+			$this->data[$key] = iterable($value)
 				? $this->new($value)->apply($fn, ...$userdata)
 				: $fn($value, $key, ...$userdata);
 		
@@ -62,6 +62,22 @@ class RecursiveCollection extends Collection
 	}
 	
 	/**
+	 * Checks whether all elements in collection pass given test.
+	 * @param callable $fn Test function. Parameters: value, key.
+	 * @return bool Does every element pass the tests?
+	 */
+	public function every(callable $fn = null): bool
+	{
+		$fn = $fn ?: 'with';
+		
+		foreach($this->iterate(true) as $key => $value)
+			if(!$fn($value, $key))
+				return false;
+		
+		return true;
+	}
+	
+	/**
 	 * Filters elements according to given test. If no test function is given,
 	 * it fallbacks to removing all false values.
 	 * @param callable $fn Test function. Parameters: value, key.
@@ -71,9 +87,9 @@ class RecursiveCollection extends Collection
 	{
 		$fn = $fn ?? 'with';
 		
-		foreach(parent::iterate() as $key => $value)
+		foreach($this->iterate() as $key => $value)
 			if($fn($value, $key))
-				$result[$key] = listable($value)
+				$result[$key] = iterable($value)
 					? $this->new($value)->filter($fn)
 					: $value;
 		
@@ -82,34 +98,35 @@ class RecursiveCollection extends Collection
 	
 	/**
 	 * Flattens collection into a single level collection.
-	 * @return Collection The flattened collection.
+	 * @return static The flattened collection.
 	 */
-	public function flatten(): Collection
+	public function flatten()
 	{
-		foreach($this->iterate() as $value)
+		foreach($this->iterate(true, false) as $value)
 			$elems[] = $value;
 		
-		return new Collection($elems ?? []);
+		return $this->new($elems ?? []);
 	}
 	
 	/**
 	 * Creates a generator that iterates over collection.
-	 * @param bool $listall Should listable objects be yield as well?
+	 * @param bool $deep Should a deep recursive iteration be performed?
+	 * @param bool $all Should iterable objects be yield as well?
 	 * @yield mixed Collection's stored values.
 	 * @return \Generator
 	 */
-	public function iterate(bool $listall = false): \Generator
+	public function iterate(bool $deep = false, bool $all = true): \Generator
 	{
 		foreach(parent::iterate() as $key => $value) {
-			$check = listable($value);
+			$iterable = iterable($value);
 			
-			if(!$check || $check && $listall)
+			if(!$deep || !$iterable || $all)
 				yield $key => $value;
 			
-			if($check)
-				yield from ($value instanceof Collection)
-					? $value->iterate()
-					: $this->new($value)->iterate();
+			if($iterable && $deep)
+				yield from ($value instanceof static)
+					? $value->iterate($deep, $all)
+					: $this->new($value)->iterate($deep, $all);
 		}
 	}
 	
@@ -122,8 +139,8 @@ class RecursiveCollection extends Collection
 	 */
 	public function map(callable $fn)
 	{
-		foreach(parent::iterate() as $key => $value)
-			$result[$key] = listable($value)
+		foreach($this->iterate() as $key => $value)
+			$result[$key] = iterable($value)
 				? $this->new($value)->map($fn)
 				: $fn($value, $key);
 		
@@ -151,8 +168,8 @@ class RecursiveCollection extends Collection
 	{
 		$userdata = toarray($userdata);
 		
-		foreach(parent::iterate() as $key => $value)
-			listable($value)
+		foreach($this->iterate() as $key => $value)
+			iterable($value)
 				? $this->new($value)->walk($fn, ...$userdata)
 				: $fn($value, $key, ...$userdata);
 		

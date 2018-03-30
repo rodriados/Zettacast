@@ -22,17 +22,17 @@ if(!function_exists('_')) {
 	}
 }
 
-if(!function_exists('listable')) {
+if(!function_exists('iterable')) {
 	/**
-	 * Check whether the given variable is listable.
+	 * Check whether the given variable is iterable.
 	 * @param mixed $data Variable to check.
-	 * @return bool Is the variable listable?
+	 * @return bool Is the variable iterable?
 	 */
-	function listable($data): bool
+	function iterable($data): bool
 	{
 		return is_array($data)
-			or $data instanceof \Zettacast\Helper\ListableInterface
-		    or $data instanceof \Traversable;
+			|| $data instanceof \Zettacast\Support\IterableInterface
+		    || $data instanceof \Traversable;
 	}
 }
 
@@ -44,7 +44,7 @@ if(!function_exists('toarray')) {
 	 */
 	function toarray($data): array
 	{
-		if($data instanceof \Zettacast\Helper\ListableInterface)
+		if($data instanceof \Zettacast\Support\IterableInterface)
 			return $data->raw();
 		
 		if($data instanceof \Traversable)

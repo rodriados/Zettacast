@@ -1,14 +1,14 @@
 <?php
 /**
- * Zettacast\Helper\ExtractableInterface interface file.
+ * Zettacast\Support\ExposableInterface interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2018 Rodrigo Siqueira
  */
-namespace Zettacast\Helper;
+namespace Zettacast\Support;
 
-interface ExtractableInterface
+interface ExposableInterface
 {
 	/**
 	 * Gives access to object's raw contents. That is, it exposes the internal

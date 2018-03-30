@@ -1,12 +1,12 @@
 <?php
 /**
- * Zettacast\Helper\ArrayAccessTrait trait file.
+ * Zettacast\Support\ArrayAccessTrait trait file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2018 Rodrigo Siqueira
  */
-namespace Zettacast\Helper;
+namespace Zettacast\Support;
 
 trait ArrayAccessTrait
 {

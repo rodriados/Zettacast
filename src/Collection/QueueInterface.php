@@ -8,9 +8,9 @@
  */
 namespace Zettacast\Collection;
 
-use Zettacast\Helper\ListableInterface;
+use Zettacast\Support\IterableInterface;
 
-interface QueueInterface extends ListableInterface
+interface QueueInterface extends IterableInterface
 {
 	/**
 	 * Peeks at next node to be removed from sequence.

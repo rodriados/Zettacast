@@ -9,7 +9,7 @@
 namespace Zettacast\Injector;
 
 use Zettacast\Collection\Collection;
-use Zettacast\Helper\StorageInterface;
+use Zettacast\Support\StorageInterface;
 
 /**
  * The injector class is responsible for handling dependency injection. This

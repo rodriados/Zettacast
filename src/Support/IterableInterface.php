@@ -1,14 +1,14 @@
 <?php
 /**
- * Zettacast\Helper\ListableInterface interface file.
+ * Zettacast\Support\IterableInterface interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2018 Rodrigo Siqueira
  */
-namespace Zettacast\Helper;
+namespace Zettacast\Support;
 
-interface ListableInterface extends ExtractableInterface, \Countable, \Iterator
+interface IterableInterface extends ExposableInterface, \Countable, \Iterator
 {
 	/**
 	 * Clears the object and return its old contents.

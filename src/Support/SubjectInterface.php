@@ -1,12 +1,12 @@
 <?php
 /**
- * Zettacast\Helper\SubjectInterface interface file.
+ * Zettacast\Support\SubjectInterface interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2018 Rodrigo Siqueira
  */
-namespace Zettacast\Helper;
+namespace Zettacast\Support;
 
 interface SubjectInterface extends \SplSubject
 {

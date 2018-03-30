@@ -8,7 +8,7 @@
  */
 namespace Zettacast\Test\Config;
 
-use Zettacast\Support\Config;
+use Zettacast\Config\Config;
 use PHPUnit\Framework\TestCase;
 
 final class ConfigTest extends TestCase

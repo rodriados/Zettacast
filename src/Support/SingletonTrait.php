@@ -1,12 +1,12 @@
 <?php
 /**
- * Zettacast\Helper\SingletonTrait trait file.
+ * Zettacast\Support\SingletonTrait trait file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2018 Rodrigo Siqueira
  */
-namespace Zettacast\Helper;
+namespace Zettacast\Support;
 
 trait SingletonTrait
 {

@@ -1,12 +1,12 @@
 <?php
 /**
- * Zettacast\Helper\ObserverInterface interface file.
+ * Zettacast\Support\ObserverInterface interface file.
  * @package Zettacast
  * @author Rodrigo Siqueira <rodriados@gmail.com>
  * @license MIT License
  * @copyright 2015-2018 Rodrigo Siqueira
  */
-namespace Zettacast\Helper;
+namespace Zettacast\Support;
 
 interface ObserverInterface extends \SplObserver
 {

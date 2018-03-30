@@ -13,6 +13,7 @@ use Zettacast\Filesystem\Disk\VirtualDisk;
 
 /**
  * This class acts as wrapper to a local disk.
+ * @todo Make Filesystem allow using Uri in all of its methods
  * @package Zettacast\Filesystem
  * @version 1.0
  */

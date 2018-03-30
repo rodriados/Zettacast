@@ -9,14 +9,14 @@
 namespace Zettacast\Stream;
 
 use Zettacast\Uri\UriInterface;
-use Zettacast\Helper\ExtractableInterface;
+use Zettacast\Support\ExposableInterface;
 
 /**
  * The Stream interface is responsible for exposing mandatory methods a stream
  * handler must have.
  * @package Zettacast\Stream
  */
-interface StreamInterface extends ExtractableInterface
+interface StreamInterface extends ExposableInterface
 {
 	/**#@+
 	 * Stream channel identifiers used for filtering.

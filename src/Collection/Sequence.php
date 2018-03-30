@@ -8,7 +8,7 @@
  */
 namespace Zettacast\Collection;
 
-use Zettacast\Helper\ArrayAccessTrait;
+use Zettacast\Support\ArrayAccessTrait;
 
 /**
  * The sequence class. This class has methods appliable for all kinds of
@@ -111,7 +111,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	 * Applies a callback to all values stored in sequence.
 	 * @param callable $fn Callback to apply. Parameters: value, key.
 	 * @param mixed $userdata Optional extra parameters for function.
-	 * @return static Sequence for method chaining.
+	 * @return static The current sequence for method chaining.
 	 */
 	public function apply(callable $fn, $userdata = null)
 	{
@@ -126,17 +126,17 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	/**
 	 * Chunks the sequence into pieces of given size.
 	 * @param int $size Size of chunks.
-	 * @return static[] Array of sequence chunks.
+	 * @return static Sequence of chunked sequences.
 	 */
-	public function chunk(int $size): array
+	public function chunk(int $size)
 	{
 		if($size <= 0)
-			return [];
+			return $this->new();
 		
 		foreach(array_chunk($this->raw(), $size) as $sequence)
 			$chunk[] = $this->new($sequence);
 		
-		return $chunk ?? [];
+		return $this->new($chunk ?? []);
 	}
 	
 	/**
@@ -382,8 +382,7 @@ class Sequence implements SequenceInterface, \ArrayAccess
 		if($sample >= $this->count())
 			return $this->shuffle();
 		
-		$keys = array_rand($this->raw(), $sample);
-		return $this->only($keys);
+		return $this->only(array_rand($this->raw(), $sample));
 	}
 	
 	/**
@@ -511,13 +510,13 @@ class Sequence implements SequenceInterface, \ArrayAccess
 	/**
 	 * Splits sequence into given number of groups.
 	 * @param int $count Number of groups to split sequence.
-	 * @return static[] Splitted sequence.
+	 * @return static Splitted sequence.
 	 */
-	public function split(int $count): array
+	public function split(int $count)
 	{
 		return !$this->empty()
 			? $this->chunk(ceil($this->count() / $count))
-			: [];
+			: $this->new();
 	}
 	
 	/**

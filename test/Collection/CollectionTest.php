@@ -36,12 +36,12 @@ final class CollectionTest extends TestCase
 		$this->assertEquals(2, $c2->next());
 		$this->assertEquals(1, $c2->prev());
 		$this->assertEquals('a', $c2->key());
-		$this->assertEquals([new Collection(['a','b']),new Collection([1,2])], $c2->divide());
+		$this->assertEquals(new Collection([new Collection(['a', 'b']), new Collection([1, 2])]), $c2->divide());
 		$this->assertTrue($c2->every());
 		$this->assertFalse($c2->every(function($v) {return $v == 1;}));
 		$this->assertEquals(new Collection(['b' => 2]), $c2->except('a'));
 		$this->assertEquals(new Collection(['b' => 2]), $c2->only('b'));
-		$this->assertEquals(new Collection(['a'=>2,'b'=>4]), $c2->map(function($v){return $v * 2;}));
+		$this->assertEquals(new Collection(['a'=>2, 'b'=>4]), $c2->map(function($v){return $v * 2;}));
 		$this->assertEquals(3, $c2->reduce(function($c, $v) {return $c + $v;}));
 		$this->assertEquals('b', $c2->search(2));
 		
@@ -51,7 +51,7 @@ final class CollectionTest extends TestCase
 	
 	public function testCollection()
 	{
-		$col = new Collection([.5,1,1.5,2,2.5,3,3.5,4,4.5,5]);
+		$col = new Collection([.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5]);
 		$this->assertEquals($col[0], .5);
 		$this->assertEquals($col->get(0), .5);
 		$this->assertTrue($col->has(8));
@@ -63,13 +63,13 @@ final class CollectionTest extends TestCase
 		
 		$col->add([10 => 11, 11 => 12]);
 		$chunk = $col->chunk(3);
-		$this->assertEquals([], $col->chunk(0));
+		$this->assertEquals(new Collection, $col->chunk(0));
 		$this->assertEquals([9=>10,10=>11,11=>12], $chunk[3]->raw());
 	}
 	
 	public function testRecursiveCollection()
 	{
-		$rec = new RecursiveCollection([[1,2,3],[[4,5,6]],[7,8,9]]);
+		$rec = new RecursiveCollection([[1, 2, 3], [[4, 5, 6]], [7, 8, 9]]);
 		$this->assertInstanceOf(RecursiveCollection::class, $rec);
 		$this->assertFalse($rec->empty());
 		

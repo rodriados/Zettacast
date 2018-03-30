@@ -17,14 +17,21 @@ namespace Zettacast\Collection;
 class DotCollection extends RecursiveCollection
 {
 	/**
-	 * Depth-separator. This variable holds the symbol that indicates depth
+	 * Depth-separator. This property holds the symbol that indicates depth
 	 * when iterating over the data. It defaults to a single dot.
 	 * @var string Depth separator.
 	 */
 	protected $dot;
 	
 	/**
-	 * Dot constructor.
+	 * Key prefix. This property holds the prefix of this instance's keys. This
+	 * is only used when performing recursive actions.
+	 * @var string Key prefix.
+	 */
+	protected $prefix = null;
+	
+	/**
+	 * DotCollection constructor.
 	 * Sets given data as the data stored by collection and defines it's depth
 	 * separator indicator, which is usually a dot.
 	 * @param mixed $data Data to store.
@@ -48,7 +55,7 @@ class DotCollection extends RecursiveCollection
 		$node = &$this->data;
 		
 		foreach($dot as $segment) {
-			if(!listable($node) || !isset($node[$segment]))
+			if(!iterable($node) || !isset($node[$segment]))
 				return $default;
 			
 			$node instanceof Collection
@@ -70,7 +77,7 @@ class DotCollection extends RecursiveCollection
 		$node = &$this->data;
 		
 		foreach($dot as $segment) {
-			if(!listable($node) || !isset($node[$segment]))
+			if(!iterable($node) || !isset($node[$segment]))
 				return false;
 			
 			$node instanceof Collection
@@ -93,7 +100,7 @@ class DotCollection extends RecursiveCollection
 		$node = &$this->data;
 		
 		foreach($dot as $segment) {
-			if(!isset($node[$segment]) || !listable($node[$segment]))
+			if(!isset($node[$segment]) || !iterable($node[$segment]))
 				$node[$segment] = [];
 			
 			$node instanceof Collection
@@ -115,7 +122,7 @@ class DotCollection extends RecursiveCollection
 		$node = &$this->data;
 		
 		foreach($dot as $segment) {
-			if(!listable($node) or !isset($node[$segment]))
+			if(!iterable($node) or !isset($node[$segment]))
 				return;
 			
 			$node instanceof Collection
@@ -127,6 +134,24 @@ class DotCollection extends RecursiveCollection
 	}
 	
 	/**
+	 * Applies a callback to all values stored in collection.
+	 * @param callable $fn Callback to apply. Parameters: value, key.
+	 * @param mixed $userdata Optional extra parameters for function.
+	 * @return static The current collection for method chaining.
+	 */
+	public function apply(callable $fn, $userdata = null)
+	{
+		$userdata = toarray($userdata);
+		
+		foreach($this->iterate() as $key => $value)
+			$this->data[$key] = iterable($value)
+				? $this->new($value, $key)->apply($fn, ...$userdata)
+				: $fn($value, $this->prefix($key), ...$userdata);
+		
+		return $this;
+	}
+	
+	/**
 	 * Filters elements according to given test. If no test function is given,
 	 * it fallbacks to removing all false equivalent values.
 	 * @param callable $fn Test function. Parameters: value, key.
@@ -134,19 +159,30 @@ class DotCollection extends RecursiveCollection
 	 */
 	public function filter(callable $fn = null)
 	{
-		static $scope = [];
 		$fn = $fn ?? 'with';
 		
-		foreach($this->data as $key => $value) {
-			array_push($scope, $key);
-			
-			if($fn($value, implode($this->dot, $scope)))
-				$result[$key] = listable($value)
-					? $this->new($value)->filter($fn)
+		foreach($this->iterate() as $key => $value)
+			if($fn($value, $this->prefix($key)))
+				$result[$key] = iterable($value)
+					? $this->new($value, $key)->filter($fn)
 					: $value;
-			
-			array_pop($scope);
-		}
+		
+		return $this->new($result ?? []);
+	}
+	
+	/**
+	 * Creates a new collection, the same type as the original, by using a
+	 * function for creating the new elements based on the older ones. The
+	 * callback receives the following parameters respectively: value, key.
+	 * @param callable $fn Function to use for creating new elements.
+	 * @return static New collection instance.
+	 */
+	public function map(callable $fn)
+	{
+		foreach($this->iterate() as $key => $value)
+			$result[$key] = iterable($value)
+				? $this->new($value, $key)->map($fn)
+				: $fn($value, $this->prefix($key));
 		
 		return $this->new($result ?? []);
 	}
@@ -155,11 +191,11 @@ class DotCollection extends RecursiveCollection
 	 * Plucks an array of values from collection.
 	 * @param string|array $value Requested keys to pluck.
 	 * @param string|array $key Keys to index plucked array.
-	 * @return Collection The plucked values.
+	 * @return static The plucked values.
 	 */
-	public function pluck($value, $key = null): Collection
+	public function pluck($value, $key = null)
 	{
-		foreach($this->data as $item) {
+		foreach($this->iterate() as $item) {
 			$ref = self::ref($item, $this);
 			
 			is_null($key) || !($keyvalue = $ref->get($key))
@@ -167,18 +203,53 @@ class DotCollection extends RecursiveCollection
 				: ($result[$keyvalue] = $ref->get($value));
 		}
 		
-		return new Collection($result ?? []);
+		return $this->new($result ?? []);
+	}
+	
+	/**
+	 * Iterates over collection and executes a function over every element.
+	 * @param callable $fn Iteration function. Parameters: value, key.
+	 * @param mixed $userdata Optional extra parameters for function.
+	 * @return static Collection for method chaining.
+	 */
+	public function walk(callable $fn, $userdata = null)
+	{
+		$userdata = toarray($userdata);
+		
+		foreach($this->iterate() as $key => $value)
+			iterable($value)
+				? $this->new($value, $key)->walk($fn, ...$userdata)
+				: $fn($value, $this->prefix($key), ...$userdata);
+		
+		return $this;
 	}
 	
 	/**
 	 * Creates a new instance of class based on an already existing instance.
 	 * @param mixed $target Data to feed into the new instance.
+	 * @param string $prefix New prefix to append to new instance.
 	 * @return static The new instance.
 	 */
-	protected function new($target = [])
+	protected function new($target = [], string $prefix = null)
 	{
 		$obj = new static($target, $this->dot);
+		$obj->prefix = $this->prefix && $prefix
+			? $this->prefix.$this->dot.$prefix
+			: ($prefix ?: $this->prefix);
+		
 		return $obj;
+	}
+	
+	/**
+	 * Applies the current prefix, if any, to the given key.
+	 * @param string $key Key to prefix.
+	 * @return string The prefixed key.
+	 */
+	protected function prefix(string $key): string
+	{
+		return $this->prefix
+			? $this->prefix.$this->dot.$key
+			: $key;
 	}
 	
 	/**

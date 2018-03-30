@@ -8,10 +8,10 @@
  */
 namespace Zettacast\Collection;
 
-use Zettacast\Helper\ListableInterface;
-use Zettacast\Helper\StorageInterface;
+use Zettacast\Support\IterableInterface;
+use Zettacast\Support\StorageInterface;
 
-interface CollectionInterface extends ListableInterface, StorageInterface
+interface CollectionInterface extends IterableInterface, StorageInterface
 {
 	/**
 	 * Retrieves an element stored in object.

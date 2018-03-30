@@ -8,7 +8,7 @@
  */
 namespace Zettacast\Stream;
 
-use Zettacast\Helper\ExtractableInterface;
+use Zettacast\Support\ExposableInterface;
 
 /**
  * This class handles interactions to a stream contexts. It also allows the
@@ -16,7 +16,7 @@ use Zettacast\Helper\ExtractableInterface;
  * @package Zettacast\Stream
  * @version 1.0
  */
-class StreamContext implements ExtractableInterface
+class StreamContext implements ExposableInterface
 {
 	/**
 	 * The resource encapsulated by this object. It can be both a stream or a

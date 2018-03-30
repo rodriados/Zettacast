@@ -8,8 +8,8 @@
  */
 namespace Zettacast\Collection;
 
-use Zettacast\Helper\ArrayAccessTrait;
-use Zettacast\Helper\ObjectAccessTrait;
+use Zettacast\Support\ArrayAccessTrait;
+use Zettacast\Support\ObjectAccessTrait;
 
 /**
  * The collection class. This class has methods appliable for all kinds of
@@ -86,6 +86,15 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
+	 * Returns all data stored in collection.
+	 * @return array All data stored in collection.
+	 */
+	public function raw(): array
+	{
+		return toarray($this->data);
+	}
+	
+	/**
 	 * Adds a group of elements to collection.
 	 * @param iterable $values Values to add to collection.
 	 */
@@ -96,19 +105,10 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Returns all data stored in collection.
-	 * @return array All data stored in collection.
-	 */
-	public function raw(): array
-	{
-		return toarray($this->data);
-	}
-	
-	/**
 	 * Applies a callback to all values stored in collection.
 	 * @param callable $fn Callback to apply. Parameters: value, key.
 	 * @param mixed $userdata Optional extra parameters for function.
-	 * @return static Collection for method chaining.
+	 * @return static The current collection for method chaining.
 	 */
 	public function apply(callable $fn, $userdata = null)
 	{
@@ -123,17 +123,17 @@ class Collection implements CollectionInterface, \ArrayAccess
 	/**
 	 * Chunks the collection into pieces of given size.
 	 * @param int $size Size of chunks.
-	 * @return static[] Array of collection of chunks.
+	 * @return static Collection of chunked collections.
 	 */
-	public function chunk(int $size): array
+	public function chunk(int $size)
 	{
 		if($size <= 0)
-			return [];
+			return $this->new();
 		
 		foreach(array_chunk($this->data, $size, true) as $collection)
 			$chunk[] = $this->new($collection);
 		
-		return $chunk ?? [];
+		return $this->new($chunk ?? []);
 	}
 	
 	/**
@@ -180,11 +180,11 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Divide collection's keys and values into two collections.
-	 * @return array Array of collections of keys and values.
+	 * @return static Collection of keys and values.
 	 */
-	public function divide(): array
+	public function divide()
 	{
-		return [$this->keys(), $this->values()];
+		return $this->new([$this->keys(), $this->values()]);
 	}
 	
 	/**
@@ -270,11 +270,11 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Returns all element keys currently present in collection.
-	 * @return self Collection of this collection element's keys.
+	 * @return static Collection of this collection element's keys.
 	 */
-	public function keys(): Collection
+	public function keys()
 	{
-		return new self(array_keys($this->data));
+		return $this->new(array_keys($this->data));
 	}
 	
 	/**
@@ -368,8 +368,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 		if($sample >= $this->count())
 			return $this->shuffle();
 		
-		$keys = array_rand($this->data, $sample);
-		return $this->only($keys);
+		return $this->only(array_rand($this->data, $sample));
 	}
 	
 	/**
@@ -384,7 +383,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Replaces collection according to given data.
+	 * Replaces collection's items according to given data.
 	 * @param iterable $items Items to replace in collection.
 	 * @return static Collection with replaced data.
 	 */
@@ -394,8 +393,8 @@ class Collection implements CollectionInterface, \ArrayAccess
 	}
 	
 	/**
-	 * Set the internal pointer of the collection to its first element.
-	 * @return mixed First element in collection.
+	 * Sets the internal pointer of the collection to its initial element.
+	 * @return mixed Initial element in collection.
 	 */
 	public function rewind()
 	{
@@ -426,22 +425,22 @@ class Collection implements CollectionInterface, \ArrayAccess
 	 */
 	public function shuffle()
 	{
-		$data = $this->data;
-		shuffle($data);
+		$copy = clone $this;
+		shuffle($copy->data);
 		
-		return $this->new($data);
+		return $copy;
 	}
 	
 	/**
 	 * Splits collection into given number of groups.
 	 * @param int $count Number of groups to split the collection.
-	 * @return array Splitted collection.
+	 * @return static Collection of splitted collections.
 	 */
-	public function split(int $count): array
+	public function split(int $count)
 	{
 		return !$this->empty()
 			? $this->chunk(ceil($this->count() / (float)$count))
-			: [];
+			: $this->new();
 	}
 	
 	/**
@@ -485,18 +484,18 @@ class Collection implements CollectionInterface, \ArrayAccess
 	
 	/**
 	 * Returns all element values currently present in collection.
-	 * @return self Collection of this collection element's values.
+	 * @return static Collection of this collection element's values.
 	 */
-	public function values(): Collection
+	public function values()
 	{
-		return new self(array_values($this->data));
+		return $this->new(array_values($this->data));
 	}
 	
 	/**
 	 * Iterates over collection and executes a function over every element.
 	 * @param callable $fn Iteration function. Parameters: value, key.
 	 * @param mixed $userdata Optional extra parameters for function.
-	 * @return static Collection for method chaining.
+	 * @return static The current collection for method chaining.
 	 */
 	public function walk(callable $fn, $userdata = null)
 	{
@@ -511,7 +510,7 @@ class Collection implements CollectionInterface, \ArrayAccess
 	/**
 	 * Zips collection together with one or more arrays.
 	 * @param iterable[] $items Items to zip collection with.
-	 * @return static Array of zipped collections.
+	 * @return static Collection of zipped collections.
 	 */
 	public function zip(iterable ...$items)
 	{

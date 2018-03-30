@@ -11,8 +11,8 @@ return [
 	# Autoload module
 	['autoload', 'Zettacast\Autoload\Autoload'],
 	
-	# Miscellaneous objects
-	['config', 'Zettacast\Support\Config'],
+	# Config module
+	['config', 'Zettacast\Config\Config'],
 	
 	# Injector module
 	['injector', 'Zettacast\Injector\InjectorInterface'],

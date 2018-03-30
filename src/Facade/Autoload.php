@@ -48,14 +48,14 @@ final class Autoload extends Facade
 	
 	/**
 	 * Registers a new alias. Checks if a list of a aliases was given.
-	 * @param string|array|\Traversable $alias Alias name or a map of aliases.
+	 * @param mixed $alias Alias name or a map of aliases.
 	 * @param string $target Original name alias refers to.
 	 */
 	public static function alias($alias, string $target = null): void
 	{
 		$i = self::i();
 		
-		if(!listable($alias))
+		if(!iterable($alias))
 			$alias = [$alias => $target];
 		
 		foreach($alias as $name => $target)

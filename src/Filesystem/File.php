@@ -21,11 +21,11 @@ class File extends Stream
 	/**
 	 * File constructor.
 	 * Opens file and sets it up for usage.
-	 * @param string $filename File to open.
+	 * @param mixed $filename File to open.
 	 * @param string $mode Access mode for opening file.
 	 * @throws FilesystemException File could not be found.
 	 */
-	public function __construct(string $filename, string $mode = 'r')
+	public function __construct($filename, string $mode = 'rb')
 	{
 		try {
 			parent::__construct($filename, $mode);

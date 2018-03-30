@@ -10,7 +10,7 @@ namespace Zettacast;
 
 use Zettacast\Injector\Binder;
 use Zettacast\Injector\Injector;
-use Zettacast\Helper\SingletonTrait;
+use Zettacast\Support\SingletonTrait;
 
 /**
  * The Zettacast class boots the framework and starts its main classes and

@@ -8,7 +8,7 @@
  */
 namespace Zettacast\Injector;
 
-use Zettacast\Helper\StorageInterface;
+use Zettacast\Support\StorageInterface;
 
 interface InjectorInterface extends StorageInterface, BinderInterface
 {
