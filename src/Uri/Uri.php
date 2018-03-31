@@ -35,9 +35,9 @@ class Uri implements UriInterface
 	protected const RGX = [
 		'scheme'   => '[a-z][a-z0-9.+-]*',
 		'userinfo' => '[^@]*',
-		'host'     => '(?:[^\[\]:/?#]*|\[[0-9a-fv:.]+\])',
+		'host'     => '(?:\[[0-9a-fv:.]+\]|[^\[\]:/?#]*)',
 		'port'     => '[0-9]*',
-		'path'     => '(?:/|/?[^/?#]+(?:/[^/?#]*)*)',
+		'path'     => '(?!//)(?:[^/:?#]*(?:/[^/?#]*)*)',
 		'query'    => '[^#]*',
 		'fragment' => '.*'
 	];
