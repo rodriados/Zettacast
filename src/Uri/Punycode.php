@@ -32,6 +32,54 @@ class Punycode
 	];
 	
 	/**
+	 * Converts a unicode string representing a domain name or an email address
+	 * to Punycode. Only the non-ASCII parts will be converted.
+	 * @param string $input
+	 * @return string
+	 */
+	public static function toascii(string $input): string
+	{
+		$parts = explode('@', $input);
+		$prefix = null;
+		
+		if(count($parts) > 1) {
+			$prefix = $parts[0].'@';
+			$input = $parts[1];
+		}
+		
+		foreach(explode('.', $input) as $part)
+			$encoded[] = preg_match('~[^\x00-\x7f]~', $part)
+				? 'xn--'.self::encode($part)
+				: $part;
+			
+		return $prefix.implode('.', $encoded ?? []);
+	}
+	
+	/**
+	 * Converts a Punycode string representing a domain name or an email
+	 * address to Unicode. Only the Punycoded parts will be converted.
+	 * @param string $input The Punycode string to convert.
+	 * @return string The resulting converted string.
+	 */
+	public static function tounicode(string $input): string
+	{
+		$parts = explode('@', $input);
+		$prefix = null;
+		
+		if(count($parts) > 1) {
+			$prefix = $parts[0].'@';
+			$input = $parts[1];
+		}
+		
+		foreach(explode('.', $input) as $part)
+			$encoded[] = preg_match('~^xn--~', $part)
+				? self::decode(substr($part, 4))
+				: $part;
+		
+		return $prefix.implode('.', $encoded ?? []);
+	}
+	
+	/**
 	 * Converts a string of Unicode symbols to a string of ASCII-only symbols.
 	 * @param string $input The string of Unicode symbols.
 	 * @return string The resulting Punycode string of ASCII-only symbols.

@@ -294,6 +294,34 @@ class Uri implements UriInterface
 	}
 	
 	/**
+	 * Converts the URI host from Punycode to its unicode representation.
+	 * @return UriInterface The decoded URI.
+	 */
+	public function punydecode(): UriInterface
+	{
+		$clone = clone $this;
+		$clone->host = $this->host
+			? Punycode::tounicode($this->host)
+			: null;
+		
+		return $clone;
+	}
+	
+	/**
+	 * Converts the URI host from unicode to its Punycode representation.
+	 * @return UriInterface The encoded URI.
+	 */
+	public function punyencode(): UriInterface
+	{
+		$clone = clone $this;
+		$clone->host = $this->host
+			? Punycode::toascii($this->host)
+			: null;
+		
+		return $clone;
+	}
+	
+	/**
 	 * Initializes the object's properties based on a given URI array data.
 	 * @param array $data Data to be inserted into the object.
 	 * @throws UriException A component in given data is invalid.
