@@ -14,10 +14,10 @@ use PHPUnit\Framework\TestCase;
 
 final class UriTest extends TestCase
 {
-	public function validUriProvider()
+	public function validUriProvider(): array
 	{
 		return [
-			'complete URI' => [
+			'complete uri' => [
 				'scheme://user:pass@host:81/path?query#fragment',
 				[
 					'scheme' => 'scheme',
@@ -29,7 +29,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI is not normalized' => [
+			'uri not normalized' => [
 				'ScheMe://user:pass@HoSt:81/path?query#fragment',
 				[
 					'scheme' => 'ScheMe',
@@ -41,7 +41,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI without scheme' => [
+			'uri no scheme' => [
 				'//user:pass@HoSt:81/path?query#fragment',
 				[
 					'scheme' => null,
@@ -53,7 +53,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI without userinfo' => [
+			'uri no userinfo' => [
 				'scheme://HoSt:81/path?query#fragment',
 				[
 					'scheme' => 'scheme',
@@ -65,7 +65,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI with empty userinfo' => [
+			'uri empty userinfo' => [
 				'scheme://@HoSt:81/path?query#fragment',
 				[
 					'scheme' => 'scheme',
@@ -77,7 +77,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI without port' => [
+			'uri no port' => [
 				'scheme://user:pass@host/path?query#fragment',
 				[
 					'scheme' => 'scheme',
@@ -89,7 +89,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI with an empty port' => [
+			'uri empty port' => [
 				'scheme://user:pass@host:/path?query#fragment',
 				[
 					'scheme' => 'scheme',
@@ -101,7 +101,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI without user info and port' => [
+			'uri no user info and port' => [
 				'scheme://host/path?query#fragment',
 				[
 					'scheme' => 'scheme',
@@ -113,7 +113,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI with host IP' => [
+			'uri host ip' => [
 				'scheme://10.0.0.2/p?q#f',
 				[
 					'scheme' => 'scheme',
@@ -125,7 +125,7 @@ final class UriTest extends TestCase
 					'fragment' => 'f',
 				],
 			],
-			'URI with IP future' => [
+			'uri ip future' => [
 				'scheme://[vAF.1::2::3]/p?q#f',
 				[
 					'scheme' => 'scheme',
@@ -137,7 +137,7 @@ final class UriTest extends TestCase
 					'fragment' => 'f',
 				],
 			],
-			'URI without authority' => [
+			'uri no authority (1)' => [
 				'scheme:path?query#fragment',
 				[
 					'scheme' => 'scheme',
@@ -149,7 +149,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI without authority and scheme' => [
+			'uri no authority and scheme' => [
 				'/path',
 				[
 					'scheme' => null,
@@ -161,7 +161,7 @@ final class UriTest extends TestCase
 					'fragment' => null,
 				],
 			],
-			'URI with empty host' => [
+			'uri empty host' => [
 				'scheme:///path?query#fragment',
 				[
 					'scheme' => 'scheme',
@@ -173,7 +173,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI with empty host and without scheme' => [
+			'uri empty host and no scheme' => [
 				'///path?query#fragment',
 				[
 					'scheme' => null,
@@ -185,7 +185,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI without path' => [
+			'uri no path' => [
 				'scheme://[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]?query#fragment',
 				[
 					'scheme' => 'scheme',
@@ -197,7 +197,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI without path and scheme' => [
+			'uri no path and scheme' => [
 				'//[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]?query#fragment',
 				[
 					'scheme' => null,
@@ -209,7 +209,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI without scheme with IPv6 host and port' => [
+			'uri not scheme ipv6 host and port' => [
 				'//[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:42?query#fragment',
 				[
 					'scheme' => null,
@@ -221,7 +221,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'complete URI without scheme' => [
+			'complete uri no scheme' => [
 				'//user@[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:42?q#f',
 				[
 					'scheme' => null,
@@ -233,7 +233,7 @@ final class UriTest extends TestCase
 					'fragment' => 'f',
 				],
 			],
-			'URI without authority and query' => [
+			'uri no authority and query' => [
 				'scheme:path#fragment',
 				[
 					'scheme' => 'scheme',
@@ -245,7 +245,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI with empty query' => [
+			'uri empty query' => [
 				'scheme:path?#fragment',
 				[
 					'scheme' => 'scheme',
@@ -257,7 +257,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI with query only' => [
+			'uri query only' => [
 				'?query',
 				[
 					'scheme' => null,
@@ -269,7 +269,7 @@ final class UriTest extends TestCase
 					'fragment' => null,
 				],
 			],
-			'URI without fragment' => [
+			'uri no fragment' => [
 				'tel:05000',
 				[
 					'scheme' => 'tel',
@@ -293,7 +293,7 @@ final class UriTest extends TestCase
 					'fragment' => '',
 				],
 			],
-			'URI with fragment only' => [
+			'uri fragment only' => [
 				'#fragment',
 				[
 					'scheme' => null,
@@ -305,7 +305,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI with empty fragment only' => [
+			'uri empty fragment only' => [
 				'#',
 				[
 					'scheme' => null,
@@ -317,7 +317,7 @@ final class UriTest extends TestCase
 					'fragment' => '',
 				],
 			],
-			'URI without authority 2' => [
+			'uri no authority (2)' => [
 				'path#fragment',
 				[
 					'scheme' => null,
@@ -329,7 +329,7 @@ final class UriTest extends TestCase
 					'fragment' => 'fragment',
 				],
 			],
-			'URI with empty query and fragment' => [
+			'uri empty query and fragment' => [
 				'?#',
 				[
 					'scheme' => null,
@@ -341,7 +341,7 @@ final class UriTest extends TestCase
 					'fragment' => '',
 				],
 			],
-			'URI with absolute path' => [
+			'uri absolute path' => [
 				'/?#',
 				[
 					'scheme' => null,
@@ -353,7 +353,7 @@ final class UriTest extends TestCase
 					'fragment' => '',
 				],
 			],
-			'URI with absolute authority' => [
+			'uri absolute authority' => [
 				'https://thephpleague.com./p?#f',
 				[
 					'scheme' => 'https',
@@ -365,7 +365,7 @@ final class UriTest extends TestCase
 					'fragment' => 'f',
 				],
 			],
-			'URI with absolute path only' => [
+			'uri absolute path only' => [
 				'/',
 				[
 					'scheme' => null,
@@ -377,7 +377,7 @@ final class UriTest extends TestCase
 					'fragment' => null,
 				],
 			],
-			'URI with empty query only' => [
+			'uri empty query only' => [
 				'?',
 				[
 					'scheme' => null,
@@ -413,7 +413,7 @@ final class UriTest extends TestCase
 					'fragment' => null,
 				],
 			],
-			'complex authority without scheme' => [
+			'complex authority no scheme' => [
 				'//a_.!~*\'(-)n0123Di%25%26:pass;:&=+$,word@www.zend.com',
 				[
 					'scheme' => null,
@@ -425,7 +425,7 @@ final class UriTest extends TestCase
 					'fragment' => null,
 				],
 			],
-			'single word is a path' => [
+			'single word' => [
 				'http',
 				[
 					'scheme' => null,
@@ -437,7 +437,7 @@ final class UriTest extends TestCase
 					'fragment' => null,
 				],
 			],
-			'fragment with pseudo segment' => [
+			'fragment pseudo segment' => [
 				'http://example.com#foo=1/bar=2',
 				[
 					'scheme' => 'http',
@@ -461,7 +461,7 @@ final class UriTest extends TestCase
 					'fragment' => null,
 				],
 			],
-			'complex URI' => [
+			'complex uri' => [
 				'htà+d/s:totot',
 				[
 					'scheme' => null,
@@ -473,7 +473,7 @@ final class UriTest extends TestCase
 					'fragment' => null,
 				],
 			],
-			'RFC3986 LDAP example' => [
+			'rfc3986 ldap' => [
 				'ldap://[2001:db8::7]/c=GB?objectClass?one',
 				[
 					'scheme' => 'ldap',
@@ -485,7 +485,7 @@ final class UriTest extends TestCase
 					'fragment' => null,
 				],
 			],
-			'RFC3987 example' => [
+			'rfc3987' => [
 				'http://bébé.bé./有词法别名.zh',
 				[
 					'scheme' => 'http',
@@ -497,7 +497,7 @@ final class UriTest extends TestCase
 					'fragment' => null,
 				],
 			],
-			'colon detection respect RFC3986 (1)' => [
+			'rfc3986 (1)' => [
 				'http://example.org/hello:12?foo=bar#test',
 				[
 					'scheme' => 'http',
@@ -509,7 +509,7 @@ final class UriTest extends TestCase
 					'fragment' => 'test',
 				],
 			],
-			'colon detection respect RFC3986 (2)' => [
+			'rfc3986 (2)' => [
 				'/path/to/colon:34',
 				[
 					'scheme' => null,
@@ -521,7 +521,7 @@ final class UriTest extends TestCase
 					'fragment' => null,
 				],
 			],
-			'scheme with hyphen' => [
+			'scheme hyphen' => [
 				'android-app://org.wikipedia/http/en.m.wikipedia.org/wiki/The_Hitchhiker%27s_Guide_to_the_Galaxy',
 				[
 					'scheme' => 'android-app',
@@ -619,6 +619,15 @@ final class UriTest extends TestCase
 		];
 	}
 	
+	public function segmentsUriProvider(): array
+	{
+		return [
+			'segments (1)' => ['/absolute/path', ['', 'absolute', 'path']],
+			'segments (2)' => ['relative/path', ['relative', 'path']],
+			'segments (3)' => ['/a/b/c/d', ['', 'a', 'b', 'c', 'd']],
+		];
+	}
+	
 	/**
 	 * @dataProvider validUriProvider
 	 * @param string $uri
@@ -626,16 +635,16 @@ final class UriTest extends TestCase
 	 */
 	public function testValidUri(string $uri, array $data)
 	{
-		$uri = new Uri($uri);
-		$this->assertInstanceOf(Uri::class, $uri);
-		$this->assertEquals($uri->scheme(), $data['scheme']);
-		$this->assertEquals($uri->userinfo(), $data['userinfo']);
-		$this->assertEquals($uri->host(), $data['host']);
-		$this->assertEquals($uri->port(), $data['port']);
-		$this->assertEquals($uri->path(), $data['path']);
-		$this->assertEquals($uri->querystr(), $data['query']);
-		$this->assertEquals($uri->fragment(), $data['fragment']);
-		$this->assertEquals((string)$uri, $uri);
+		$u = new Uri($uri);
+		$this->assertInstanceOf(Uri::class, $u);
+		$this->assertEquals($u->scheme(), $data['scheme']);
+		$this->assertEquals($u->userinfo(), $data['userinfo']);
+		$this->assertEquals($u->host(), $data['host']);
+		$this->assertEquals($u->port(), $data['port']);
+		$this->assertEquals($u->path(), $data['path']);
+		$this->assertEquals($u->querystr(), $data['query']);
+		$this->assertEquals($u->fragment(), $data['fragment']);
+		$this->assertEquals((string)$u, $u);
 	}
 	
 	/**
@@ -670,13 +679,18 @@ final class UriTest extends TestCase
 		new Uri($uri);
 	}
 	
-	public function testSegments()
+	/**
+	 * @dataProvider segmentsUriProvider
+	 * @param string $uri
+	 * @param array $segments
+	 */
+	public function testSegments(string $uri, array $segments)
 	{
-		$uri = new Uri('/absolute/path/is/de/wae');
-		$this->assertEquals($uri->segment(1), 'absolute');
-		$this->assertEquals($uri->segment(2), 'path');
-		$this->assertEquals($uri->segment(3), 'is');
-		$this->assertEquals($uri->segment(4), 'de');
-		$this->assertEquals($uri->segment(5), 'wae');
+		$u = new Uri($uri);
+		
+		foreach($segments as $id => $expected)
+			$this->assertEquals($expected, $u->segment($id));
+		
+		$this->assertEquals($uri, $u->path());
 	}
 }

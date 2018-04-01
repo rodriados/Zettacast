@@ -211,7 +211,7 @@ class Punycode
 			
 			$n += floor($j / $outl);
 			$j %= $outl;
-			array_splice($output, $j++, 0, $n);
+			array_splice($output, $j++, 0, (int)$n);
 		}
 		
 		return self::ucs2encode($output);
@@ -316,6 +316,8 @@ class Punycode
 	 */
 	final private static function ucs2encode(array $input): string
 	{
+		static $masks = [0xffffffc0, 0xffffffe0, 0xfffffff0, 0xfffffff8];
+		
 		$length = count($input);
 		$output = [];
 		
@@ -325,7 +327,7 @@ class Punycode
 				continue;
 			}
 			
-			for($j = 0; $input[$i] > 0x80; ++$j) {
+			for($j = 0; $input[$i] & $masks[$j]; ++$j) {
 				$output[] = chr(($input[$i] & 0x3f) | 0x80);
 				$input[$i] = $input[$i] >> 6;
 			}

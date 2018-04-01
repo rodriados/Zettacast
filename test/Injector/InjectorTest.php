@@ -18,80 +18,89 @@ final class InjectorTest extends TestCase
 {
 	public function testCanInstantiate()
 	{
-		$injector = new Injector;
-		$this->assertInstanceOf(Injector::class, $injector);
+		$i = new Injector;
+		$this->assertInstanceOf(Injector::class, $i);
 		$this->assertInstanceOf(Injector::class, zetta());
+		$this->assertInstanceOf(Injector::class, zetta('injector'));
 	}
 	
 	public function testCannotInstantiate()
 	{
+		$i = new Injector;
+
 		$this->expectException(InjectorException::class);
-		zetta(DInterface::class);
+		$i->make(DInterface::class);
 	}
 	
 	public function testCanBind()
 	{
-		zetta()->bind(AInterface::class, A::class);
-		zetta()->bind(BInterface::class, B::class);
-		zetta()->bind(CInterface::class, C::class);
-		zetta()->bind(DInterface::class, D::class);
-		zetta()->bind('testA', AInterface::class);
-		zetta()->bind('testD', DInterface::class);
-		$this->assertInstanceOf(A::class, $a = zetta()->make('testA'));
-		$this->assertInstanceOf(C::class, zetta()->make(CInterface::class));
+		$i = new Injector;
+		$i->bind(AInterface::class, A::class);
+		$i->bind(BInterface::class, B::class);
+		$i->bind(CInterface::class, C::class);
+		$i->bind(DInterface::class, D::class);
+		$i->bind('testA', AInterface::class);
+		$i->bind('testD', DInterface::class);
+		$this->assertInstanceOf(A::class, $a = $i->make('testA'));
+		$this->assertInstanceOf(C::class, $i->make(CInterface::class));
 		
-		zetta()->set(AInterface::class, $a);
-		$this->assertEquals(zetta()->make('testA'), $a);
+		$i->set(AInterface::class, $a);
+		$this->assertEquals($i->make('testA'), $a);
 		
-		zetta()->when(D::class)->bind(BInterface::class, C::class);
-		$this->assertInstanceOf(D::class, $d = zetta()->make('testD'));
+		$i->when(D::class)->bind(BInterface::class, C::class);
+		$this->assertInstanceOf(D::class, $d = $i->make('testD'));
 		$this->assertInstanceOf(C::class, $d->b);
 		
-		zetta()->when(D::class)->unbind(BInterface::class);
-		$this->assertInstanceOf(D::class, $d = zetta()->make('testD'));
+		$i->when(D::class)->unbind(BInterface::class);
+		$this->assertInstanceOf(D::class, $d = $i->make('testD'));
 		$this->assertInstanceOf(B::class, $d->b);
-		$this->assertTrue(zetta()->knows('testA'));
+		$this->assertTrue($i->knows('testA'));
 		
-		zetta()->del(AInterface::class);
-		$this->assertFalse(zetta()->has(AInterface::class));
+		$i->del(AInterface::class);
+		$this->assertFalse($i->has(AInterface::class));
 		
-		zetta()->drop('testD');
+		$i->drop('testD');
+		
 		$this->expectException(InjectorException::class);
-		zetta('testD');
+		$i->make('testD');
 	}
 	
 	public function testCanBindClosure()
 	{
-		zetta()->bind(AInterface::class, function() {
+		$i = new Injector;
+		
+		$i->bind(AInterface::class, function() {
 			return new A;
 		});
 		
-		zetta()->bind(BInterface::class, function() {
-			return zetta(B::class);
+		$i->bind(BInterface::class, function() use($i) {
+			return $i->make(B::class);
 		});
 		
-		zetta()->bind(CInterface::class, C::class);
-		zetta()->bind(DInterface::class, D::class);
+		$i->bind(CInterface::class, C::class);
+		$i->bind(DInterface::class, D::class);
 		
-		$this->assertInstanceOf(A::class, zetta(AInterface::class));
-		$this->assertInstanceOf(B::class, zetta(BInterface::class));
+		$this->assertInstanceOf(A::class, $i->make(AInterface::class));
+		$this->assertInstanceOf(B::class, $i->make(BInterface::class));
 	}
 	
 	public function testCanWrap()
 	{
-		zetta()->bind(AInterface::class, A::class);
-		zetta()->bind(BInterface::class, B::class);
-		zetta()->bind(CInterface::class, C::class);
-		zetta()->bind(DInterface::class, D::class);
+		$i = new Injector;
 		
-		$d = zetta()->factory(DInterface::class);
+		$i->bind(AInterface::class, A::class);
+		$i->bind(BInterface::class, B::class);
+		$i->bind(CInterface::class, C::class);
+		$i->bind(DInterface::class, D::class);
+		
+		$d = $i->factory(DInterface::class);
 		$this->assertInstanceOf(D::class, $d());
 		
-		$f = zetta()->wrap(__NAMESPACE__.'\\f');
+		$f = $i->wrap(__NAMESPACE__.'\\f');
 		$this->assertInstanceOf(D::class, $f());
-		$this->assertInstanceOf(D::class, zetta()->call(__NAMESPACE__.'\\f'));
+		$this->assertInstanceOf(D::class, $i->call(__NAMESPACE__.'\\f'));
 		
-		$f = zetta()->wrap([D::class, 'staticF']);
+		$f = $i->wrap([D::class, 'staticF']);
 		$r = $f([1089]);
 		$this->assertInstanceOf(A::class, $r[0]);
 		$this->assertEquals($r[1], 1089);
@@ -103,12 +112,14 @@ final class InjectorTest extends TestCase
 	
 	public function testCanWrapInstanceMethod()
 	{
-		zetta()->bind(AInterface::class, A::class);
-		zetta()->bind(BInterface::class, B::class);
-		zetta()->bind(CInterface::class, C::class);
-		zetta()->bind(DInterface::class, D::class);
+		$i = new Injector;
 		
-		$f = zetta()->wrap([zetta()->make(D::class), 'instanceF'], [57.48]);
+		$i->bind(AInterface::class, A::class);
+		$i->bind(BInterface::class, B::class);
+		$i->bind(CInterface::class, C::class);
+		$i->bind(DInterface::class, D::class);
+		
+		$f = $i->wrap([$i->make(D::class), 'instanceF'], [57.48]);
 		$r = $f();
 		$this->assertInstanceOf(A::class, $r[0]);
 		$this->assertEquals($r[1], 57.48);
@@ -117,12 +128,14 @@ final class InjectorTest extends TestCase
 	
 	public function testCanShareBoundInstance()
 	{
-		zetta()->bind(AInterface::class, A::class, true);
-		zetta()->bind(BInterface::class, B::class, true);
-		zetta()->bind(CInterface::class, C::class, true);
-		zetta()->bind(DInterface::class, D::class, true);
-		$i1 = zetta(DInterface::class);
-		$i2 = zetta(DInterface::class);
+		$i = new Injector;
+		
+		$i->bind(AInterface::class, A::class, true);
+		$i->bind(BInterface::class, B::class, true);
+		$i->bind(CInterface::class, C::class, true);
+		$i->bind(DInterface::class, D::class, true);
+		$i1 = $i->make(DInterface::class);
+		$i2 = $i->make(DInterface::class);
 		
 		$this->assertEquals(spl_object_hash($i1), spl_object_hash($i2));
 	}
