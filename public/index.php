@@ -73,3 +73,5 @@ require APPPATH.'/bootstrap.php';
 #$response->send();
 #$kernel->commit($request, $response);
 
+$uri = zetta('uri', ROOTPATH);
+var_dump($uri);

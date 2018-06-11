@@ -302,7 +302,7 @@ class Uri implements UriInterface
 		$clone = clone $this;
 		$clone->host = $this->host
 			? Punycode::tounicode($this->host)
-			: null;
+			: $this->host;
 		
 		return $clone;
 	}
@@ -316,7 +316,7 @@ class Uri implements UriInterface
 		$clone = clone $this;
 		$clone->host = $this->host
 			? Punycode::toascii($this->host)
-			: null;
+			: $this->host;
 		
 		return $clone;
 	}
