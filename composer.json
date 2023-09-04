@@ -1,8 +1,8 @@
 {
 	"name": "rodriados/zettacast",
-	"description": "Zettacast: A simple, fast and lightweight PHP Framework.",
+	"description": "A simple, fast and lightweight PHP dependency injection framework.",
 	"keywords": [
-		"framework", "http", "dependency injection", "DI"
+		"dependency injection", "DI"
 	],
 	"license": "MIT",
 	"author": [
@@ -12,7 +12,10 @@
 		}
 	],
 	"require": {
-		"php": ">=7.2.0"
+		"php": "^8.2"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^10.0"
 	},
 	"autoload": {
 		"psr-4": {
@@ -20,6 +23,6 @@
 		}
 	},
 	"archive": {
-		"exclude": ["/test", "/build", "/tmp"]
+		"exclude": ["/test"]
 	}
 }

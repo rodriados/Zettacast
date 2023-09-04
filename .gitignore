@@ -9,3 +9,4 @@ vendor/
 build/
 tmp/
 /.phpstorm.meta.php
+index.php
