@@ -12,22 +12,22 @@ use Exception;
 
 /**
  * The entry point to the Zettacast framework.
- * @version 1.0
+ * @since 1.0
  */
 final class Zettacast
 {
     /**
-     * Disallows the instantiation of the framework entry point.
+     * Disallows the instantiation of the framework entry point class.
      * @see Zettacast::createInjector
      */
     private function __construct() {}
 
     /**
      * Creates a new injector from the given set of modules.
-     * @return never The function is not yet implemented.
-     * @throws Exception The function is not yet implemented.
+     * @param ModuleInterface ...$modules The modules to start injector with.
+     * @return InjectorInterface The new injector instance.
      */
-    public static function createInjector(): never
+    public static function createInjector(ModuleInterface... $modules): InjectorInterface
     {
         throw new Exception("function not yet implemented!");
     }
