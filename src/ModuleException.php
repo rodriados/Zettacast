@@ -11,7 +11,7 @@ namespace Zettacast;
 use Throwable;
 
 /**
- * The exception type for all errors related to modules
+ * The exception type for all errors related to modules.
  * @since 1.0
  */
 class ModuleException extends ZettacastException
@@ -19,11 +19,11 @@ class ModuleException extends ZettacastException
     /**
      * Returns an exception for when a module re-entry happens.
      * @param Throwable|null $previous The parent exception instance.
-     * @return ModuleException The new module exception instance.
+     * @return static The new module exception instance.
      */
-    public static function reentryIsNotAllowed(?Throwable $previous = null): ModuleException
+    public static function reentryIsNotAllowed(?Throwable $previous = null): static
     {
-        return new ModuleException(
+        return new static(
             message: "Re-entry to modules is not allowed."
           , previous: $previous
         );

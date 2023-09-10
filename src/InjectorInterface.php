@@ -8,8 +8,6 @@
  */
 namespace Zettacast;
 
-use Closure;
-
 /**
  * Builds the graphs of objects that make up your application. The injector tracks
  * the dependencies for each type and uses bindings to inject them.
@@ -26,43 +24,21 @@ interface InjectorInterface
     public function injectMembers(object $instance): void;
 
     /**
-     * Returns this injector's named bindings. These bindings are either created
-     * manually by the user or discovered automatically the framework. It is not
-     * guaranteed that all bindings in the whole application will ever be present
-     * in the returned value, but only those bound explicitly by a module.
-     * @return array The injector's bindings.
+     * Returns a type provider for the given type literal with a map of possible
+     * named parameters to be overriden or used with specific values or instances.
+     * @param string $type The type to get a provider for.
+     * @param array $params The list of provider overridden parameters.
+     * @return ProviderInterface A new type provider.
      */
-    public function getBindings(): array;
-
-    /**
-     * Returns a type factory for the given type literal with a map of possible named
-     * parameters to be overriden or used with scalar values.
-     * @param string $type The type to get a factory for.
-     * @param array $params The list of factory overridden parameters.
-     * @return Closure A new type factory.
-     */
-    public function getFactory(string $type, array $params = []): Closure;
+    public function getProvider(string $type, array $params = []): ProviderInterface;
 
     /**
      * Returns the appropriate instance for the given injection type. When possible,
      * avoid using this method directly, in favor of having your dependencies injected
      * automatically by the framework ahead of time.
      * @param string $type The type to be instantiated.
-     * @return mixed The synthetized instance.
+     * @param array $params The list of parameters to override.
+     * @return object The synthetized object instance.
      */
-    public function getInstance(string $type): mixed;
-
-    /**
-     * Returns the injector's parent, if any is known.
-     * @return InjectorInterface|null The parent injector if any.
-     */
-    public function getParent(): ?InjectorInterface;
-
-    /**
-     * Returns a new injector that inherits all state from this injector. All bindings,
-     * scopes and interceptors are inherited and visible to the child injector.
-     * @param ModuleInterface ...$modules The modules to start child injector with.
-     * @return InjectorInterface The new child injector instance.
-     */
-    public function createChildInjector(ModuleInterface... $modules): InjectorInterface;
+    public function getInstance(string $type, array $params = []): object;
 }

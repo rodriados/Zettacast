@@ -8,7 +8,7 @@
  */
 namespace Zettacast;
 
-use Exception;
+use Zettacast\Internal\DefaultInjector;
 
 /**
  * The entry point to the Zettacast framework.
@@ -24,11 +24,11 @@ final class Zettacast
 
     /**
      * Creates a new injector from the given set of modules.
-     * @param ModuleInterface ...$modules The modules to start injector with.
+     * @param ModuleInterface[] $modules The modules to create a new injector with.
      * @return InjectorInterface The new injector instance.
      */
     public static function createInjector(ModuleInterface... $modules): InjectorInterface
     {
-        throw new Exception("function not yet implemented!");
+        return DefaultInjector::fromModules(...$modules);
     }
 }
